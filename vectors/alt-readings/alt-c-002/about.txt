@@ -1,0 +1,1 @@
+Reading C. The chain lost seq 4, so only 5 records exist up to seq 6 while cp-2 claims 6 accepted. Counters balance on their own, so the primary reading passes; Reading C ties them to the chain and fails with proposed T14A-CHAIN.

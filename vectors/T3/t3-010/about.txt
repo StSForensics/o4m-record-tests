@@ -1,0 +1,1 @@
+Tampering with the data of event 3 while leaving its stored hash unchanged. Recomputation does not match (T3-HASH). Links still match the stored hashes, so only T3-HASH fires. Expected FAIL.

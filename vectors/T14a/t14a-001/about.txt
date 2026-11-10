@@ -1,0 +1,1 @@
+One checkpoint, received 100, accepted 100, dropped 0, fail-closed. Counters balance. The PASS carries the SOURCE-LOCAL line: it is arithmetic on numbers the capture point produced. Expected PASS.

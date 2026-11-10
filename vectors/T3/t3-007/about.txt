@@ -1,0 +1,1 @@
+Reorder attack: the seq values of events 3 and 4 are swapped without recomputing anything. Both moved records fail hash recomputation (T3-HASH, seq is inside the hash) and the links at seq 3, 4 and 5 no longer match their predecessors (T3-LINK). Expected FAIL.

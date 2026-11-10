@@ -1,0 +1,1 @@
+Added after the mutation run (mutant M-T14-06, tolerate an imbalance of 1, survived without it). Received 100, accepted 99, dropped 0: one record lost without being counted. The declared maximum gap is 0, so a loss of one is a FAIL. Expected FAIL.

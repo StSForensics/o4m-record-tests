@@ -1,0 +1,3 @@
+command: python verify.py T3 vectors/T3/t3-009/input.json
+intended result: FAIL
+intended reason codes: T3-FORK, T3-TAIL

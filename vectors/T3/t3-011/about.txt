@@ -1,0 +1,1 @@
+Tampering with event 3 and recomputing that record's hash, but not the records after it. Event 3 now verifies on its own, but seq 4 points at the old hash (T3-LINK). Expected FAIL.

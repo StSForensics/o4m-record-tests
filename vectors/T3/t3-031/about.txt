@@ -1,0 +1,1 @@
+Added 10 Nov 2026 (package 2026-11-10). A valid stream plus one element nested 14 arrays deep, so the file nests exactly 16 levels, the limit. The depth scan lets it through; the odd element is then a malformed record (T3-MALFORMED), HOLD. Pins the limit from the other side: a limit of 15 would reject this file. Expected HOLD.

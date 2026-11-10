@@ -1,0 +1,1 @@
+Counters of 2^53 (9007199254740992), one above the largest integer a JSON reader using IEEE 754 doubles holds exactly. Profile v0 bounds integers at 2^53 minus 1, so this is malformed. A reader in another language could silently round these numbers and reach a different result. Expected HOLD.

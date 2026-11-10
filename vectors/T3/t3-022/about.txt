@@ -1,0 +1,1 @@
+Event 2 stores its hash in uppercase hex. Vector profile v0 requires 64 lowercase hex characters, so the record is malformed (proposed T3-MALFORMED, HOLD) and its stream is not walked. Accepting either case would let two different byte strings stand for one hash. Expected HOLD.

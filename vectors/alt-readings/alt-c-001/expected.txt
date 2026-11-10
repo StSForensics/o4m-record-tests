@@ -1,0 +1,22 @@
+Declaration: consequential action types declared: 1; tolerances: max gap 0, max clock skew 5 s, max unsealed window 60 s; fail mode: fail-closed; monitors: none declared; declared gaps: none, covering 0 of 1 consequential action types; T1b: not run
+Clock grade: no ordering claims made by this test
+Sampling: none, every record checked
+Test: T14a | Suite: O4M Record Tests 2026 v1.0 (vector profile v0) | Alternative reading C, not the primary reading | Evidence SHA-256: a8fb33cd1da284e4a623682e90900623319946b625742b20ac687ed0bdcba936
+Profile: F (vector profile v0 assumes sequence numbers assigned at the source)
+Result: PASS
+Reason codes (proposed, not normative): none
+Checkpoint cp-1: received 3, accepted 3, dropped 0, policy fail-closed, provenance SOURCE-LOCAL
+Checkpoint cp-2: received 6, accepted 6, dropped 0, policy fail-closed, provenance SOURCE-LOCAL
+counters are SOURCE-LOCAL: arithmetic on numbers the capture point produced; not independently reconciled
+Declared gaps: none
+Undeclared gaps: none
+Coverage windows (C22 item 6): not run
+T14e-SHADOW: not run
+Verifier disclosure: no fee, volunteer run, no financial relationship with the operator
+Unsigned result. This is the output of the O4M Record Tests, published as plain text with the SHA-256 of the evidence it was run on. It is not a certificate, seal or approval. No certificates are issued.
+T6c: OPEN (demo time sources sign the operator clock)
+Scope 1: records of AI system operation at inference and action time only; not training, model internals or behavioural tests.
+Scope 2: policy adequacy is out of scope.
+Scope 3: no claim to any assurance level of any other scheme; any mapping is informative only.
+Scope 4: evidence after the fact; these tests prevent nothing.
+Scope 5: integrity is not truth; an intact record of false content is still false content.

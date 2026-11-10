@@ -1,0 +1,1 @@
+Two valid streams whose records alternate in file order. Models normal interleaved capture. The verifier walks each stream by seq, so interleaving does not matter. Expected PASS.

@@ -1,0 +1,1 @@
+Reading C (accepted equals the number of records in the chain up to the checkpoint). The chain holds 6 records (5 events and a teardown); cp-1 covers seq 1 to 3 and cp-2 covers seq 1 to 6, matching accepted. Expected PASS under Reading C.

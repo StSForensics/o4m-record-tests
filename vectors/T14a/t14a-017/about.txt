@@ -1,0 +1,1 @@
+Balanced counters labelled UNVERIFIED (for example a copy of an outside count delivered inside the operator's own export). Spec Conventions: a check resting on an UNVERIFIED source can return FAIL but never PASS. HOLD with proposed code T14A-UNVERIFIED. Expected HOLD.

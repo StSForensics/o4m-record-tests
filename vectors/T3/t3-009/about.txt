@@ -1,0 +1,1 @@
+Fork: a second branch starts at seq 4 linking to seq 3 and runs to its own teardown, so seq 4, 5 and 6 each hold two records (T3-FORK) and the stream has two teardowns (T3-TAIL). Each branch is internally valid, which is why only the fork and tail checks catch it. Expected FAIL.

@@ -1,0 +1,1 @@
+Deletion of the last event before the teardown (seq 5). Three codes fire: T3-GAP (seq 5 missing), T3-LINK (the teardown at seq 6 points at the deleted record, not at seq 4) and T3-TAIL (the teardown says last_seq 5 but the highest event present is 4). The teardown carrying last_seq is what makes this tail deletion visible. Expected FAIL.

@@ -1,0 +1,1 @@
+Two teardowns in one stream (seq 6 and seq 7, both with last_seq 5). T3-TAIL fires because a stream has exactly one teardown. Expected FAIL.

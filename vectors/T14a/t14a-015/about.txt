@@ -1,0 +1,1 @@
+Two checkpoints share the id cp-1. The second is malformed (T14A-MALFORMED) and set aside; the first is checked and balances. Expected HOLD.

@@ -1,0 +1,1 @@
+The records of t3-001 in a fixed shuffled file order (4, 1, teardown, 2, 5, 3). Content is valid; the verifier walks by seq, so file order does not matter. Expected PASS.

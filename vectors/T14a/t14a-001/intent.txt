@@ -1,0 +1,3 @@
+command: python verify.py T14a vectors/T14a/t14a-001/input.json
+intended result: PASS
+intended reason codes: none

@@ -1,0 +1,38 @@
+{
+  "declaration": {
+    "consequential_action_types": [
+      "payment"
+    ],
+    "tolerances": {
+      "max_gap": 0,
+      "max_clock_skew_s": 5,
+      "max_unsealed_window_s": 60
+    },
+    "fail_mode": "fail-closed",
+    "monitors": [],
+    "declared_gaps": []
+  },
+  "checkpoints": [
+    {
+      "checkpoint_id": "cp-1",
+      "received": 100,
+      "accepted": 100,
+      "dropped": 0,
+      "policy": "fail-closed"
+    },
+    {
+      "checkpoint_id": "cp-2",
+      "received": 200,
+      "accepted": 199,
+      "dropped": 1,
+      "policy": "fail-closed"
+    },
+    {
+      "checkpoint_id": "cp-3",
+      "received": 300,
+      "accepted": 298,
+      "dropped": 2,
+      "policy": "fail-closed"
+    }
+  ]
+}

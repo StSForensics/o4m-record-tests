@@ -1,0 +1,3 @@
+command: python verify.py T14a vectors/alt-readings/alt-c-002/input.json --reading C
+intended result: FAIL
+intended reason codes: T14A-CHAIN

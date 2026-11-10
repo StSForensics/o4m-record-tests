@@ -1,0 +1,1 @@
+Deletion attack: the event at seq 3 is removed and nothing is recomputed. Seq 3 is missing (T3-GAP, also listed as an UNDECLARED GAP) and seq 4 still points at the deleted record, so it does not link to seq 2 (T3-LINK). Expected FAIL.

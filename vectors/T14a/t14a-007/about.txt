@@ -1,0 +1,1 @@
+Fail-closed policy with 3 counted drops and balanced counters. T14a only checks arithmetic, so PASS, with the line "dropped greater than zero under fail-closed: T14b not run". T14b would decide whether these drops fail. Expected PASS.

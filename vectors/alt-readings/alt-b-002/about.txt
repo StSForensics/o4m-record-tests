@@ -1,0 +1,1 @@
+Reading B. Checkpoint cp-3 reports lower received, accepted and dropped counts than cp-2 while each checkpoint balances on its own. A counter reset like this hides what happened in between. Under the primary reading this vector passes. Expected FAIL with proposed T14A-REGRESS under Reading B.

@@ -1,0 +1,1 @@
+Added after the mutation run (mutant M-T3-04 survived without it). Seq 1 has a valid hash but its prev_hash points at some earlier record instead of the zero value, and the rest of the chain is consistent. This is what a stream looks like when its true beginning was cut off and the remainder renumbered from 1. T3-START fires. Expected FAIL.

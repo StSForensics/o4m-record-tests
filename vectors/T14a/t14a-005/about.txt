@@ -1,0 +1,1 @@
+Five cumulative checkpoints, all balanced, with a few counted drops under fail-closed. PASS, with the line noting that T14b (drops under fail-closed) was not run. Expected PASS.

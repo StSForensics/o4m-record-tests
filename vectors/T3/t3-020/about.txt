@@ -1,0 +1,1 @@
+Same declaration as t3-019 (seq 3 declared as a gap), but the record actually missing is seq 4, deleted with nothing recomputed. The declared range does not excuse a different gap: T3-GAP and T3-LINK fire, seq 4 is listed as an UNDECLARED GAP, and the declared entry is still reported. Expected FAIL.

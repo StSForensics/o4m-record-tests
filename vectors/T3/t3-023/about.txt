@@ -1,0 +1,1 @@
+Event 3 gives its seq as the string "3" instead of an integer. Malformed under vector profile v0 (T3-MALFORMED, HOLD). A lax reader that coerced strings to numbers would walk a different chain. Expected HOLD.

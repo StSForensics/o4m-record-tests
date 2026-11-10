@@ -1,0 +1,3 @@
+command: python verify.py T14a vectors/alt-readings/alt-b-001/input.json --reading B
+intended result: PASS
+intended reason codes: none

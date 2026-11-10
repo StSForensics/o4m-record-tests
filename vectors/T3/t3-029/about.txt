@@ -1,0 +1,1 @@
+Added 10 Nov 2026 (package 2026-11-10). A valid stream plus one element nested 15 arrays deep, so the file nests 17 levels (limit 16). The depth scan rejects it before parsing: INPUT-MALFORMED, HOLD, 'nesting deeper than 16'. Models a file shaped to crash or confuse a parser. The verdict does not depend on the Python version. Expected HOLD.

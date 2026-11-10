@@ -1,0 +1,1 @@
+Padding: received 100, accepted 95, dropped 10, so accepted plus dropped exceed received by 5. T14A-IMBALANCE fires. This is not a gap (nothing is missing), so it is not listed as one. Expected FAIL.

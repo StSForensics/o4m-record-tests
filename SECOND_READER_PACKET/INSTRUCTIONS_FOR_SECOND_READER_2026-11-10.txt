@@ -1,0 +1,20 @@
+INSTRUCTIONS FOR THE SECOND READER: T3 and T14a, O4M Record Tests 2026 v1.0
+Version 2, 10 Nov 2026 (replaces the 7 Nov 2026 version). For a fresh chat on a different AI vendor from the author, or for a human.
+
+For the person handing this over (Gareth): hand it over in three stages, using the three zip files.
+Stage 1: this file and the specification file only.
+Stage 2: the folder pass2_inputs, only after the reader says Pass 1 is finished and has written SECOND_READER_LOG.txt.
+Stage 3: the author's expected files, only after the reader has saved all Pass 2 verdicts.
+Never give the reader verify.py, gen_vectors.py, mutation/, check_exit_codes.py, AMBIGUITY_LOG.txt, REASON_CODES_PROPOSED.txt, REGULATOR_QUESTIONS.txt, the about.txt or intent.txt files, the repository link, or any Cowork brief.
+
+What you have
+The specification, O4M Record Tests 2026 v1.0, in the file "O4M Record Tests 2026 v1_0 2026-11-01.md". Its SHA-256 must be 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d (published at DOI 10.5281/zenodo.23857888). Check it before you start. The parts that matter most are: Conventions, Three profiles, the C2, C3, C13 and C14 rows, Scope, V2.1 (the common output rule and A1 T1b-VACUITY), V2.3 and V2.4.
+
+Your task
+Pass 1. Write your own verifier for T3 and T14a from the specification alone, in Python with the standard library only. It takes a test name and a file path and prints a verdict; choose exit codes and say what they are. The specification does not fix an input format, so you will have to decide one; when you receive the inputs in Pass 2 you may adapt your reader to their format, and log that you did. Before running anything, write SECOND_READER_LOG.txt listing every place the text left you a choice: the section, the question, and the choice you made. The verdict layout is part of what you must work out from the common output rule.
+Pass 2. You now receive pass2_inputs (50 files). Each file name ends with the test it belongs to (__T3 or __T14a). Run your verifier on each and save each verdict and exit code in a folder. Some inputs are broken or hostile on purpose (for example very deeply nested, or saved with an odd first character). If your verifier crashes or does something you did not plan on one of them, record what happened and the exit code. Do not fix it quietly: log it as a choice the text left open or as your own bug.
+Pass 3. You now receive the author's expected files, named <vector id>__expected.txt and <vector id>__expected_exit.txt. For each vector where you disagree, write one line: vector id, which side differs, and why (text unclear, a vector or profile choice not stated in the text, your bug, or the author's bug). Then write a short summary: how many vectors agree on result (PASS, FAIL or HOLD), how many agree on reason codes (expect few, since the specification names no codes for these tests), and the five most important ambiguities.
+
+Rules
+Never ask for the reference code. Never edit your verifier to match the expected output without logging the change and the reason. Do not search the web for these tests, their repository or other people's versions of them: the point is what the specification alone lets you do. You publish nothing and contact nobody. Your log is the product; a count of agreements shows agreement only.
+When you finish, send the log and the Pass 3 summary back as plain text.

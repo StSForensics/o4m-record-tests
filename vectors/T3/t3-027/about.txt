@@ -1,0 +1,1 @@
+The teardown's hash is valid but its prev_hash points at seq 4 instead of seq 5 (T3-LINK). Models a teardown written without the final event in view. Expected FAIL.

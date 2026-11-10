@@ -1,0 +1,1 @@
+Deletion of the first event. The lowest seq is now 2 (T3-START) and seq 1 is missing (T3-GAP, listed as an UNDECLARED GAP). No link failure is reported for seq 2 because it has no predecessor left to compare with; T3-START carries that finding. Expected FAIL.

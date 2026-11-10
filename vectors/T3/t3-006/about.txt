@@ -1,0 +1,1 @@
+The teardown is removed, leaving an open stream of five valid events. T3 cannot tell whether events after seq 5 existed, so it returns HOLD with T3-OPEN rather than PASS. Known limit: deleting the tail of a stream that has no teardown cannot be seen by T3 alone; it needs C13 (teardown on a never-shed lane) or counters and checkpoints (C14, C6). Expected HOLD.

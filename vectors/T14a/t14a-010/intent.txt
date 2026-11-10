@@ -1,0 +1,3 @@
+command: python verify.py T14a vectors/T14a/t14a-010/input.json
+intended result: HOLD
+intended reason codes: T14A-MALFORMED

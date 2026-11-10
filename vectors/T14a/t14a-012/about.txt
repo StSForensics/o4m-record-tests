@@ -1,0 +1,1 @@
+The received counter is the JSON value true. Python treats true as the integer 1, so a naive check would balance 1 = 1 + 0. Vector profile v0 rejects booleans as counters (T14A-MALFORMED). Expected HOLD.

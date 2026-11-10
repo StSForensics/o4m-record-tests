@@ -1,0 +1,75 @@
+MUTATION RECORD, O4M Record Tests 2026 v1.0, T3 and T14a, vector profile v0
+Self-run by the author of the verifier. Not reproduced by anyone else. Finer mutants beyond this list have not been run.
+
+Run started: 2026-11-10 02:06:53 UTC
+Python: 3.13.18 (Linux-6.18.44-fc-v338-x86_64-with-glibc2.39)
+SHA-256 verify.py: ed7ac40559d0524a524f44116cabd226c485fb9fc61ac275d686f72ce05aa228
+SHA-256 gen_vectors.py: 6b2f60e0c40bdc7e7fcc4a11f5db0590ef02363b8be3649d4793858ecb96e96e
+SHA-256 mutation/mutate.py: 859b9e86e56398e82aa590de9a102380de4911f29bdc67af4582c0fbaa84e69a
+Commands (from the package root):
+  python gen_vectors.py . --expected
+  python mutation/mutate.py
+Vectors run per mutant: 55 (T3, T14a and alternative readings; a vector kills a mutant if stdout or exit code differs from expected)
+Unmutated verifier against every vector: all match
+
+One line per mutant: id | description | result
+M-T3-01 | T3 always PASS (all T3 checks skipped) | killed by t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-013, t3-014, t3-016, t3-017, t3-019, t3-020, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-031
+M-T3-02 | T3 always FAIL | killed by t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-031
+M-T3-03 | skip the hash recomputation | killed by t3-007, t3-010, t3-016, t3-026
+M-T3-04 | skip the genesis (zero prev_hash) check | killed by t3-028
+M-T3-05 | accept first seq 0 | killed by t3-014
+M-T3-06 | off-by-one in the gap test: highest seq left out of the scan (equivalent mutant, see note) | SURVIVED
+M-T3-06b | off-by-one in the gap test: seq 1 left out of the scan | killed by t3-004
+M-T3-06c | off-by-one in the gap test: scan runs one past the highest seq | killed by t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-024, t3-025, t3-026, t3-027, t3-028, t3-031
+M-T3-20 | link compared only with seq minus one (a missing predecessor is never a link failure) | killed by t3-003, t3-005, t3-020
+M-T3-07 | skip the link check | killed by t3-003, t3-005, t3-007, t3-011, t3-020, t3-026, t3-027
+M-T3-08 | skip the fork check | killed by t3-008, t3-009
+M-T3-09 | ignore teardown last_seq | killed by t3-005, t3-017
+M-T3-10 | treat an open stream as PASS | killed by t3-006
+M-T3-11 | report only the first reason code | killed by t3-003, t3-004, t3-005, t3-007, t3-009, t3-020, t3-026
+M-T3-12 | walk in file order instead of seq order | killed by t3-007, t3-015
+M-T3-13 | accept more than one teardown | killed by t3-009, t3-025
+M-T3-14 | accept records after the teardown | killed by t3-024
+M-T3-15 | treat an empty input as PASS | killed by t3-013
+M-T3-16 | accept uppercase hex | killed by t3-022
+M-T3-17 | declared-gap range ignored (declared seqs still counted as undeclared) | killed by t3-019
+M-T3-18 | declared gap reported without the DECLARED-GAP hold (declared scope can PASS) | killed by t3-019, t3-020
+M-T3-19 | missing seqs not listed as UNDECLARED GAP | killed by t3-003, t3-004, t3-005, t3-020
+M-IN-01 | booleans accepted as integers | killed by t14a-012
+M-IN-02 | duplicate keys accepted (last one wins) | killed by t3-021
+M-IN-03 | NFC check removed | killed by t3-018
+M-IN-04 | evidence hash over the input with newlines removed instead of the file bytes | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
+M-IN-05 | integer bound raised to 2^64 | killed by t14a-014
+M-OUT-01 | profile line dropped | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
+M-OUT-02 | V2.4 unsigned-result sentence dropped | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
+M-OUT-03 | exit code always 0 | killed by t14a-003, t14a-004, t14a-006, t14a-008, t14a-009, t14a-010, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-019, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-013, t3-014, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, alt-b-002, alt-c-002, alt-d-001
+M-OUT-04 | FAIL and HOLD precedence swapped | killed by t3-020
+M-T14-01 | T14a always PASS (all T14a checks skipped) | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
+M-T14-02 | T14a always FAIL | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
+M-T14-03 | ignore dropped | killed by t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-016, alt-b-001, alt-b-002, alt-d-001
+M-T14-04 | accept accepted plus dropped greater than or equal to received | killed by t14a-004
+M-T14-05 | check only the first checkpoint | killed by t14a-005, t14a-006, alt-b-001, alt-b-002, alt-c-001, alt-c-002
+M-T14-06 | tolerate an imbalance of 1 | killed by t14a-019
+M-T14-07 | ignore the fail-open declared-gap line | killed by t14a-002, alt-d-001
+M-T14-08 | drop the SOURCE-LOCAL line | killed by t14a-001, t14a-002, t14a-005, t14a-007, t14a-011, t14a-018, alt-b-001, alt-c-001
+M-T14-09 | checkpoint policy ignored | killed by t14a-016
+M-T14-10 | UNVERIFIED provenance ignored | killed by t14a-017
+M-T14-11 | negative counters accepted | killed by t14a-010
+M-T14-12 | duplicate checkpoint ids accepted | killed by t14a-015
+M-T14-13 | claimed INDEPENDENTLY-RECONCILED label printed as if checked | killed by t14a-018
+M-T14-14 | no checkpoints treated as PASS | killed by t14a-008
+M-T14-15 | T14b-not-run line dropped | killed by t14a-005, t14a-006, t14a-007, alt-b-001, alt-b-002
+M-T14-16 | fail-open drops listed as declared gap even when the declaration says fail-closed | killed by t14a-016
+M-ALT-B | Reading B regression check disabled | killed by alt-b-002
+M-ALT-C | Reading C chain-count check disabled | killed by alt-c-002
+M-ALT-D | Reading D hold disabled | killed by alt-d-001
+M-IN-06 | nesting depth check removed | killed by t3-029
+M-IN-07 | nesting limit off by one, too high (17) | killed by t3-029
+M-IN-08 | nesting limit off by one, too low (15) | killed by t3-029, t3-031
+
+Mutants: 53. Killed: 52. Survived: 1.
+
+On survivors and history
+First run on 7 Nov 2026: 47 mutants, 44 killed, 3 survived (M-T3-04 skip the genesis check, M-T3-06, M-T14-06 tolerate an imbalance of 1). Two survivors showed missing vectors, not equivalent code. Vectors t3-028 (valid first record with a non-zero prev_hash) and t14a-019 (imbalance of exactly 1) were added, every expected.txt was regenerated from the unchanged verifier, and both mutants are now killed. Mutants M-T3-06b, M-T3-06c and M-T3-20 were added at the same time. No expected.txt was edited to kill a mutant.
+M-T3-06 survives and is an equivalent mutant: the highest seq in a stream is present by construction (it is taken from the records), so leaving it out of the missing-seq scan cannot change any output. No vector can kill it. The sharper off-by-one mutants M-T3-06b and M-T3-06c are killed.
+Limits of this record: mutants are hand-written text substitutions chosen by the same author who wrote the verifier, so they reflect that author's idea of likely mistakes. A kill shows that a vector disagrees with the mutant; it does not show that the expected outputs are right. Agreement with RT-1 or with a second reader has not been checked.

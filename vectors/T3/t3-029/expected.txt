@@ -1,0 +1,20 @@
+Declaration: not read (input rejected); T1b: not run
+Clock grade: no ordering claims made by this test
+Sampling: none, every record checked
+Test: T3 | Suite: O4M Record Tests 2026 v1.0 (vector profile v0) | Evidence SHA-256: bf1b938601ea930e4882f355911cc79641304986b1c4237ee905f03e12cd0ce5
+Profile: F (vector profile v0 assumes sequence numbers assigned at the source)
+Result: HOLD
+Reason codes (proposed, not normative): INPUT-MALFORMED
+  INPUT-MALFORMED: nesting deeper than 16
+Declared gaps: none
+Undeclared gaps: none
+Coverage windows (C22 item 6): not run
+T14e-SHADOW: not run
+Verifier disclosure: no fee, volunteer run, no financial relationship with the operator
+Unsigned result. This is the output of the O4M Record Tests, published as plain text with the SHA-256 of the evidence it was run on. It is not a certificate, seal or approval. No certificates are issued.
+T6c: OPEN (demo time sources sign the operator clock)
+Scope 1: records of AI system operation at inference and action time only; not training, model internals or behavioural tests.
+Scope 2: policy adequacy is out of scope.
+Scope 3: no claim to any assurance level of any other scheme; any mapping is informative only.
+Scope 4: evidence after the fact; these tests prevent nothing.
+Scope 5: integrity is not truth; an intact record of false content is still false content.

@@ -1,0 +1,1 @@
+Hidden drops: received 100, accepted 90, dropped 5. Five records vanished without being counted (T14A-IMBALANCE, listed as an UNDECLARED GAP of 5). Expected FAIL.

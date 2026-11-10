@@ -1,0 +1,1 @@
+The teardown claims last_seq 7 while the highest event is 5; its hash is recomputed so only the tail check can catch it (T3-TAIL). Models a teardown that misstates how many events the stream held. Expected FAIL.

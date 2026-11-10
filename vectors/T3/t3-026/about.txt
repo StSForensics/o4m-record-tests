@@ -1,0 +1,1 @@
+Splice: event 3 of stream s1 is copied into stream s2 with only stream_id changed, replacing s2's own event 3. Because stream_id is inside the hash, the moved record fails recomputation (T3-HASH); its link points into s1 and s2's seq 4 points at the replaced record (T3-LINK). Stream s1 is untouched. Expected FAIL.

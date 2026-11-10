@@ -1,0 +1,1 @@
+Added 10 Nov 2026 (package 2026-11-10). The same valid input as t3-001 saved with a UTF-8 byte order mark at the start, as some Windows editors do. Vector profile v0 does not strip it (AMBIGUITY_LOG entry 35): INPUT-UNPARSEABLE, HOLD. Expected HOLD.

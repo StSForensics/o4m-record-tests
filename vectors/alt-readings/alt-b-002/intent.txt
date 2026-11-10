@@ -1,0 +1,3 @@
+command: python verify.py T14a vectors/alt-readings/alt-b-002/input.json --reading B
+intended result: FAIL
+intended reason codes: T14A-REGRESS

@@ -1,0 +1,1 @@
+Event 2 carries the key "seq" twice. Python's json module would silently keep the last one, so two readers could see different records. Vector profile v0 rejects duplicate keys (proposed code INPUT-DUPKEY, FAIL) and does not walk the chain. Expected FAIL.

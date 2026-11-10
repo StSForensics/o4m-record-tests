@@ -1,0 +1,21 @@
+Declaration: consequential action types declared: 1; tolerances: max gap 0, max clock skew 5 s, max unsealed window 60 s; fail mode: fail-closed; monitors: none declared; declared gaps: none, covering 0 of 1 consequential action types; T1b: not run
+Clock grade: no ordering claims made by this test
+Sampling: none, every record checked
+Test: T3 | Suite: O4M Record Tests 2026 v1.0 (vector profile v0) | Evidence SHA-256: cd200d70ce7b59187a494ee6eab46805aeb308c9a69c6ad9447f4966d8844be6
+Profile: F (vector profile v0 assumes sequence numbers assigned at the source)
+Result: HOLD
+Reason codes (proposed, not normative): T3-MALFORMED
+  T3-MALFORMED: stream s1, record number 2 in file order (seq field 2): fields or types outside vector profile v0
+  T3-MALFORMED: stream s1, record number 3 in file order (seq field 3): fields or types outside vector profile v0
+Declared gaps: none
+Undeclared gaps: none
+Coverage windows (C22 item 6): not run
+T14e-SHADOW: not run
+Verifier disclosure: no fee, volunteer run, no financial relationship with the operator
+Unsigned result. This is the output of the O4M Record Tests, published as plain text with the SHA-256 of the evidence it was run on. It is not a certificate, seal or approval. No certificates are issued.
+T6c: OPEN (demo time sources sign the operator clock)
+Scope 1: records of AI system operation at inference and action time only; not training, model internals or behavioural tests.
+Scope 2: policy adequacy is out of scope.
+Scope 3: no claim to any assurance level of any other scheme; any mapping is informative only.
+Scope 4: evidence after the fact; these tests prevent nothing.
+Scope 5: integrity is not truth; an intact record of false content is still false content.

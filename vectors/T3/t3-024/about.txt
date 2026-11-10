@@ -1,0 +1,1 @@
+An event at seq 7 follows the teardown at seq 6 and links to it. Hashes and links are valid, but a stream must end with its teardown, so T3-TAIL fires. Models activity recorded after an agent was declared torn down. Expected FAIL.

@@ -1,0 +1,1 @@
+Zero-based stream: seq runs 0 to 4 and the teardown is at 5, all hashes and links valid. Vector profile v0 chose one-based numbering, so this fails T3-START. It documents the choice; if the editor picks zero-based numbering, this vector and t3-001 swap results. Expected FAIL.

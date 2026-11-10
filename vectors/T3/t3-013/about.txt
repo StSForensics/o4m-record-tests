@@ -1,0 +1,1 @@
+Zero streams: the records list is empty. Nothing can be walked, so the result is HOLD with T3-EMPTY, never PASS. Expected HOLD.

@@ -1,0 +1,1 @@
+Three streams; stream s2 has event 2 altered with its stored hash unchanged. Only s2 is named in the detail lines; s1 and s3 raise nothing. Expected FAIL.

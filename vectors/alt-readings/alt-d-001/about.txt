@@ -1,0 +1,1 @@
+Reading D (V2.3 read strictly: a declared gap is never PASS for its scope). Same input as t14a-002. Counted drops under fail-open do not fail (A1) but the scope they cover is not PASS either, so the result is HOLD with DECLARED-GAP. Expected HOLD under Reading D.

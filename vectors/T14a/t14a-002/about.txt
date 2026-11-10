@@ -1,0 +1,1 @@
+Under a declared fail-open policy the checkpoint shows received 100, accepted 95, dropped 5. Counters balance and the drops are counted, so per A1 they are reported and do not fail. The verdict lists them as a DECLARED GAP. Primary reading: PASS. See alt-d-001 for the reading where this scope is HOLD. Expected PASS.

@@ -1,0 +1,1 @@
+Five checkpoints; the fourth (cp-4) is short by 4. The detail line names cp-4 only. Expected FAIL.

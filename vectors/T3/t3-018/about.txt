@@ -1,0 +1,1 @@
+Event 2 holds a string in decomposed form (e followed by a combining acute accent), which is not NFC. The chain is otherwise valid. C2 requires the verifier to reject non-NFC input rather than normalise it, so the result is FAIL with proposed code T2-NFC. Expected FAIL.

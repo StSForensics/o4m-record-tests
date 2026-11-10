@@ -1,0 +1,1 @@
+The operator's own input labels its counters INDEPENDENTLY-RECONCILED. That label is the operator's assertion; T14a has no reconciliation evidence, so it prints the label as claimed and not checked, and the PASS still carries the SOURCE-LOCAL line. Expected PASS.

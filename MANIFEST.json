@@ -1,7 +1,7 @@
 {
-  "package": "o4m-record-tests-vectors-2026-11-10",
+  "package": "o4m-record-tests-vectors-2026-11-10b",
   "date": "2026-11-10",
-  "first_issued": "2026-11-07 (revision b: 2026-11-07b; this is revision c)",
+  "first_issued": "2026-11-07 (revision b: 2026-11-07b; this is revision c, build b of 10 Nov 2026; an earlier same-day build was never published)",
   "specification": {
     "title": "O4M Record Tests 2026 v1.0",
     "doi": "10.5281/zenodo.23857888",
@@ -33,15 +33,15 @@
     },
     {
       "path": "AMBIGUITY_LOG.txt",
-      "bytes": 15512
+      "bytes": 15675
     },
     {
       "path": "CHANGES_2026-11-07b.txt",
       "bytes": 2017
     },
     {
-      "path": "CHANGES_2026-11-10.txt",
-      "bytes": 2567
+      "path": "CHANGES_2026-11-10b.txt",
+      "bytes": 3179
     },
     {
       "path": "LICENSE",
@@ -64,8 +64,8 @@
       "bytes": 6437
     },
     {
-      "path": "SECOND_READER_PACKET/INSTRUCTIONS_FOR_SECOND_READER_2026-11-07.txt",
-      "bytes": 2669
+      "path": "SECOND_READER_PACKET/INSTRUCTIONS_FOR_SECOND_READER_2026-11-10.txt",
+      "bytes": 3393
     },
     {
       "path": "SECOND_READER_PACKET/O4M Record Tests 2026 v1_0 2026-11-01.md",
@@ -258,6 +258,18 @@
     {
       "path": "SECOND_READER_PACKET/pass2_inputs/t3-028__T3.json",
       "bytes": 1954
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-029__T3.json",
+      "bytes": 2522
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-030__T3.json",
+      "bytes": 1957
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-031__T3.json",
+      "bytes": 2456
     },
     {
       "path": "check_exit_codes.py",
@@ -1380,5 +1392,5 @@
       "bytes": 21892
     }
   ],
-  "revision": "c, 10 Nov 2026: nesting depth limit 16 (HOLD, INPUT-MALFORMED) decided by a byte scan before parsing; string walk iterative; vectors t3-029, t3-030, t3-031 added; mutants M-IN-06 to M-IN-08 added; check_exit_codes.py added; gen_vectors.py refuses an OUTDIR starting with \"-\"; README Python versions stated from recorded runs; \"not yet started trading\" sentence removed from README disclaimer. The 52 earlier vectors are byte-identical to 2026-11-07b. See CHANGES_2026-11-10.txt."
+  "revision": "c, 10 Nov 2026: nesting depth limit 16 (HOLD, INPUT-MALFORMED) decided by a byte scan before parsing; string walk iterative; vectors t3-029, t3-030, t3-031 added; mutants M-IN-06 to M-IN-08 added; check_exit_codes.py added; gen_vectors.py refuses an OUTDIR starting with \"-\"; README Python versions stated from recorded runs; \"not yet started trading\" sentence removed from README disclaimer. The 52 earlier vectors are byte-identical to 2026-11-07b. The second-reader packet is refreshed (50 blind inputs, three-stage handover, instructions version 2). See CHANGES_2026-11-10b.txt."
 }

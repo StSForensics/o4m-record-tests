@@ -1,0 +1,1 @@
+Insertion attack: an extra record reuses seq 3 with different data, a valid hash and a valid link to seq 2. Two records now share seq 3 (T3-FORK). Seq 4 still links to one of them, so no link failure fires. Expected FAIL.
