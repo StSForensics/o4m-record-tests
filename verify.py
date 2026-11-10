@@ -12,6 +12,8 @@
 #   python verify.py T14a path/to/input.json --reading B   (alternative readings B, C, D)
 # Exit code: 0 PASS, 1 FAIL, 2 HOLD, 3 usage error, unreadable file or internal error.
 # Exit code 1 is only ever a FAIL verdict: a crash must never look like a FAIL (added 7 Nov 2026, package 2026-11-07b).
+# Nesting deeper than 16 is HOLD (INPUT-MALFORMED), decided by a byte scan before parsing, so the verdict
+# does not depend on the Python version or its recursion limit (added 10 Nov 2026, package 2026-11-10).
 
 import hashlib
 import json
@@ -21,6 +23,7 @@ import unicodedata
 SUITE = "O4M Record Tests 2026 v1.0 (vector profile v0)"
 ZERO_HASH = "0" * 64
 MAX_INT = 2 ** 53 - 1
+MAX_DEPTH = 16
 HEX = set("0123456789abcdef")
 
 FAIL_CODES = {
@@ -89,16 +92,48 @@ def is_hex64(v):
     return isinstance(v, str) and len(v) == 64 and set(v) <= HEX
 
 
+def nesting_depth(raw):
+    # Iterative scan of the raw bytes: counts [ and { that are outside JSON strings.
+    # For valid JSON this is the exact nesting depth. Stops early once the limit is passed.
+    depth = peak = 0
+    in_str = esc = False
+    for b in raw:
+        if in_str:
+            if esc:
+                esc = False
+            elif b == 0x5C:
+                esc = True
+            elif b == 0x22:
+                in_str = False
+        elif b == 0x22:
+            in_str = True
+        elif b == 0x5B or b == 0x7B:
+            depth += 1
+            if depth > peak:
+                peak = depth
+                if peak > MAX_DEPTH:
+                    return peak
+        elif b == 0x5D or b == 0x7D:
+            if depth > 0:
+                depth -= 1
+    return peak
+
+
 def walk_strings(obj, path, out):
-    if isinstance(obj, str):
-        out.append((path, obj))
-    elif isinstance(obj, dict):
-        for k in sorted(obj):
-            out.append((path + "/" + k + " (key)", k))
-            walk_strings(obj[k], path + "/" + k, out)
-    elif isinstance(obj, list):
-        for i, v in enumerate(obj):
-            walk_strings(v, path + "/" + str(i), out)
+    # Iterative, so that no input can exhaust the Python stack. Same order as a depth-first walk
+    # with keys sorted: each key string, then its value.
+    stack = [(obj, path)]
+    while stack:
+        o, p = stack.pop()
+        if isinstance(o, str):
+            out.append((p, o))
+        elif isinstance(o, dict):
+            for k in reversed(sorted(o)):
+                stack.append((o[k], p + "/" + k))
+                stack.append((k, p + "/" + k + " (key)"))
+        elif isinstance(o, list):
+            for i in range(len(o) - 1, -1, -1):
+                stack.append((o[i], p + "/" + str(i)))
 
 
 class Verdict:
@@ -428,15 +463,18 @@ def main(argv):
     evidence_hash = hashlib.sha256(raw).hexdigest()
     v = Verdict()
     top = None
-    try:
-        top = json.loads(raw.decode("utf-8"), object_pairs_hook=pairs_hook,
-                         parse_float=Float, parse_constant=Float)
-    except DupKey as e:
-        v.add("INPUT-DUPKEY", "duplicate key %r; vector profile v0 rejects duplicate keys" % str(e))
-    except (ValueError, UnicodeDecodeError):
-        v.add("INPUT-UNPARSEABLE", "input is not valid UTF-8 JSON")
-    except RecursionError:
-        v.add("INPUT-UNPARSEABLE", "input is nested too deeply to read")
+    if nesting_depth(raw) > MAX_DEPTH:
+        v.add("INPUT-MALFORMED", "nesting deeper than %d" % MAX_DEPTH)
+    else:
+        try:
+            top = json.loads(raw.decode("utf-8"), object_pairs_hook=pairs_hook,
+                             parse_float=Float, parse_constant=Float)
+        except DupKey as e:
+            v.add("INPUT-DUPKEY", "duplicate key %r; vector profile v0 rejects duplicate keys" % str(e))
+        except (ValueError, UnicodeDecodeError):
+            v.add("INPUT-UNPARSEABLE", "input is not valid UTF-8 JSON")
+        except RecursionError:
+            v.add("INPUT-UNPARSEABLE", "input is nested too deeply to read")
     decl_line = "Declaration: not read (input rejected); T1b: not run"
     if top is not None:
         strings = []

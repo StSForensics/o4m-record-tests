@@ -1,7 +1,7 @@
-O4M RECORD TESTS 2026 v1.0: TEST VECTORS FOR T3 AND T14a (DRAFT PACKAGE, 7 Nov 2026, revision b)
+O4M RECORD TESTS 2026 v1.0: TEST VECTORS FOR T3 AND T14a (DRAFT PACKAGE, 10 Nov 2026, revision c of the package first issued 7 Nov 2026)
 
 What this is
-A small package of test vectors for two of the O4M Record Tests: T3 (chain walk per stream, requirement C3) and T14a (capture counters balance, requirement C14). It holds a reference verifier written in Python with the standard library only, a deterministic generator that rebuilds every vector byte for byte, 52 vectors with their expected verdicts and exit codes, a mutation-kill record, an ambiguity log and a list of proposed reason codes.
+A small package of test vectors for two of the O4M Record Tests: T3 (chain walk per stream, requirement C3) and T14a (capture counters balance, requirement C14). It holds a reference verifier written in Python with the standard library only, a deterministic generator that rebuilds every vector byte for byte, 55 vectors with their expected verdicts and exit codes, a mutation-kill record, a short script that checks the exit-3 paths, an ambiguity log and a list of proposed reason codes.
 Specification: O4M Record Tests 2026 v1.0, DOI 10.5281/zenodo.23857888 (https://doi.org/10.5281/zenodo.23857888). Markdown source SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d.
 
 Status, plainly
@@ -17,16 +17,17 @@ t14a-011: if the operator consistently under-reports what it received, the count
 t3-006 (an open stream's tail cannot be checked by T3 alone) is a third limit of the same kind.
 
 How to run
-Python 3, no packages to install. On a Mac type python3 instead of python; on Windows, python or py. Every vector has been run with Python 3.11, 3.12 and 3.13 on Linux, with identical results. The code is written for Python 3.8 or later, but 3.8 to 3.10 have not been run, and Windows and macOS have not been run. From this folder:
+Python 3, no packages to install. On a Mac type python3 instead of python; on Windows, python or py. On 10 Nov 2026 every vector, the exit-code check and two hostile nesting files were run with Python 3.11.18, 3.12.3 and 3.13.18 on Linux, with identical results (the result lines are in MANIFEST.json). The code is written for Python 3.8 or later, but 3.8 to 3.10 have not been run, and Windows and macOS have not been run. From this folder:
   python verify.py T3 vectors/T3/t3-001/input.json
   python verify.py T14a vectors/T14a/t14a-003/input.json
   python verify.py T14a vectors/alt-readings/alt-b-002/input.json --reading B
-Exit code 0 is PASS, 1 FAIL, 2 HOLD, 3 a usage error, a file that cannot be read, or an internal error (no verdict). A crash never exits with 1. Each vector folder holds input.json, expected.txt (the exact verdict text), expected_exit.txt, about.txt (scenario, attack modelled, expected result and why) and intent.txt (the command and the result the author intended before running the verifier).
+Exit code 0 is PASS, 1 FAIL, 2 HOLD, 3 a usage error, a file that cannot be read, or an internal error (no verdict). A crash never exits with 1. Input nested deeper than 16 levels is HOLD (INPUT-MALFORMED), decided by a byte scan before parsing, so the verdict does not depend on the Python version. Each vector folder holds input.json, expected.txt (the exact verdict text), expected_exit.txt, about.txt (scenario, attack modelled, expected result and why) and intent.txt (the command and the result the author intended before running the verifier).
 To check the package as shipped, first:
   sha256sum -c SHA256SUMS                 (on a Mac: shasum -a 256 -c SHA256SUMS; every line should say OK)
 To rebuild and re-test everything:
   python gen_vectors.py . --expected      (rebuilds inputs and expected outputs; stops on any mismatch with intent)
   python mutation/mutate.py               (runs every mutant against every vector, rewrites MUTATION_RECORD.txt)
+  python check_exit_codes.py              (checks the exit-3 paths, which give no verdict and so cannot be vectors)
 mutate.py writes the date, time and Python version of your run at the top of MUTATION_RECORD.txt, so after you run it that one file no longer matches SHA256SUMS. Every other file should still match. Compare the mutant lines, not the header.
 Extract the zip rather than copying vectors by hand. The evidence hash in every verdict is the SHA-256 of the input.json bytes, so a changed line ending changes every expected verdict. The file .gitattributes stops Git from rewriting line endings. The zip file's own hash is not reproducible (zip stores timestamps); SHA256SUMS is the reference.
 
@@ -42,7 +43,7 @@ SECOND_READER_PACKET holds what an independent second implementer should get: in
 Disclaimer and terms of use
 1. This package is free. It is provided AS IS, WITHOUT WARRANTY OF ANY KIND, under the Apache License 2.0 (sections 7 and 8 of that licence apply). Like any software it can contain errors; check anything important another way too.
 2. A verdict from verify.py is an unsigned comparison of an input against the draft tests under vector profile v0. It is not a finding of fact, a rating of any company, a certificate, an assurance or an approval, and it should not be your only basis for a legal, financial, safety or regulatory decision.
-3. Using this package does not create a client, adviser, expert or other professional relationship with StS Forensics Ltd (company 17054694) or Gareth Wong. StS Forensics Ltd has not yet started trading.
+3. Using this package does not create a client, adviser, expert or other professional relationship with StS Forensics Ltd (company 17054694) or Gareth Wong.
 4. To the fullest extent the law allows, StS Forensics Ltd, its director and contributors are not liable for any loss arising from use of, or reliance on, this package. Nothing here limits liability for death or personal injury caused by negligence, for fraud or fraudulent misrepresentation, or for anything else the law does not allow to be limited. If you are a consumer, your legal rights are not affected.
 5. Every input in vectors/ is made up for testing. None is a record of a real person, company or AI system.
 6. The names O4M, O4M Record Tests, VerZan and StS Forensics are not licensed for use as trade marks (Apache-2.0 section 6).

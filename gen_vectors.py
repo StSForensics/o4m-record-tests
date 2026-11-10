@@ -244,6 +244,32 @@ add("T3/t3-028", "T3", {"declaration": decl(), "records": s}, "FAIL", ["T3-START
     "points at some earlier record instead of the zero value, and the rest of the chain is consistent. This is what a "
     "stream looks like when its true beginning was cut off and the remainder renumbered from 1. T3-START fires. Expected FAIL.")
 
+def deep(k):
+    x = []
+    for _ in range(k):
+        x = [x]
+    return x
+
+
+s = stream("s1")
+add("T3/t3-029", "T3", {"declaration": decl(), "records": s + [deep(14)]}, "HOLD", ["INPUT-MALFORMED"],
+    "Added 10 Nov 2026 (package 2026-11-10). A valid stream plus one element nested 15 arrays deep, so the file nests 17 "
+    "levels (limit 16). The depth scan rejects it before parsing: INPUT-MALFORMED, HOLD, 'nesting deeper than 16'. Models "
+    "a file shaped to crash or confuse a parser. The verdict does not depend on the Python version. Expected HOLD.")
+
+s = stream("s1")
+add("T3/t3-030", "T3", "\ufeff" + json.dumps({"declaration": decl(), "records": s}, indent=2, ensure_ascii=True) + "\n",
+    "HOLD", ["INPUT-UNPARSEABLE"],
+    "Added 10 Nov 2026 (package 2026-11-10). The same valid input as t3-001 saved with a UTF-8 byte order mark at the start, "
+    "as some Windows editors do. Vector profile v0 does not strip it (AMBIGUITY_LOG entry 35): INPUT-UNPARSEABLE, HOLD. "
+    "Expected HOLD.")
+
+s = stream("s1")
+add("T3/t3-031", "T3", {"declaration": decl(), "records": s + [deep(13)]}, "HOLD", ["T3-MALFORMED"],
+    "Added 10 Nov 2026 (package 2026-11-10). A valid stream plus one element nested 14 arrays deep, so the file nests exactly "
+    "16 levels, the limit. The depth scan lets it through; the odd element is then a malformed record (T3-MALFORMED), HOLD. "
+    "Pins the limit from the other side: a limit of 15 would reject this file. Expected HOLD.")
+
 # T14a vectors
 
 add("T14a/t14a-001", "T14a", {"declaration": decl(), "checkpoints": [cp("cp-1", 100, 100, 0)]}, "PASS", [],
@@ -384,6 +410,10 @@ def main(argv):
         sys.stderr.write("usage: gen_vectors.py OUTDIR [--expected]\n")
         return 3
     out = argv[1]
+    if out.startswith("-"):
+        # 7 Nov 2026 bug: "gen_vectors.py --expected" took "--expected" as the output folder.
+        sys.stderr.write("usage: gen_vectors.py OUTDIR [--expected]   (OUTDIR must not start with '-')\n")
+        return 3
     here = os.path.dirname(os.path.abspath(__file__))
     bad = 0
     for folder, test, reading, obj, result, codes, about in V:

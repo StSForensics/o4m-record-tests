@@ -1,17 +1,18 @@
 {
-  "package": "o4m-record-tests-vectors-2026-11-07b",
-  "date": "2026-11-07",
+  "package": "o4m-record-tests-vectors-2026-11-10",
+  "date": "2026-11-10",
+  "first_issued": "2026-11-07 (revision b: 2026-11-07b; this is revision c)",
   "specification": {
     "title": "O4M Record Tests 2026 v1.0",
     "doi": "10.5281/zenodo.23857888",
     "source_md_sha256": "8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d"
   },
   "profile": "vector profile v0 (not normative)",
-  "python_used_for_recorded_run": "3.13.16 (mutation record, revision b); first run 3.13.18",
-  "python_minimum_intended": "3.8; every vector run on 3.11.17, 3.12.3 and 3.13.16 with identical results; 3.8 to 3.10, Windows and macOS not run",
+  "python_used_for_recorded_run": "3.13.18 (mutation record, 10 Nov 2026, Linux)",
+  "python_minimum_intended": "3.8; on 10 Nov 2026 every vector (55), check_exit_codes.py (7 cases) and two hostile nesting files were run with identical results on 3.11.18 (55 vectors, 0 mismatches; 7 cases, 0 failed), 3.12.3 (55 vectors, 0 mismatches; 7 cases, 0 failed) and 3.13.18 (55 vectors, 0 mismatches; 7 cases, 0 failed); 3.8 to 3.10, Windows and macOS not run",
   "third_party_packages": "none",
   "vector_count": {
-    "T3": 28,
+    "T3": 31,
     "T14a": 19,
     "alt-readings": 5
   },
@@ -22,7 +23,8 @@
     "python verify.py T14a vectors/T14a/t14a-001/input.json",
     "python verify.py T14a vectors/alt-readings/alt-b-001/input.json --reading B",
     "python gen_vectors.py . --expected",
-    "python mutation/mutate.py"
+    "python mutation/mutate.py",
+    "python check_exit_codes.py"
   ],
   "files": [
     {
@@ -31,11 +33,15 @@
     },
     {
       "path": "AMBIGUITY_LOG.txt",
-      "bytes": 14090
+      "bytes": 15512
     },
     {
       "path": "CHANGES_2026-11-07b.txt",
       "bytes": 2017
+    },
+    {
+      "path": "CHANGES_2026-11-10.txt",
+      "bytes": 2567
     },
     {
       "path": "LICENSE",
@@ -47,7 +53,7 @@
     },
     {
       "path": "README.txt",
-      "bytes": 9303
+      "bytes": 9722
     },
     {
       "path": "REASON_CODES_PROPOSED.txt",
@@ -55,7 +61,7 @@
     },
     {
       "path": "REGULATOR_QUESTIONS.txt",
-      "bytes": 6172
+      "bytes": 6437
     },
     {
       "path": "SECOND_READER_PACKET/INSTRUCTIONS_FOR_SECOND_READER_2026-11-07.txt",
@@ -254,16 +260,20 @@
       "bytes": 1954
     },
     {
+      "path": "check_exit_codes.py",
+      "bytes": 2024
+    },
+    {
       "path": "gen_vectors.py",
-      "bytes": 26022
+      "bytes": 27746
     },
     {
       "path": "mutation/MUTATION_RECORD.txt",
-      "bytes": 8746
+      "bytes": 9068
     },
     {
       "path": "mutation/mutate.py",
-      "bytes": 12613
+      "bytes": 12918
     },
     {
       "path": "vectors/T14a/t14a-001/about.txt",
@@ -1206,6 +1216,66 @@
       "bytes": 112
     },
     {
+      "path": "vectors/T3/t3-029/about.txt",
+      "bytes": 343
+    },
+    {
+      "path": "vectors/T3/t3-029/expected.txt",
+      "bytes": 1346
+    },
+    {
+      "path": "vectors/T3/t3-029/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-029/input.json",
+      "bytes": 2522
+    },
+    {
+      "path": "vectors/T3/t3-029/intent.txt",
+      "bytes": 119
+    },
+    {
+      "path": "vectors/T3/t3-030/about.txt",
+      "bytes": 250
+    },
+    {
+      "path": "vectors/T3/t3-030/expected.txt",
+      "bytes": 1357
+    },
+    {
+      "path": "vectors/T3/t3-030/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-030/input.json",
+      "bytes": 1957
+    },
+    {
+      "path": "vectors/T3/t3-030/intent.txt",
+      "bytes": 121
+    },
+    {
+      "path": "vectors/T3/t3-031/about.txt",
+      "bytes": 329
+    },
+    {
+      "path": "vectors/T3/t3-031/expected.txt",
+      "bytes": 1619
+    },
+    {
+      "path": "vectors/T3/t3-031/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-031/input.json",
+      "bytes": 2456
+    },
+    {
+      "path": "vectors/T3/t3-031/intent.txt",
+      "bytes": 116
+    },
+    {
       "path": "vectors/alt-readings/alt-b-001/about.txt",
       "bytes": 148
     },
@@ -1307,8 +1377,8 @@
     },
     {
       "path": "verify.py",
-      "bytes": 20467
+      "bytes": 21892
     }
   ],
-  "revision": "b, 7 Nov 2026: verifier exit codes hardened (a crash or unreadable file exits 3, never 1); disclaimer and terms of use added to README.txt and NOTICE; REGULATOR_QUESTIONS.txt added; README run order fixed; AMBIGUITY_LOG.txt entries 32 and 34 extended, entry 35 added. No input, expected verdict or exit code changed. See CHANGES_2026-11-07b.txt."
+  "revision": "c, 10 Nov 2026: nesting depth limit 16 (HOLD, INPUT-MALFORMED) decided by a byte scan before parsing; string walk iterative; vectors t3-029, t3-030, t3-031 added; mutants M-IN-06 to M-IN-08 added; check_exit_codes.py added; gen_vectors.py refuses an OUTDIR starting with \"-\"; README Python versions stated from recorded runs; \"not yet started trading\" sentence removed from README disclaimer. The 52 earlier vectors are byte-identical to 2026-11-07b. See CHANGES_2026-11-10.txt."
 }
