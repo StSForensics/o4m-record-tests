@@ -11,9 +11,9 @@ jobs:
       - name: Unpack, check and commit
         run: |
           set -e
-          ZIP=o4m-record-tests_repo-root-files_2026-11-10b.zip
+          ZIP=$(ls o4m-record-tests_repo-root-files_*.zip | head -n 1)
           test -f "$ZIP"
-          git rm -q -f --ignore-unmatch bundle_2026-11-07b.txt o4m-record-tests-vectors-2026-11-07b.zip bundle_2026-11-10.txt CHANGES_2026-11-10.txt SECOND_READER_PACKET/INSTRUCTIONS_FOR_SECOND_READER_2026-11-07.txt
+          git rm -q -f --ignore-unmatch bundle_2026-11-07b.txt bundle_2026-11-10.txt bundle_2026-11-10b.txt CHANGES_2026-11-10.txt o4m-record-tests-vectors-2026-11-07b.zip SECOND_READER_PACKET/INSTRUCTIONS_FOR_SECOND_READER_2026-11-07.txt
           unzip -q -o "$ZIP"
           rm "$ZIP"
           sha256sum -c SHA256SUMS | grep -v ': OK$' || true
@@ -22,5 +22,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "O4M Record Tests vectors 2026-11-10b (private rehearsal): unpacked package tree"
+          git commit -m "Unpacked package tree from $ZIP"
           git push
