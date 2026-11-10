@@ -1,11 +1,6 @@
-name: Unpack package
+name: Unpack 10c
 on:
   workflow_dispatch:
-    inputs:
-      zipname:
-        description: "Exact file name of the zip in the repo front page"
-        required: true
-        default: "o4m-record-tests_repo-root-files_2026-11-10c.zip"
 permissions:
   contents: write
 jobs:
@@ -14,44 +9,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Unpack, check and commit
-        env:
-          ZIPNAME: ${{ inputs.zipname }}
         run: |
-          set -eu
-          ZIP="${ZIPNAME:-o4m-record-tests_repo-root-files_2026-11-10c.zip}"
+          set -e
+          ZIP=o4m-record-tests_repo-root-files_2026-11-10c.zip
           if [ ! -f "$ZIP" ]; then
-            SEEN=$(ls -1 | tr '\n' ' ')
-            echo "::error::Zip named $ZIP is not in the repo front page. Files seen: $SEEN"
+            echo "::error::Cannot find $ZIP. Files seen: $(ls -1 | tr '\n' ' ')"
             exit 1
           fi
           git rm -q -f --ignore-unmatch bundle_2026-11-07b.txt bundle_2026-11-10.txt bundle_2026-11-10b.txt CHANGES_2026-11-10.txt o4m-record-tests-vectors-2026-11-07b.zip SECOND_READER_PACKET/INSTRUCTIONS_FOR_SECOND_READER_2026-11-07.txt SHA256SUMS
-          if ! unzip -q -o "$ZIP"; then
-            echo "::error::unzip failed on $ZIP. The file may be damaged or not a zip."
-            exit 1
-          fi
-          rm -f "$ZIP"
-          if [ ! -f SHA256SUMS ]; then
-            echo "::error::SHA256SUMS is not at the top level after unzip. The zip probably holds a folder. Use the repo-root-files zip."
-            exit 1
-          fi
+          unzip -q -o "$ZIP"
+          rm "$ZIP"
+          test -f SHA256SUMS || { echo "::error::SHA256SUMS missing after unzip (folder inside the zip?)"; exit 1; }
           sha256sum -c SHA256SUMS > /tmp/sums.txt || true
-          BAD=$(grep -vc ': OK$' /tmp/sums.txt || true)
-          GOOD=$(grep -c ': OK$' /tmp/sums.txt || true)
-          if [ "$BAD" != "0" ]; then
-            FIRST=$(grep -v ': OK$' /tmp/sums.txt | head -n 3 | tr '\n' ' ')
-            echo "::error::Checksum mismatch on $BAD lines. First: $FIRST"
-            exit 1
-          fi
-          echo "::notice::All $GOOD files match SHA256SUMS"
-          R=$(python3 verify.py T3 vectors/T3/t3-003/input.json | grep -E '^Result|T3-GAP|T3-LINK' | tr '\n' ' ' || true)
-          echo "::notice::t3-003 gives: $R"
+          grep -v ': OK$' /tmp/sums.txt || true
+          if grep -qv ': OK$' /tmp/sums.txt; then echo "::error::Checksum mismatch, see log"; exit 1; fi
+          echo "::notice::All $(grep -c ': OK$' /tmp/sums.txt) files match SHA256SUMS"
+          python3 verify.py T3 vectors/T3/t3-003/input.json | grep -E '^Result|T3-GAP|T3-LINK' || true
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          if git diff --cached --quiet; then
-            echo "::notice::Nothing to commit. The repo already holds this package."
-            exit 0
-          fi
-          git commit -q -m "Unpacked package tree from $ZIP"
+          git diff --cached --quiet && { echo "::notice::Nothing to commit"; exit 0; }
+          git commit -m "Unpacked package tree from $ZIP"
           git push
-          echo "::notice::Done. Committed and pushed."
