@@ -1,0 +1,12 @@
+CHANGES, package o4m-record-tests-vectors-2026-11-07b (from 2026-11-07), 7 Nov 2026
+Every input.json, expected.txt and expected_exit.txt is byte-identical to the 2026-11-07 package. The 52 vectors, the second-reader inputs and every verdict are unchanged.
+
+1. verify.py: a file that cannot be read (missing, a folder) and any internal error now exit 3 with a message and no verdict. Input nested too deeply to parse is HOLD with INPUT-UNPARSEABLE. Before, all of these exited 1, the code for FAIL, so a script could not tell a crash from a FAIL. Found by a red-team run of hostile inputs (100,000 nested brackets, a missing file, a folder). No vector pins this yet; a later revision should add one.
+2. README.txt: "Disclaimer and terms of use" added, matching the VerZan Check repository (AS IS, no warranty, not a rating or certificate, no professional relationship, limits of liability, consumer rights, trade marks, English law). Run order fixed: check SHA256SUMS before running mutate.py, which rewrites the header of MUTATION_RECORD.txt with your own run's date and Python version. Mac and Windows commands named. Python versions actually run stated.
+The repository address is filled in (github.com/StSForensics/o4m-record-tests); the public comment log address is still to be added.
+3. NOTICE: one line on AS IS and not legal advice.
+4. REGULATOR_QUESTIONS.txt added: the vectors indexed by three supervisor questions, with what they cannot show. Reading aid only. Added to the list of files never given to a second reader.
+5. AMBIGUITY_LOG.txt: entry 32 records the exit-code change; entry 34 notes the b suffix; entry 35 added (UTF-8 byte order mark gives HOLD).
+6. mutation/MUTATION_RECORD.txt: re-run against the changed verify.py. Same result as before: 50 mutants, 49 killed, 1 equivalent mutant survives (M-T3-06).
+7. MANIFEST.json, SHA256SUMS and the bundle (now bundle_2026-11-07b.txt) regenerated.
+Status unchanged: self-run, generated with AI assistance, not reproduced by anyone outside the editor.

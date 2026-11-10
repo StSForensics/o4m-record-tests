@@ -1,0 +1,108 @@
+AMBIGUITY LOG, O4M Record Tests 2026 v1.0, tests T3 and T14a, vector profile v0
+Package date 7 Nov 2026. Source text: DOI 10.5281/zenodo.23857888, Markdown source SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d.
+Each entry: where the document is silent or unclear, the question, the readings considered, the reading used, and which vectors change if the reading changes. Every reading used here is a vector profile v0 choice. None is normative.
+
+1. Encoding (C2; "Planned for the next version": one normative wire profile).
+Question: which canonical encoding do T3 records use? Readings: deterministic CBOR; JCS (RFC 8785). Used: JSON with JCS rules for a restricted subset (ASCII keys, strings, integers, booleans; no floats, no nulls). For that subset Python's json.dumps with sorted keys, compact separators and ensure_ascii False gives the same bytes as JCS. Effect: every T3 hash, so every T3 vector, changes if CBOR is chosen.
+
+2. Keys are ASCII only (C2).
+Question: JCS sorts keys by UTF-16 code units; Python sorts by code points. They differ only for keys outside the Basic Multilingual Plane. Used: profile v0 keys are fixed ASCII names, so the difference never arises. Effect: none on current vectors; a future profile with free-form keys must sort by UTF-16 code units.
+
+3. Number rules (C2; next-version wire profile lists "number and null rules").
+Question: which numbers are allowed? Used: integers only, from minus (2^53 minus 1) to plus (2^53 minus 1); counters and seq additionally non-negative. A number written with a fraction or exponent (100.0) is rejected even when its value is whole. Booleans are never integers (Python treats true as 1). Effect: t14a-012, t14a-013, t14a-014 return HOLD; under a looser reading they would PASS or be read differently by readers in other languages.
+
+4. Duplicate keys (C2; next-version wire profile lists duplicate-key rejection).
+Question: what happens to an input with a repeated key? Used: reject the whole input with proposed code INPUT-DUPKEY, result FAIL, and walk nothing. FAIL rather than HOLD because a repeated key lets two readers see two different records, which is the attack C2 names. Effect: t3-021. Under a HOLD reading t3-021 returns HOLD.
+
+5. NFC (C2).
+Question: which strings must be NFC, and what result? The text says the verifier rejects non-NFC input. Used: every string, keys included; proposed code T2-NFC, FAIL; the T3 walk still runs and its findings are also reported. Effect: t3-018. If NFC is checked only in record data, nothing changes today.
+
+6. Hash input (C3, C2).
+Question: what bytes are hashed? Used: SHA-256 over the canonical bytes of the record without its own "hash" field, stored as 64 lowercase hex characters. No domain separation tag (the next version plans one). Uppercase hex is malformed (T3-MALFORMED), since accepting both cases lets two strings stand for one hash. Effect: every T3 vector if a domain tag is added; t3-022.
+
+7. Numbering and genesis (C3).
+Question: zero-based or one-based seq; what prev_hash does the first record carry? Used: one-based, first prev_hash is 64 zero characters. Effect: t3-014 (zero-based) FAILs and t3-001 PASSes; they swap if zero-based is chosen. t3-028 depends on the genesis value.
+
+8. Teardown shape (C3, C13).
+Question: the text says only that the teardown carries last_seq. Used: the teardown is a record of type "teardown" in the same stream, its seq is last_seq plus 1, it links to the final event, exactly one per stream, nothing after it. Effect: t3-005, t3-009, t3-017, t3-024, t3-025, t3-027.
+
+9. Open stream (C3: "no gaps"; T3 pass criterion).
+Question: is a stream with no teardown a PASS? Used: HOLD with proposed T3-OPEN, because tail completeness cannot be shown. Effect: t3-006. Under a PASS reading, tail deletion of open streams would pass silently.
+
+10. Empty input (C3).
+Question: what does T3 return with no streams? Used: HOLD with proposed T3-EMPTY. Effect: t3-013.
+
+11. Walk order (C3).
+Question: is file order meaningful? Used: no; the verifier walks each stream by seq. Effect: t3-002 and t3-015 PASS; under a file-order reading they would fail.
+
+12. Link rule across a missing seq (C3: "valid links").
+Question: when seq n minus 1 is absent, what does record n's prev_hash have to match? Readings: (a) nothing, the gap is reported by T3-GAP alone; (b) the nearest lower record present. Used: (b). Reason: it separates a deletion (seq 4 still points at the deleted record: T3-GAP plus T3-LINK, t3-003) from a declared capture skip (seq 4 links straight to seq 2: DECLARED GAP only, t3-019). Effect: t3-003, t3-005, t3-020 lose T3-LINK under reading (a).
+
+13. Order of checks (C3).
+Question: the brief lists checks (a) to (f) in order; does an earlier failure stop later checks? Used: all checks run and every code that fires is printed. A record that is malformed takes its whole stream out of the walk, to avoid noise from a record the verifier cannot read. Effect: t3-022 reports only T3-MALFORMED.
+
+14. Malformed records (C3; the text has no malformed-input rule).
+Question: what does T3 do with a missing field, wrong type, unknown field or bad hex? Used: proposed T3-MALFORMED, HOLD. Effect: t3-022, t3-023.
+
+15. Reason codes (no registry yet; "Planned for the next version": a registry of reason codes).
+Question: what codes exist? Used: the list in REASON_CODES_PROPOSED.txt, every one marked proposed, not normative. Effect: every expected.txt prints codes; a registry would rename them.
+
+16. Several reasons at once (common output rule).
+Question: how are multiple reasons printed and combined? Used: every code once in the summary line, sorted alphabetically, then one detail line per occurrence (a code can fire on several records). Overall result FAIL if any FAIL code, else HOLD if any HOLD code, else PASS. The brief asked for one detail line per code; one line per occurrence was chosen so that no finding is hidden. Effect: t3-007, t3-009, t14a-005 print several lines per code.
+
+17. Declared gaps (V2.3; A1; Known issues: two senses of "gap").
+Question: how is a declared gap expressed, and what is the result for its scope? The text says a declared gap is "never PASS" for its scope and an undetected-but-undeclared gap is a FAIL. Used: declared_gaps entries are {stream_id, from_seq, to_seq, action_type, reason}; any declared gap gives proposed code DECLARED-GAP, HOLD, and is listed under "Declared gaps". A missing seq outside the declared range is an UNDECLARED GAP and fails. Effect: t3-019 (HOLD), t3-020 (FAIL).
+
+18. Fail-open drops (A1 against V2.3; Known issues).
+Question: A1 says counted drops under a declared fail-open policy "are reported, and do not fail". V2.3 says a declared gap is "never PASS" for its scope. Readings: primary (brief): PASS with a DECLARED GAP line; Reading D: HOLD with DECLARED-GAP. Used: primary, as the brief instructs. Recommendation to the editor: Reading D. It keeps one rule for every declared gap, it matches "never PASS", and A1's "do not fail" is still met because HOLD is not FAIL. Effect: t14a-002 becomes HOLD under Reading D (alt-d-001 shows it).
+
+19. Fail-open drops under a fail-closed declaration (A1: "declared fail-open policy").
+Question: if the declaration says fail-closed but a checkpoint says fail-open, are its drops a declared gap? Used: no. The policy was not declared, so the drops are not listed as a declared gap and the mismatch fails with proposed T14A-POLICY. Effect: t14a-016.
+
+20. Counters "balance" (C14, T14a). Three readings.
+Primary: received equals accepted plus dropped at every checkpoint. Reading B: also, no counter falls from one checkpoint to the next (proposed T14A-REGRESS). Reading C: also, accepted at a checkpoint equals the number of records in the chain up to that checkpoint (proposed T14A-CHAIN). The words "counters balance" settle none of this. Recommendation to the editor: adopt Reading B into T14a now (it needs nothing beyond the checkpoints, and a counter reset is a cheap way to hide a loss), and make Reading C its own test under C14 tied to T3, because it needs the chain as well as the counters and fails for a different reason. Effect: alt-b-002 and alt-c-002 FAIL only under their readings. No primary T14a vector changes under Reading B, because every primary multi-checkpoint vector has counters that never fall.
+
+21. Counter provenance (C14; Conventions: independent source).
+Question: who sets the provenance label, and what does UNVERIFIED do? Used: the label defaults to SOURCE-LOCAL; UNVERIFIED gives proposed T14A-UNVERIFIED, HOLD, because a check resting on an UNVERIFIED copy can FAIL but never PASS; a label of INDEPENDENTLY-RECONCILED written in the operator's own input is printed as "claimed in input, not checked" and changes nothing. Effect: t14a-017, t14a-018.
+
+22. Drops under fail-closed (T14a against T14b).
+Question: should T14a fail when dropped is above zero under fail-closed? Used: no; that is T14b's job, which is not run. T14a PASSes with the line "dropped greater than zero under fail-closed: T14b not run". Effect: t14a-005, t14a-007.
+
+23. Malformed checkpoints and duplicates (C14).
+Used: missing, non-integer, negative or out-of-range counters, unknown fields, missing policy and a repeated checkpoint_id are proposed T14A-MALFORMED, HOLD; the malformed checkpoint is set aside and the rest are checked. Effect: t14a-009, t14a-010, t14a-012 to t14a-015.
+
+24. Padding versus gap (A1 definition of gap).
+Question: is accepted plus dropped above received a gap? Used: it fails T14A-IMBALANCE but is not listed as a gap, because nothing is missing. Effect: t14a-004.
+
+25. Signed counters (C14 says "signed ... counters").
+Question: T14a vectors carry no signatures. Used: signature checks belong to T5 and are not run here; T14a is arithmetic only. Effect: none on current vectors.
+
+26. Declaration shape and T1b (A1).
+Question: what fields does the declaration carry? Used: consequential_action_types, tolerances {max_gap, max_clock_skew_s, max_unsealed_window_s}, fail_mode, monitors (list of names), declared_gaps. T1b gating (DECL-EMPTY, DECL-LOOSE) is not run; the strength line ends "T1b: not run". Every vector uses the A1 default bounds (max gap 0, skew 5 s, unsealed window 60 s). A declaration outside this shape gives proposed DECL-MALFORMED, HOLD. The tolerance max_gap is printed but not applied (no vector uses a non-zero gap tolerance). Effect: none today; a non-zero max_gap reading would need new vectors.
+
+27. "Covering [n of m] consequential action types" (A1).
+Question: how does a gap defined by stream and seq "cover" an action type? Used: each declared gap names one action_type; n is the number of distinct declared action types named by declared gaps. Effect: t3-019, t3-020 print "covering 1 of 1". Under DECL-LOOSE (not run) this declaration would be HOLD because declared gaps cover every action type; that is a sign the field needs a clearer definition.
+
+28. Profile (Three profiles: "the profile is printed on every result").
+Used: Profile F, since C3 sequence numbers are assigned at the source only under F (C3 data availability N for W). Profile W vectors (verifier assigns seq on ingestion, and the PASS line "integrity of received records; source completeness not established") are out of scope. Effect: every expected.txt prints "Profile: F".
+
+29. Verdict layout (common output rule; Scope; V2.3; V2.4).
+Question: the common output rule fixes six items; Scope and V2.3 add lines without placing them. Used: strength line; clock grade; sampling; test, suite and evidence hash; profile; result and reason codes with details; counters and notes (T14a); declared gaps; undeclared gaps; coverage windows (not run); T14e-SHADOW (not run); disclosure; V2.4 sentence in full (which contains item 5's line); T6c line; five shortened scope lines. Effect: layout of every expected.txt.
+
+30. Disclosure wording (common output rule item 4; C21).
+Used: "Verifier disclosure: no fee, volunteer run, no financial relationship with the operator". It is placed after the gap lists rather than on the result line. Effect: every expected.txt.
+
+31. Evidence hash (V2.4).
+Used: SHA-256 of the input.json file bytes exactly as stored. A Git checkout that rewrites line endings changes this hash; the package ships .gitattributes ("* -text") for that reason. Effect: every expected.txt.
+
+32. Exit codes and output bytes.
+Used: 0 PASS, 1 FAIL, 2 HOLD, 3 usage error; output forced to UTF-8 with LF line endings so that byte comparisons hold on Windows. Effect: expected_exit.txt in every vector folder. Revision b (7 Nov 2026): a file that cannot be read and any internal error (for example input nested too deeply for Python to walk) now exit 3 with no verdict, and input too deeply nested to parse is HOLD with INPUT-UNPARSEABLE. Before revision b these exited 1, the FAIL code, so a script could not tell a crash from a FAIL. No vector output changed.
+
+33. Known limits kept as vectors.
+t3-006 (open stream tail), t3-012 (full rewrite from the point of tampering) and t14a-011 (consistent under-reporting) PASS or HOLD where an attack happened. They show what T3 and T14a cannot see alone: C13, C6/T6a and T14c respectively.
+
+34. File names (brief house rule 9 against Part 2 names).
+The brief asks for dated file names and also names files README.txt, verify.py and so on. Used: the package folder carries the date (o4m-record-tests-vectors-2026-11-07) and the bundle file is dated; the files inside keep the names Part 2 gives, so that commands in the documents work. Revision b adds the letter b to the folder and bundle names.
+
+35. Byte order mark (C2; RFC 8259 section 8.1 forbids adding a BOM to JSON sent over a network and lets a parser ignore one).
+Question: what happens to a file that starts with a UTF-8 byte order mark, as some Windows editors save? Used: the verifier does not strip it, so the input is INPUT-UNPARSEABLE, HOLD. Effect: no current vector. An operator export saved in such an editor will HOLD until the BOM is removed; a future profile should say whether to strip, reject or HOLD, and add a vector.

@@ -1,0 +1,67 @@
+READING AID FOR SUPERVISORS: THREE QUESTIONS ABOUT AI RECORDS, AND WHAT THESE VECTORS SHOW
+O4M Record Tests 2026 v1.0, tests T3 and T14a, vector profile v0. Added 7 Nov 2026.
+For regulators, supervisors, courts, auditors, insurers and anyone handed an operator's AI records.
+
+What this file is
+A plain-language index of the vectors in this package, sorted by the question a supervisor would ask. It changes no vector, no expected verdict and no code. It is a reading aid, not a requirement, not guidance from any regulator and not legal advice. The specification (DOI 10.5281/zenodo.23857888) is the authority; where this file and the specification differ, the specification wins.
+
+The three questions
+1. Is the record complete for the scope the operator declared?
+2. Who else holds a copy, or a count, that the operator does not control?
+3. If an entry were missing or changed, how would anyone notice?
+
+How to read a result
+PASS means the test found nothing wrong in what it was given. It does not mean the record is true, complete beyond its declared scope, or approved. Every verdict in this package ends with "Scope 5: integrity is not truth; an intact record of false content is still false content."
+FAIL means the test found a specific problem and names it with a reason code (proposed, not normative).
+HOLD means the test could not reach PASS or FAIL: something is missing, malformed or declared as a gap. A HOLD is never a PASS.
+Run any vector yourself with Python 3 and no packages: python verify.py T3 vectors/T3/t3-003/input.json
+
+QUESTION 1. IS THE RECORD COMPLETE FOR THE DECLARED SCOPE?
+A record can only be complete against something written down in advance. Each verdict prints the declaration first (action types, tolerances, fail mode, declared gaps).
+t3-001 | PASS | an untampered stream: what "complete for the declared scope" looks like when the test can show it
+t3-019 | HOLD | the operator declared a gap in advance and the record skips exactly that entry: reported as a DECLARED GAP, never PASS
+t3-020 | FAIL | a gap was declared, but a different entry is missing: a declaration does not excuse what it does not name
+t3-006 | HOLD | the stream was never closed, so nobody can tell whether entries after the last one existed
+t3-013 | HOLD | no records at all: the test refuses to call nothing a PASS
+t14a-008 | HOLD | no counters at all: same rule for the counting test
+t14a-016 | FAIL | the declaration says recording stops on failure (fail-closed), but the counters say it carried on and dropped entries (fail-open)
+t14a-002 | PASS | entries were dropped and counted under a declared fail-open policy; alt-d-001 (HOLD) shows the stricter reading the author recommends
+
+QUESTION 2. WHO ELSE HOLDS A COPY, OR A COUNT?
+T3 and T14a work on what the operator hands over. Three vectors are kept on purpose to show what they cannot see without something held by someone else.
+t3-012 | PASS | KNOWN LIMIT: an entry was changed and everything after it was recomputed. The chain still checks. Only a copy committed earlier by someone else (checkpoints with independent time-stamps and witnesses, requirement C6, test T6a) can show this.
+t14a-011 | PASS | KNOWN LIMIT: the operator under-reports what it received, consistently. The counters still balance. Only a count the operator does not control (test T14c) can show this.
+t3-006 | HOLD | KNOWN LIMIT: an open stream's tail. Agent start and stop registration (requirement C13) is needed.
+t14a-017 | HOLD | counters labelled UNVERIFIED: a check resting on an unverified copy can FAIL, never PASS
+t14a-018 | PASS | the operator's own file says its counters were "independently reconciled". The verdict prints this as "claimed in input, not checked": an operator's statement about independence is not independence.
+
+QUESTION 3. IF AN ENTRY WERE MISSING OR CHANGED, HOW WOULD ANYONE NOTICE?
+Deletions
+t3-003 | FAIL | one entry deleted from the middle: the numbering gap and the broken link both show
+t3-004 | FAIL | the first entry deleted
+t3-005 | FAIL | the last entry deleted: the closing record still points at it
+t14a-003 | FAIL | five entries vanished without being counted
+t14a-006 | FAIL | one checkpoint out of five is short: the verdict names that checkpoint only
+t14a-019 | FAIL | exactly one entry lost: the smallest possible gap still fails
+alt-c-002 | FAIL | (alternative reading C) counters balance on their own, but do not match the entries actually in the chain
+Changes, insertions and re-ordering
+t3-010 | FAIL | the content of one entry edited
+t3-011 | FAIL | one entry edited and its own fingerprint recomputed, but not the ones after it
+t3-007 | FAIL | two entries swapped
+t3-008 | FAIL | an extra entry inserted with a valid fingerprint
+t3-009 | FAIL | the record forks into two versions
+t3-026 | FAIL | an entry copied from one stream into another
+t3-017, t3-024, t3-025, t3-027 | FAIL | the closing record misstates the end, or entries appear after it
+alt-b-002 | FAIL | (alternative reading B) a counter goes backwards between checkpoints, a cheap way to hide a loss
+
+WHEN TWO TOOLS COULD READ THE SAME FILE DIFFERENTLY
+These matter to anyone comparing results from different tools. A lax reader could reach a different verdict on the same bytes.
+t3-021 | FAIL | the same key appears twice in one entry, so two readers could see two different records
+t3-018 | FAIL | text stored in a non-standard Unicode form that looks identical on screen
+t3-022, t3-023 | HOLD | a fingerprint in upper case; a number written as text
+t14a-012, t14a-013, t14a-014 | HOLD | a counter written as true, as 100.0, or one above the largest whole number many readers hold exactly
+t3-014 | FAIL | numbering that starts at 0 instead of 1: a profile choice, logged in AMBIGUITY_LOG.txt entry 7
+
+What none of these vectors can tell you
+Whether the operator recorded everything it did (C13, C14 with T14c, C22). Whether a record was made at the time it claims (C6, C15). Who signed it and whether the key was safe (C5, C10, C23). Whether what the record says is true (C17, and evidence from others).
+Status: self-run by one author, generated with AI assistance, not reproduced by anyone else. See README.txt.

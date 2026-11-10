@@ -1,0 +1,32 @@
+REASON CODES USED BY THE T3 AND T14a VECTORS (vector profile v0, 7 Nov 2026)
+Every code below is proposed, not normative. O4M Record Tests 2026 v1.0 defines no codes for T3 or T14a; it plans a registry of reason codes in the next version. Result is what the code contributes: an overall result is FAIL if any FAIL code fires, otherwise HOLD if any HOLD code fires, otherwise PASS.
+
+Input level
+INPUT-UNPARSEABLE | HOLD | proposed, not normative | the file is not valid UTF-8 JSON
+INPUT-DUPKEY | FAIL | proposed, not normative | a key is repeated in an object
+INPUT-MALFORMED | HOLD | proposed, not normative | top-level shape wrong, or a string holds a lone surrogate
+T2-NFC | FAIL | proposed, not normative | a string is not in Unicode NFC (C2: rejected, never normalised)
+DECL-MALFORMED | HOLD | proposed, not normative | the declaration is missing or not in the profile v0 shape
+DECLARED-GAP | HOLD | proposed, not normative | the declaration names a gap; that scope is reported as DECLARED GAP, never PASS (V2.3). Under Reading D also raised for counted drops under a declared fail-open policy
+
+T3 (C3, chain walk)
+T3-HASH | FAIL | proposed, not normative | stored hash does not match recomputation
+T3-START | FAIL | proposed, not normative | lowest seq is not 1, or seq 1 does not carry the zero prev_hash
+T3-GAP | FAIL | proposed, not normative | a seq between 1 and the highest seq is missing and not declared
+T3-FORK | FAIL | proposed, not normative | two or more records share a stream and seq
+T3-LINK | FAIL | proposed, not normative | prev_hash does not match the record at seq minus one (or the nearest lower record present)
+T3-TAIL | FAIL | proposed, not normative | teardown missing its correct last_seq, more than one teardown, or records after the teardown
+T3-OPEN | HOLD | proposed, not normative | stream has no teardown; tail completeness not established
+T3-EMPTY | HOLD | proposed, not normative | input holds no streams
+T3-MALFORMED | HOLD | proposed, not normative | a record has missing, extra or wrongly typed fields or bad hex
+
+T14a (C14, counters balance)
+T14A-IMBALANCE | FAIL | proposed, not normative | received is not accepted plus dropped
+T14A-POLICY | FAIL | proposed, not normative | checkpoint policy differs from the declared fail mode
+T14A-UNVERIFIED | HOLD | proposed, not normative | counters labelled UNVERIFIED; can FAIL, never PASS
+T14A-NONE | HOLD | proposed, not normative | input holds no checkpoints
+T14A-MALFORMED | HOLD | proposed, not normative | missing, non-integer, negative or out-of-range counter, unknown field or repeated checkpoint_id
+
+Alternative readings only
+T14A-REGRESS | FAIL | proposed, not normative | Reading B: a counter falls from one checkpoint to the next
+T14A-CHAIN | FAIL | proposed, not normative | Reading C: accepted does not equal the records in the chain up to the checkpoint

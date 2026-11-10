@@ -1,0 +1,1314 @@
+{
+  "package": "o4m-record-tests-vectors-2026-11-07b",
+  "date": "2026-11-07",
+  "specification": {
+    "title": "O4M Record Tests 2026 v1.0",
+    "doi": "10.5281/zenodo.23857888",
+    "source_md_sha256": "8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d"
+  },
+  "profile": "vector profile v0 (not normative)",
+  "python_used_for_recorded_run": "3.13.16 (mutation record, revision b); first run 3.13.18",
+  "python_minimum_intended": "3.8; every vector run on 3.11.17, 3.12.3 and 3.13.16 with identical results; 3.8 to 3.10, Windows and macOS not run",
+  "third_party_packages": "none",
+  "vector_count": {
+    "T3": 28,
+    "T14a": 19,
+    "alt-readings": 5
+  },
+  "status": "self-run by one author; not reproduced by anyone else",
+  "run_commands": [
+    "sha256sum -c SHA256SUMS",
+    "python verify.py T3 vectors/T3/t3-001/input.json",
+    "python verify.py T14a vectors/T14a/t14a-001/input.json",
+    "python verify.py T14a vectors/alt-readings/alt-b-001/input.json --reading B",
+    "python gen_vectors.py . --expected",
+    "python mutation/mutate.py"
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 8
+    },
+    {
+      "path": "AMBIGUITY_LOG.txt",
+      "bytes": 14090
+    },
+    {
+      "path": "CHANGES_2026-11-07b.txt",
+      "bytes": 2017
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 11358
+    },
+    {
+      "path": "NOTICE",
+      "bytes": 484
+    },
+    {
+      "path": "README.txt",
+      "bytes": 9303
+    },
+    {
+      "path": "REASON_CODES_PROPOSED.txt",
+      "bytes": 2852
+    },
+    {
+      "path": "REGULATOR_QUESTIONS.txt",
+      "bytes": 6172
+    },
+    {
+      "path": "SECOND_READER_PACKET/INSTRUCTIONS_FOR_SECOND_READER_2026-11-07.txt",
+      "bytes": 2669
+    },
+    {
+      "path": "SECOND_READER_PACKET/O4M Record Tests 2026 v1_0 2026-11-01.md",
+      "bytes": 55258
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-001__T14a.json",
+      "bytes": 435
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-002__T14a.json",
+      "bytes": 430
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-003__T14a.json",
+      "bytes": 434
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-004__T14a.json",
+      "bytes": 435
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-005__T14a.json",
+      "bytes": 994
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-006__T14a.json",
+      "bytes": 994
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-007__T14a.json",
+      "bytes": 434
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-008__T14a.json",
+      "bytes": 293
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-009__T14a.json",
+      "bytes": 415
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-010__T14a.json",
+      "bytes": 436
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-011__T14a.json",
+      "bytes": 435
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-012__T14a.json",
+      "bytes": 434
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-013__T14a.json",
+      "bytes": 437
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-014__T14a.json",
+      "bytes": 461
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-015__T14a.json",
+      "bytes": 575
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-016__T14a.json",
+      "bytes": 432
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-017__T14a.json",
+      "bytes": 469
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-018__T14a.json",
+      "bytes": 483
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t14a-019__T14a.json",
+      "bytes": 434
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-001__T3.json",
+      "bytes": 1954
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-002__T3.json",
+      "bytes": 3617
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-003__T3.json",
+      "bytes": 1681
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-004__T3.json",
+      "bytes": 1681
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-005__T3.json",
+      "bytes": 1681
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-006__T3.json",
+      "bytes": 1656
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-007__T3.json",
+      "bytes": 1954
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-008__T3.json",
+      "bytes": 2235
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-009__T3.json",
+      "bytes": 2819
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-010__T3.json",
+      "bytes": 1962
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-011__T3.json",
+      "bytes": 1962
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-012__T3.json",
+      "bytes": 1962
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-013__T3.json",
+      "bytes": 289
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-014__T3.json",
+      "bytes": 1954
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-015__T3.json",
+      "bytes": 1954
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-016__T3.json",
+      "bytes": 5288
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-017__T3.json",
+      "bytes": 1954
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-018__T3.json",
+      "bytes": 1965
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-019__T3.json",
+      "bytes": 1872
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-020__T3.json",
+      "bytes": 1872
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-021__T3.json",
+      "bytes": 1970
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-022__T3.json",
+      "bytes": 1954
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-023__T3.json",
+      "bytes": 1956
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-024__T3.json",
+      "bytes": 2240
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-025__T3.json",
+      "bytes": 2259
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-026__T3.json",
+      "bytes": 3617
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-027__T3.json",
+      "bytes": 1954
+    },
+    {
+      "path": "SECOND_READER_PACKET/pass2_inputs/t3-028__T3.json",
+      "bytes": 1954
+    },
+    {
+      "path": "gen_vectors.py",
+      "bytes": 26022
+    },
+    {
+      "path": "mutation/MUTATION_RECORD.txt",
+      "bytes": 8746
+    },
+    {
+      "path": "mutation/mutate.py",
+      "bytes": 12613
+    },
+    {
+      "path": "vectors/T14a/t14a-001/about.txt",
+      "bytes": 197
+    },
+    {
+      "path": "vectors/T14a/t14a-001/expected.txt",
+      "bytes": 1697
+    },
+    {
+      "path": "vectors/T14a/t14a-001/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-001/input.json",
+      "bytes": 435
+    },
+    {
+      "path": "vectors/T14a/t14a-001/intent.txt",
+      "bytes": 114
+    },
+    {
+      "path": "vectors/T14a/t14a-002/about.txt",
+      "bytes": 318
+    },
+    {
+      "path": "vectors/T14a/t14a-002/expected.txt",
+      "bytes": 1769
+    },
+    {
+      "path": "vectors/T14a/t14a-002/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-002/input.json",
+      "bytes": 430
+    },
+    {
+      "path": "vectors/T14a/t14a-002/intent.txt",
+      "bytes": 114
+    },
+    {
+      "path": "vectors/T14a/t14a-003/about.txt",
+      "bytes": 163
+    },
+    {
+      "path": "vectors/T14a/t14a-003/expected.txt",
+      "bytes": 1753
+    },
+    {
+      "path": "vectors/T14a/t14a-003/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-003/input.json",
+      "bytes": 434
+    },
+    {
+      "path": "vectors/T14a/t14a-003/intent.txt",
+      "bytes": 124
+    },
+    {
+      "path": "vectors/T14a/t14a-004/about.txt",
+      "bytes": 200
+    },
+    {
+      "path": "vectors/T14a/t14a-004/expected.txt",
+      "bytes": 1749
+    },
+    {
+      "path": "vectors/T14a/t14a-004/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-004/input.json",
+      "bytes": 435
+    },
+    {
+      "path": "vectors/T14a/t14a-004/intent.txt",
+      "bytes": 124
+    },
+    {
+      "path": "vectors/T14a/t14a-005/about.txt",
+      "bytes": 178
+    },
+    {
+      "path": "vectors/T14a/t14a-005/expected.txt",
+      "bytes": 2476
+    },
+    {
+      "path": "vectors/T14a/t14a-005/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-005/input.json",
+      "bytes": 994
+    },
+    {
+      "path": "vectors/T14a/t14a-005/intent.txt",
+      "bytes": 114
+    },
+    {
+      "path": "vectors/T14a/t14a-006/about.txt",
+      "bytes": 99
+    },
+    {
+      "path": "vectors/T14a/t14a-006/expected.txt",
+      "bytes": 2458
+    },
+    {
+      "path": "vectors/T14a/t14a-006/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-006/input.json",
+      "bytes": 994
+    },
+    {
+      "path": "vectors/T14a/t14a-006/intent.txt",
+      "bytes": 124
+    },
+    {
+      "path": "vectors/T14a/t14a-007/about.txt",
+      "bytes": 235
+    },
+    {
+      "path": "vectors/T14a/t14a-007/expected.txt",
+      "bytes": 1772
+    },
+    {
+      "path": "vectors/T14a/t14a-007/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-007/input.json",
+      "bytes": 434
+    },
+    {
+      "path": "vectors/T14a/t14a-007/intent.txt",
+      "bytes": 114
+    },
+    {
+      "path": "vectors/T14a/t14a-008/about.txt",
+      "bytes": 87
+    },
+    {
+      "path": "vectors/T14a/t14a-008/expected.txt",
+      "bytes": 1536
+    },
+    {
+      "path": "vectors/T14a/t14a-008/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-008/input.json",
+      "bytes": 293
+    },
+    {
+      "path": "vectors/T14a/t14a-008/intent.txt",
+      "bytes": 119
+    },
+    {
+      "path": "vectors/T14a/t14a-009/about.txt",
+      "bytes": 108
+    },
+    {
+      "path": "vectors/T14a/t14a-009/expected.txt",
+      "bytes": 1629
+    },
+    {
+      "path": "vectors/T14a/t14a-009/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-009/input.json",
+      "bytes": 415
+    },
+    {
+      "path": "vectors/T14a/t14a-009/intent.txt",
+      "bytes": 124
+    },
+    {
+      "path": "vectors/T14a/t14a-010/about.txt",
+      "bytes": 153
+    },
+    {
+      "path": "vectors/T14a/t14a-010/expected.txt",
+      "bytes": 1629
+    },
+    {
+      "path": "vectors/T14a/t14a-010/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-010/input.json",
+      "bytes": 436
+    },
+    {
+      "path": "vectors/T14a/t14a-010/intent.txt",
+      "bytes": 124
+    },
+    {
+      "path": "vectors/T14a/t14a-011/about.txt",
+      "bytes": 394
+    },
+    {
+      "path": "vectors/T14a/t14a-011/expected.txt",
+      "bytes": 1697
+    },
+    {
+      "path": "vectors/T14a/t14a-011/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-011/input.json",
+      "bytes": 435
+    },
+    {
+      "path": "vectors/T14a/t14a-011/intent.txt",
+      "bytes": 114
+    },
+    {
+      "path": "vectors/T14a/t14a-012/about.txt",
+      "bytes": 204
+    },
+    {
+      "path": "vectors/T14a/t14a-012/expected.txt",
+      "bytes": 1629
+    },
+    {
+      "path": "vectors/T14a/t14a-012/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-012/input.json",
+      "bytes": 434
+    },
+    {
+      "path": "vectors/T14a/t14a-012/intent.txt",
+      "bytes": 124
+    },
+    {
+      "path": "vectors/T14a/t14a-013/about.txt",
+      "bytes": 186
+    },
+    {
+      "path": "vectors/T14a/t14a-013/expected.txt",
+      "bytes": 1629
+    },
+    {
+      "path": "vectors/T14a/t14a-013/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-013/input.json",
+      "bytes": 437
+    },
+    {
+      "path": "vectors/T14a/t14a-013/intent.txt",
+      "bytes": 124
+    },
+    {
+      "path": "vectors/T14a/t14a-014/about.txt",
+      "bytes": 294
+    },
+    {
+      "path": "vectors/T14a/t14a-014/expected.txt",
+      "bytes": 1629
+    },
+    {
+      "path": "vectors/T14a/t14a-014/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-014/input.json",
+      "bytes": 461
+    },
+    {
+      "path": "vectors/T14a/t14a-014/intent.txt",
+      "bytes": 124
+    },
+    {
+      "path": "vectors/T14a/t14a-015/about.txt",
+      "bytes": 141
+    },
+    {
+      "path": "vectors/T14a/t14a-015/expected.txt",
+      "bytes": 1670
+    },
+    {
+      "path": "vectors/T14a/t14a-015/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-015/input.json",
+      "bytes": 575
+    },
+    {
+      "path": "vectors/T14a/t14a-015/intent.txt",
+      "bytes": 124
+    },
+    {
+      "path": "vectors/T14a/t14a-016/about.txt",
+      "bytes": 202
+    },
+    {
+      "path": "vectors/T14a/t14a-016/expected.txt",
+      "bytes": 1688
+    },
+    {
+      "path": "vectors/T14a/t14a-016/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-016/input.json",
+      "bytes": 432
+    },
+    {
+      "path": "vectors/T14a/t14a-016/intent.txt",
+      "bytes": 121
+    },
+    {
+      "path": "vectors/T14a/t14a-017/about.txt",
+      "bytes": 269
+    },
+    {
+      "path": "vectors/T14a/t14a-017/expected.txt",
+      "bytes": 1714
+    },
+    {
+      "path": "vectors/T14a/t14a-017/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-017/input.json",
+      "bytes": 469
+    },
+    {
+      "path": "vectors/T14a/t14a-017/intent.txt",
+      "bytes": 125
+    },
+    {
+      "path": "vectors/T14a/t14a-018/about.txt",
+      "bytes": 264
+    },
+    {
+      "path": "vectors/T14a/t14a-018/expected.txt",
+      "bytes": 1741
+    },
+    {
+      "path": "vectors/T14a/t14a-018/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-018/input.json",
+      "bytes": 483
+    },
+    {
+      "path": "vectors/T14a/t14a-018/intent.txt",
+      "bytes": 114
+    },
+    {
+      "path": "vectors/T14a/t14a-019/about.txt",
+      "bytes": 248
+    },
+    {
+      "path": "vectors/T14a/t14a-019/expected.txt",
+      "bytes": 1753
+    },
+    {
+      "path": "vectors/T14a/t14a-019/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T14a/t14a-019/input.json",
+      "bytes": 434
+    },
+    {
+      "path": "vectors/T14a/t14a-019/intent.txt",
+      "bytes": 124
+    },
+    {
+      "path": "vectors/T3/t3-001/about.txt",
+      "bytes": 187
+    },
+    {
+      "path": "vectors/T3/t3-001/expected.txt",
+      "bytes": 1489
+    },
+    {
+      "path": "vectors/T3/t3-001/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-001/input.json",
+      "bytes": 1954
+    },
+    {
+      "path": "vectors/T3/t3-001/intent.txt",
+      "bytes": 108
+    },
+    {
+      "path": "vectors/T3/t3-002/about.txt",
+      "bytes": 179
+    },
+    {
+      "path": "vectors/T3/t3-002/expected.txt",
+      "bytes": 1489
+    },
+    {
+      "path": "vectors/T3/t3-002/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-002/input.json",
+      "bytes": 3617
+    },
+    {
+      "path": "vectors/T3/t3-002/intent.txt",
+      "bytes": 108
+    },
+    {
+      "path": "vectors/T3/t3-003/about.txt",
+      "bytes": 235
+    },
+    {
+      "path": "vectors/T3/t3-003/expected.txt",
+      "bytes": 1646
+    },
+    {
+      "path": "vectors/T3/t3-003/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-003/input.json",
+      "bytes": 1681
+    },
+    {
+      "path": "vectors/T3/t3-003/intent.txt",
+      "bytes": 119
+    },
+    {
+      "path": "vectors/T3/t3-004/about.txt",
+      "bytes": 260
+    },
+    {
+      "path": "vectors/T3/t3-004/expected.txt",
+      "bytes": 1625
+    },
+    {
+      "path": "vectors/T3/t3-004/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-004/input.json",
+      "bytes": 1681
+    },
+    {
+      "path": "vectors/T3/t3-004/intent.txt",
+      "bytes": 120
+    },
+    {
+      "path": "vectors/T3/t3-005/about.txt",
+      "bytes": 340
+    },
+    {
+      "path": "vectors/T3/t3-005/expected.txt",
+      "bytes": 1738
+    },
+    {
+      "path": "vectors/T3/t3-005/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-005/input.json",
+      "bytes": 1681
+    },
+    {
+      "path": "vectors/T3/t3-005/intent.txt",
+      "bytes": 128
+    },
+    {
+      "path": "vectors/T3/t3-006/about.txt",
+      "bytes": 362
+    },
+    {
+      "path": "vectors/T3/t3-006/expected.txt",
+      "bytes": 1561
+    },
+    {
+      "path": "vectors/T3/t3-006/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-006/input.json",
+      "bytes": 1656
+    },
+    {
+      "path": "vectors/T3/t3-006/intent.txt",
+      "bytes": 111
+    },
+    {
+      "path": "vectors/T3/t3-007/about.txt",
+      "bytes": 261
+    },
+    {
+      "path": "vectors/T3/t3-007/expected.txt",
+      "bytes": 1858
+    },
+    {
+      "path": "vectors/T3/t3-007/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-007/input.json",
+      "bytes": 1954
+    },
+    {
+      "path": "vectors/T3/t3-007/intent.txt",
+      "bytes": 120
+    },
+    {
+      "path": "vectors/T3/t3-008/about.txt",
+      "bytes": 222
+    },
+    {
+      "path": "vectors/T3/t3-008/expected.txt",
+      "bytes": 1545
+    },
+    {
+      "path": "vectors/T3/t3-008/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-008/input.json",
+      "bytes": 2235
+    },
+    {
+      "path": "vectors/T3/t3-008/intent.txt",
+      "bytes": 111
+    },
+    {
+      "path": "vectors/T3/t3-009/about.txt",
+      "bytes": 280
+    },
+    {
+      "path": "vectors/T3/t3-009/expected.txt",
+      "bytes": 1701
+    },
+    {
+      "path": "vectors/T3/t3-009/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-009/input.json",
+      "bytes": 2819
+    },
+    {
+      "path": "vectors/T3/t3-009/intent.txt",
+      "bytes": 120
+    },
+    {
+      "path": "vectors/T3/t3-010/about.txt",
+      "bytes": 191
+    },
+    {
+      "path": "vectors/T3/t3-010/expected.txt",
+      "bytes": 1561
+    },
+    {
+      "path": "vectors/T3/t3-010/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-010/input.json",
+      "bytes": 1962
+    },
+    {
+      "path": "vectors/T3/t3-010/intent.txt",
+      "bytes": 111
+    },
+    {
+      "path": "vectors/T3/t3-011/about.txt",
+      "bytes": 181
+    },
+    {
+      "path": "vectors/T3/t3-011/expected.txt",
+      "bytes": 1565
+    },
+    {
+      "path": "vectors/T3/t3-011/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-011/input.json",
+      "bytes": 1962
+    },
+    {
+      "path": "vectors/T3/t3-011/intent.txt",
+      "bytes": 111
+    },
+    {
+      "path": "vectors/T3/t3-012/about.txt",
+      "bytes": 462
+    },
+    {
+      "path": "vectors/T3/t3-012/expected.txt",
+      "bytes": 1489
+    },
+    {
+      "path": "vectors/T3/t3-012/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-012/input.json",
+      "bytes": 1962
+    },
+    {
+      "path": "vectors/T3/t3-012/intent.txt",
+      "bytes": 108
+    },
+    {
+      "path": "vectors/T3/t3-013/about.txt",
+      "bytes": 128
+    },
+    {
+      "path": "vectors/T3/t3-013/expected.txt",
+      "bytes": 1528
+    },
+    {
+      "path": "vectors/T3/t3-013/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-013/input.json",
+      "bytes": 289
+    },
+    {
+      "path": "vectors/T3/t3-013/intent.txt",
+      "bytes": 112
+    },
+    {
+      "path": "vectors/T3/t3-014/about.txt",
+      "bytes": 277
+    },
+    {
+      "path": "vectors/T3/t3-014/expected.txt",
+      "bytes": 1544
+    },
+    {
+      "path": "vectors/T3/t3-014/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-014/input.json",
+      "bytes": 1954
+    },
+    {
+      "path": "vectors/T3/t3-014/intent.txt",
+      "bytes": 112
+    },
+    {
+      "path": "vectors/T3/t3-015/about.txt",
+      "bytes": 171
+    },
+    {
+      "path": "vectors/T3/t3-015/expected.txt",
+      "bytes": 1489
+    },
+    {
+      "path": "vectors/T3/t3-015/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-015/input.json",
+      "bytes": 1954
+    },
+    {
+      "path": "vectors/T3/t3-015/intent.txt",
+      "bytes": 108
+    },
+    {
+      "path": "vectors/T3/t3-016/about.txt",
+      "bytes": 155
+    },
+    {
+      "path": "vectors/T3/t3-016/expected.txt",
+      "bytes": 1561
+    },
+    {
+      "path": "vectors/T3/t3-016/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-016/input.json",
+      "bytes": 5288
+    },
+    {
+      "path": "vectors/T3/t3-016/intent.txt",
+      "bytes": 111
+    },
+    {
+      "path": "vectors/T3/t3-017/about.txt",
+      "bytes": 212
+    },
+    {
+      "path": "vectors/T3/t3-017/expected.txt",
+      "bytes": 1575
+    },
+    {
+      "path": "vectors/T3/t3-017/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-017/input.json",
+      "bytes": 1954
+    },
+    {
+      "path": "vectors/T3/t3-017/intent.txt",
+      "bytes": 111
+    },
+    {
+      "path": "vectors/T3/t3-018/about.txt",
+      "bytes": 271
+    },
+    {
+      "path": "vectors/T3/t3-018/expected.txt",
+      "bytes": 1564
+    },
+    {
+      "path": "vectors/T3/t3-018/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-018/input.json",
+      "bytes": 1965
+    },
+    {
+      "path": "vectors/T3/t3-018/intent.txt",
+      "bytes": 110
+    },
+    {
+      "path": "vectors/T3/t3-019/about.txt",
+      "bytes": 384
+    },
+    {
+      "path": "vectors/T3/t3-019/expected.txt",
+      "bytes": 1712
+    },
+    {
+      "path": "vectors/T3/t3-019/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-019/input.json",
+      "bytes": 1872
+    },
+    {
+      "path": "vectors/T3/t3-019/intent.txt",
+      "bytes": 116
+    },
+    {
+      "path": "vectors/T3/t3-020/about.txt",
+      "bytes": 301
+    },
+    {
+      "path": "vectors/T3/t3-020/expected.txt",
+      "bytes": 1875
+    },
+    {
+      "path": "vectors/T3/t3-020/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-020/input.json",
+      "bytes": 1872
+    },
+    {
+      "path": "vectors/T3/t3-020/intent.txt",
+      "bytes": 133
+    },
+    {
+      "path": "vectors/T3/t3-021/about.txt",
+      "bytes": 256
+    },
+    {
+      "path": "vectors/T3/t3-021/expected.txt",
+      "bytes": 1379
+    },
+    {
+      "path": "vectors/T3/t3-021/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-021/input.json",
+      "bytes": 1970
+    },
+    {
+      "path": "vectors/T3/t3-021/intent.txt",
+      "bytes": 116
+    },
+    {
+      "path": "vectors/T3/t3-022/about.txt",
+      "bytes": 279
+    },
+    {
+      "path": "vectors/T3/t3-022/expected.txt",
+      "bytes": 1725
+    },
+    {
+      "path": "vectors/T3/t3-022/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-022/input.json",
+      "bytes": 1954
+    },
+    {
+      "path": "vectors/T3/t3-022/intent.txt",
+      "bytes": 116
+    },
+    {
+      "path": "vectors/T3/t3-023/about.txt",
+      "bytes": 209
+    },
+    {
+      "path": "vectors/T3/t3-023/expected.txt",
+      "bytes": 1613
+    },
+    {
+      "path": "vectors/T3/t3-023/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-023/input.json",
+      "bytes": 1956
+    },
+    {
+      "path": "vectors/T3/t3-023/intent.txt",
+      "bytes": 116
+    },
+    {
+      "path": "vectors/T3/t3-024/about.txt",
+      "bytes": 231
+    },
+    {
+      "path": "vectors/T3/t3-024/expected.txt",
+      "bytes": 1551
+    },
+    {
+      "path": "vectors/T3/t3-024/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-024/input.json",
+      "bytes": 2240
+    },
+    {
+      "path": "vectors/T3/t3-024/intent.txt",
+      "bytes": 111
+    },
+    {
+      "path": "vectors/T3/t3-025/about.txt",
+      "bytes": 141
+    },
+    {
+      "path": "vectors/T3/t3-025/expected.txt",
+      "bytes": 1533
+    },
+    {
+      "path": "vectors/T3/t3-025/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-025/input.json",
+      "bytes": 2259
+    },
+    {
+      "path": "vectors/T3/t3-025/intent.txt",
+      "bytes": 111
+    },
+    {
+      "path": "vectors/T3/t3-026/about.txt",
+      "bytes": 316
+    },
+    {
+      "path": "vectors/T3/t3-026/expected.txt",
+      "bytes": 1716
+    },
+    {
+      "path": "vectors/T3/t3-026/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-026/input.json",
+      "bytes": 3617
+    },
+    {
+      "path": "vectors/T3/t3-026/intent.txt",
+      "bytes": 120
+    },
+    {
+      "path": "vectors/T3/t3-027/about.txt",
+      "bytes": 165
+    },
+    {
+      "path": "vectors/T3/t3-027/expected.txt",
+      "bytes": 1565
+    },
+    {
+      "path": "vectors/T3/t3-027/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-027/input.json",
+      "bytes": 1954
+    },
+    {
+      "path": "vectors/T3/t3-027/intent.txt",
+      "bytes": 111
+    },
+    {
+      "path": "vectors/T3/t3-028/about.txt",
+      "bytes": 343
+    },
+    {
+      "path": "vectors/T3/t3-028/expected.txt",
+      "bytes": 1554
+    },
+    {
+      "path": "vectors/T3/t3-028/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-028/input.json",
+      "bytes": 1954
+    },
+    {
+      "path": "vectors/T3/t3-028/intent.txt",
+      "bytes": 112
+    },
+    {
+      "path": "vectors/alt-readings/alt-b-001/about.txt",
+      "bytes": 148
+    },
+    {
+      "path": "vectors/alt-readings/alt-b-001/expected.txt",
+      "bytes": 2098
+    },
+    {
+      "path": "vectors/alt-readings/alt-b-001/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/alt-readings/alt-b-001/input.json",
+      "bytes": 715
+    },
+    {
+      "path": "vectors/alt-readings/alt-b-001/intent.txt",
+      "bytes": 135
+    },
+    {
+      "path": "vectors/alt-readings/alt-b-002/about.txt",
+      "bytes": 294
+    },
+    {
+      "path": "vectors/alt-readings/alt-b-002/expected.txt",
+      "bytes": 2168
+    },
+    {
+      "path": "vectors/alt-readings/alt-b-002/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/alt-readings/alt-b-002/input.json",
+      "bytes": 715
+    },
+    {
+      "path": "vectors/alt-readings/alt-b-002/intent.txt",
+      "bytes": 143
+    },
+    {
+      "path": "vectors/alt-readings/alt-c-001/about.txt",
+      "bytes": 239
+    },
+    {
+      "path": "vectors/alt-readings/alt-c-001/expected.txt",
+      "bytes": 1838
+    },
+    {
+      "path": "vectors/alt-readings/alt-c-001/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/alt-readings/alt-c-001/input.json",
+      "bytes": 2291
+    },
+    {
+      "path": "vectors/alt-readings/alt-c-001/intent.txt",
+      "bytes": 135
+    },
+    {
+      "path": "vectors/alt-readings/alt-c-002/about.txt",
+      "bytes": 230
+    },
+    {
+      "path": "vectors/alt-readings/alt-c-002/expected.txt",
+      "bytes": 1822
+    },
+    {
+      "path": "vectors/alt-readings/alt-c-002/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/alt-readings/alt-c-002/input.json",
+      "bytes": 2018
+    },
+    {
+      "path": "vectors/alt-readings/alt-c-002/intent.txt",
+      "bytes": 141
+    },
+    {
+      "path": "vectors/alt-readings/alt-d-001/about.txt",
+      "bytes": 264
+    },
+    {
+      "path": "vectors/alt-readings/alt-d-001/expected.txt",
+      "bytes": 1823
+    },
+    {
+      "path": "vectors/alt-readings/alt-d-001/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/alt-readings/alt-d-001/input.json",
+      "bytes": 430
+    },
+    {
+      "path": "vectors/alt-readings/alt-d-001/intent.txt",
+      "bytes": 143
+    },
+    {
+      "path": "verify.py",
+      "bytes": 20467
+    }
+  ],
+  "revision": "b, 7 Nov 2026: verifier exit codes hardened (a crash or unreadable file exits 3, never 1); disclaimer and terms of use added to README.txt and NOTICE; REGULATOR_QUESTIONS.txt added; README run order fixed; AMBIGUITY_LOG.txt entries 32 and 34 extended, entry 35 added. No input, expected verdict or exit code changed. See CHANGES_2026-11-07b.txt."
+}
