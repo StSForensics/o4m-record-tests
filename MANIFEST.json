@@ -1,7 +1,7 @@
 {
-  "package": "o4m-record-tests-vectors-2026-11-10b",
+  "package": "o4m-record-tests-vectors-2026-11-10c",
   "date": "2026-11-10",
-  "first_issued": "2026-11-07 (revision b: 2026-11-07b; this is revision c, build b of 10 Nov 2026; an earlier same-day build was never published)",
+  "first_issued": "2026-11-07 (revision b: 2026-11-07b; this is revision c, build c of 10 Nov 2026; earlier same-day builds were never made public)",
   "specification": {
     "title": "O4M Record Tests 2026 v1.0",
     "doi": "10.5281/zenodo.23857888",
@@ -33,7 +33,7 @@
     },
     {
       "path": "AMBIGUITY_LOG.txt",
-      "bytes": 15675
+      "bytes": 15849
     },
     {
       "path": "CHANGES_2026-11-07b.txt",
@@ -42,6 +42,10 @@
     {
       "path": "CHANGES_2026-11-10b.txt",
       "bytes": 3179
+    },
+    {
+      "path": "CHANGES_2026-11-10c.txt",
+      "bytes": 1222
     },
     {
       "path": "LICENSE",
@@ -53,7 +57,7 @@
     },
     {
       "path": "README.txt",
-      "bytes": 9722
+      "bytes": 9899
     },
     {
       "path": "REASON_CODES_PROPOSED.txt",
@@ -1392,5 +1396,5 @@
       "bytes": 21892
     }
   ],
-  "revision": "c, 10 Nov 2026: nesting depth limit 16 (HOLD, INPUT-MALFORMED) decided by a byte scan before parsing; string walk iterative; vectors t3-029, t3-030, t3-031 added; mutants M-IN-06 to M-IN-08 added; check_exit_codes.py added; gen_vectors.py refuses an OUTDIR starting with \"-\"; README Python versions stated from recorded runs; \"not yet started trading\" sentence removed from README disclaimer. The 52 earlier vectors are byte-identical to 2026-11-07b. The second-reader packet is refreshed (50 blind inputs, three-stage handover, instructions version 2). See CHANGES_2026-11-10b.txt."
+  "revision": "c, 10 Nov 2026: nesting depth limit 16 (HOLD, INPUT-MALFORMED) decided by a byte scan before parsing; string walk iterative; vectors t3-029, t3-030, t3-031 added; mutants M-IN-06 to M-IN-08 added; check_exit_codes.py added; gen_vectors.py refuses an OUTDIR starting with \"-\"; README Python versions stated from recorded runs; \"not yet started trading\" sentence removed from README disclaimer. The 52 earlier vectors are byte-identical to 2026-11-07b. The second-reader packet is refreshed (50 blind inputs, three-stage handover, instructions version 2). Build c changes documentation only: README comment log address and patents scope. See CHANGES_2026-11-10c.txt and CHANGES_2026-11-10b.txt."
 }

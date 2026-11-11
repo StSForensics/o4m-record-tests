@@ -1,11 +1,11 @@
-BUNDLE: o4m-record-tests-vectors-2026-11-10b, every text file in the package, one header line per file.
+BUNDLE: o4m-record-tests-vectors-2026-11-10c, every text file in the package, one header line per file.
 SHA256SUMS in this package is the reference; this bundle is for copy and paste.
 
 FILE: .gitattributes (SHA-256 705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da)
 * -text
 END OF FILE: .gitattributes
 
-FILE: AMBIGUITY_LOG.txt (SHA-256 72cd0e9bb8eb5971717e247cf4e8b7207ed5879513d1a1eb09ddb5ec1044389c)
+FILE: AMBIGUITY_LOG.txt (SHA-256 aff30c275ccc0f8b668f1de2cc389718be8c709c54c995dd85dd4a882622b697)
 AMBIGUITY LOG, O4M Record Tests 2026 v1.0, tests T3 and T14a, vector profile v0
 Package first issued 7 Nov 2026; revision c issued 10 Nov 2026. Source text: DOI 10.5281/zenodo.23857888, Markdown source SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d.
 Each entry: where the document is silent or unclear, the question, the readings considered, the reading used, and which vectors change if the reading changes. Every reading used here is a vector profile v0 choice. None is normative.
@@ -110,7 +110,7 @@ Used: 0 PASS, 1 FAIL, 2 HOLD, 3 usage error; output forced to UTF-8 with LF line
 t3-006 (open stream tail), t3-012 (full rewrite from the point of tampering) and t14a-011 (consistent under-reporting) PASS or HOLD where an attack happened. They show what T3 and T14a cannot see alone: C13, C6/T6a and T14c respectively.
 
 34. File names (brief house rule 9 against Part 2 names).
-The brief asks for dated file names and also names files README.txt, verify.py and so on. Used: the package folder carries the date (o4m-record-tests-vectors-2026-11-07) and the bundle file is dated; the files inside keep the names Part 2 gives, so that commands in the documents work. Revision b added the letter b to the folder and bundle names. Revision c (10 Nov 2026) is named by its issue date and a letter, o4m-record-tests-vectors-2026-11-10b, because its vector inputs are the 7 Nov inputs plus three added vectors. A first build of revision c, also dated 10 Nov, was superseded the same day by the b build (second-reader packet refreshed) and was never published.
+The brief asks for dated file names and also names files README.txt, verify.py and so on. Used: the package folder carries the date (o4m-record-tests-vectors-2026-11-07) and the bundle file is dated; the files inside keep the names Part 2 gives, so that commands in the documents work. Revision b added the letter b to the folder and bundle names. Revision c (10 Nov 2026) is named by its issue date and a letter, o4m-record-tests-vectors-2026-11-10b, because its vector inputs are the 7 Nov inputs plus three added vectors. A first build of revision c, also dated 10 Nov, was superseded the same day by the b build (second-reader packet refreshed) and was never published. A c build (2026-11-10c) changed only README.txt (comment log address, patents scope), added CHANGES_2026-11-10c.txt and regenerated MANIFEST.json, SHA256SUMS and the bundle.
 
 35. Byte order mark (C2; RFC 8259 section 8.1 forbids adding a BOM to JSON sent over a network and lets a parser ignore one).
 Question: what happens to a file that starts with a UTF-8 byte order mark, as some Windows editors save? Used: the verifier does not strip it, so the input is INPUT-UNPARSEABLE, HOLD. Effect: vector t3-030 (added in revision c, 10 Nov 2026) pins HOLD with INPUT-UNPARSEABLE. An operator export saved in such an editor will HOLD until the BOM is removed; a future profile should say whether to strip, reject or HOLD.
@@ -149,6 +149,17 @@ Every input.json, expected.txt and expected_exit.txt of the 52 vectors in 2026-1
 9. SECOND_READER_PACKET refreshed: INSTRUCTIONS_FOR_SECOND_READER_2026-11-10.txt (version 2) replaces the 7 Nov file. It adds a three-stage handover, a note that some inputs are hostile on purpose, and a rule not to search the web for the tests. pass2_inputs now holds 50 files: the 47 earlier inputs plus t3-029, t3-030 and t3-031. The depth limit and the byte order mark are profile choices that the specification does not state, so a blind reader is expected to differ on those three; that is informative, not a fault.
 Status unchanged: self-run, generated with AI assistance, not reproduced by anyone outside the editor.
 END OF FILE: CHANGES_2026-11-10b.txt
+
+FILE: CHANGES_2026-11-10c.txt (SHA-256 598df4963e14f06413d7835b57fa66f998f330f94cb7349ac652df82b5fe0c1e)
+CHANGES, package o4m-record-tests-vectors-2026-11-10c (revision c of the package first issued 7 Nov 2026), 10 Nov 2026. This c build supersedes the b build of the same day, which was never made public.
+Nothing but documentation changed. verify.py, gen_vectors.py, check_exit_codes.py, mutation/, every vector (55) and the SECOND_READER_PACKET are byte-identical to 2026-11-10b (checked with diff).
+
+1. README.txt, Comments: the public comment log is the Issues page of this repository (https://github.com/StSForensics/o4m-record-tests/issues). Before, the line read "TO BE ADDED BY EDITOR (URL)". Comments sent by email are copied there only with the sender's permission.
+2. README.txt, Patents: the promise not to assert now says "the tests, verifier and vectors in this package", where it said "this suite". The rest of the paragraph is unchanged.
+3. AMBIGUITY_LOG.txt: one sentence added to the naming entry to record this build.
+4. MANIFEST.json (package name, revision note), SHA256SUMS and the bundle (bundle_2026-11-10c.txt) regenerated. CHANGES_2026-11-07b.txt and CHANGES_2026-11-10b.txt are kept for history.
+Status unchanged: self-run, generated with AI assistance, not reproduced by anyone outside the editor.
+END OF FILE: CHANGES_2026-11-10c.txt
 
 FILE: LICENSE (SHA-256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30)
 
@@ -355,11 +366,11 @@ FILE: LICENSE (SHA-256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417b
    limitations under the License.
 END OF FILE: LICENSE
 
-FILE: MANIFEST.json (SHA-256 fc242bce696fc50708ca866056ef02fbe7fce4748f107e61c5725f6e4808357c)
+FILE: MANIFEST.json (SHA-256 600fd4c120b598ec8ea1fd3c84dbb5c43a423b2f29d465f1a1002efb52311ae5)
 {
-  "package": "o4m-record-tests-vectors-2026-11-10b",
+  "package": "o4m-record-tests-vectors-2026-11-10c",
   "date": "2026-11-10",
-  "first_issued": "2026-11-07 (revision b: 2026-11-07b; this is revision c, build b of 10 Nov 2026; an earlier same-day build was never published)",
+  "first_issued": "2026-11-07 (revision b: 2026-11-07b; this is revision c, build c of 10 Nov 2026; earlier same-day builds were never made public)",
   "specification": {
     "title": "O4M Record Tests 2026 v1.0",
     "doi": "10.5281/zenodo.23857888",
@@ -391,7 +402,7 @@ FILE: MANIFEST.json (SHA-256 fc242bce696fc50708ca866056ef02fbe7fce4748f107e61c57
     },
     {
       "path": "AMBIGUITY_LOG.txt",
-      "bytes": 15675
+      "bytes": 15849
     },
     {
       "path": "CHANGES_2026-11-07b.txt",
@@ -400,6 +411,10 @@ FILE: MANIFEST.json (SHA-256 fc242bce696fc50708ca866056ef02fbe7fce4748f107e61c57
     {
       "path": "CHANGES_2026-11-10b.txt",
       "bytes": 3179
+    },
+    {
+      "path": "CHANGES_2026-11-10c.txt",
+      "bytes": 1222
     },
     {
       "path": "LICENSE",
@@ -411,7 +426,7 @@ FILE: MANIFEST.json (SHA-256 fc242bce696fc50708ca866056ef02fbe7fce4748f107e61c57
     },
     {
       "path": "README.txt",
-      "bytes": 9722
+      "bytes": 9899
     },
     {
       "path": "REASON_CODES_PROPOSED.txt",
@@ -1750,7 +1765,7 @@ FILE: MANIFEST.json (SHA-256 fc242bce696fc50708ca866056ef02fbe7fce4748f107e61c57
       "bytes": 21892
     }
   ],
-  "revision": "c, 10 Nov 2026: nesting depth limit 16 (HOLD, INPUT-MALFORMED) decided by a byte scan before parsing; string walk iterative; vectors t3-029, t3-030, t3-031 added; mutants M-IN-06 to M-IN-08 added; check_exit_codes.py added; gen_vectors.py refuses an OUTDIR starting with \"-\"; README Python versions stated from recorded runs; \"not yet started trading\" sentence removed from README disclaimer. The 52 earlier vectors are byte-identical to 2026-11-07b. The second-reader packet is refreshed (50 blind inputs, three-stage handover, instructions version 2). See CHANGES_2026-11-10b.txt."
+  "revision": "c, 10 Nov 2026: nesting depth limit 16 (HOLD, INPUT-MALFORMED) decided by a byte scan before parsing; string walk iterative; vectors t3-029, t3-030, t3-031 added; mutants M-IN-06 to M-IN-08 added; check_exit_codes.py added; gen_vectors.py refuses an OUTDIR starting with \"-\"; README Python versions stated from recorded runs; \"not yet started trading\" sentence removed from README disclaimer. The 52 earlier vectors are byte-identical to 2026-11-07b. The second-reader packet is refreshed (50 blind inputs, three-stage handover, instructions version 2). Build c changes documentation only: README comment log address and patents scope. See CHANGES_2026-11-10c.txt and CHANGES_2026-11-10b.txt."
 }
 END OF FILE: MANIFEST.json
 
@@ -1763,7 +1778,7 @@ Requirement and test text from O4M Record Tests 2026 v1.0 (DOI 10.5281/zenodo.23
 Provided AS IS, WITHOUT WARRANTY OF ANY KIND. Not a rating, certificate or approval, and not legal advice. See README.txt, "Disclaimer and terms of use".
 END OF FILE: NOTICE
 
-FILE: README.txt (SHA-256 3c2d6f20526bee3048c236f7ab545353a7ca94c35ee2713e5737a54b85cd2901)
+FILE: README.txt (SHA-256 ed2c259521196fffc5cf5dab2e3da60e5f89897938fa52d7b2f33745df287277)
 O4M RECORD TESTS 2026 v1.0: TEST VECTORS FOR T3 AND T14a (DRAFT PACKAGE, 10 Nov 2026, revision c of the package first issued 7 Nov 2026)
 
 What this is
@@ -1820,7 +1835,7 @@ Reference verifier, generator, mutation harness and test vectors: Apache License
 Repository for issues, downloads and DCO-signed contributions: https://github.com/StSForensics/o4m-record-tests (releases: https://github.com/StSForensics/o4m-record-tests/releases)
 
 Patents
-STS Forensics Ltd does not assert patent rights against anyone who implements, runs or publishes results of these tests. Gareth Wong is named inventor on unpublished UK patent applications filed in early 2026 on hardware gating and logging, and will not assert any patent arising from them against implementing, running or publishing results of this suite. Third-party patents may exist; no assessment has been made. This is not legal advice. Results are published unsigned and no certificates are issued.
+STS Forensics Ltd does not assert patent rights against anyone who implements, runs or publishes results of these tests. Gareth Wong is named inventor on unpublished UK patent applications filed in early 2026 on hardware gating and logging, and will not assert any patent arising from them against implementing, running or publishing results of the tests, verifier and vectors in this package. Third-party patents may exist; no assessment has been made. This is not legal advice. Results are published unsigned and no certificates are issued.
 
 Name use
 Any public statement about a run should quote the version, the T1b strength line and the in-scope tests not run, for example: "O4M Record Tests 2026 v1.0, Profile F: declaration 3 consequential action types, fail-closed, skew 5 s; C2 to C5 PASS; C14 and C22 not run; declared gaps: none." Please do not describe a system as "compliant", "conformant", "approved" or "certified" on the strength of these tests. Every verdict here is an unsigned result.
@@ -1830,8 +1845,8 @@ The editor used AI assistants (Claude, by Anthropic) to help draft and edit requ
 The reference verifier, vectors and mutation harness in this package were generated by an AI assistant from the requirement text above and are not yet reviewed or reproduced by anyone else.
 
 Comments
-Send comments to comments@sts-forensics.com with the subject "O4M Record Tests". Comments and the editor's replies are kept in a public comment log.
-Public comment log: TO BE ADDED BY EDITOR (URL)
+Send comments to comments@sts-forensics.com with the subject "O4M Record Tests", or open an issue in this repository. Comments and the editor's replies are kept in a public comment log. Comments sent by email are copied there only with the sender's permission.
+Public comment log: https://github.com/StSForensics/o4m-record-tests/issues
 
 Copyright 2026 Gareth Wong.
 END OF FILE: README.txt
@@ -5230,15 +5245,16 @@ FILE: SECOND_READER_PACKET/pass2_inputs/t3-031__T3.json (SHA-256 231debf76b060cb
 }
 END OF FILE: SECOND_READER_PACKET/pass2_inputs/t3-031__T3.json
 
-FILE: SHA256SUMS (SHA-256 fb8f3c52dbeaf0f3ce0918334386db5f0f6e6fc63d3486f5a5c03c999824f768)
+FILE: SHA256SUMS (SHA-256 cb0b6f79be2ad737845e668dc20a9a7b095010ccbcbc26310737388475a27803)
 705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da  .gitattributes
-72cd0e9bb8eb5971717e247cf4e8b7207ed5879513d1a1eb09ddb5ec1044389c  AMBIGUITY_LOG.txt
+aff30c275ccc0f8b668f1de2cc389718be8c709c54c995dd85dd4a882622b697  AMBIGUITY_LOG.txt
 ccdafdddb517e08f2561849cbdda54013ac319606dca9c052a4fc0465af9da7e  CHANGES_2026-11-07b.txt
 33356d617a9fba1609bc73bbfbf0721c2dadf8ac91a1e944c01c9ecbe1406cb2  CHANGES_2026-11-10b.txt
+598df4963e14f06413d7835b57fa66f998f330f94cb7349ac652df82b5fe0c1e  CHANGES_2026-11-10c.txt
 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30  LICENSE
-fc242bce696fc50708ca866056ef02fbe7fce4748f107e61c5725f6e4808357c  MANIFEST.json
+600fd4c120b598ec8ea1fd3c84dbb5c43a423b2f29d465f1a1002efb52311ae5  MANIFEST.json
 22893a02d52afe1dbd2e399680c9bc86c01edda5e7d1301aef7630510e12edea  NOTICE
-3c2d6f20526bee3048c236f7ab545353a7ca94c35ee2713e5737a54b85cd2901  README.txt
+ed2c259521196fffc5cf5dab2e3da60e5f89897938fa52d7b2f33745df287277  README.txt
 5c747ccd04df823390bd4b6dd9d5ce98ac2dccfe86ca4c488b2a9a26facb54fe  REASON_CODES_PROPOSED.txt
 0c1db860a57b68e2c0aced35e8181adfff6d75f2851cfda799a7800adf957828  REGULATOR_QUESTIONS.txt
 f31c407edae930ab9c8f9382ec7c2d0b0d47d20ce2af3ea0d2ff77aa72437c30  SECOND_READER_PACKET/INSTRUCTIONS_FOR_SECOND_READER_2026-11-10.txt

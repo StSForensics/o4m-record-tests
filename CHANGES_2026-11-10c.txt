@@ -1,0 +1,8 @@
+CHANGES, package o4m-record-tests-vectors-2026-11-10c (revision c of the package first issued 7 Nov 2026), 10 Nov 2026. This c build supersedes the b build of the same day, which was never made public.
+Nothing but documentation changed. verify.py, gen_vectors.py, check_exit_codes.py, mutation/, every vector (55) and the SECOND_READER_PACKET are byte-identical to 2026-11-10b (checked with diff).
+
+1. README.txt, Comments: the public comment log is the Issues page of this repository (https://github.com/StSForensics/o4m-record-tests/issues). Before, the line read "TO BE ADDED BY EDITOR (URL)". Comments sent by email are copied there only with the sender's permission.
+2. README.txt, Patents: the promise not to assert now says "the tests, verifier and vectors in this package", where it said "this suite". The rest of the paragraph is unchanged.
+3. AMBIGUITY_LOG.txt: one sentence added to the naming entry to record this build.
+4. MANIFEST.json (package name, revision note), SHA256SUMS and the bundle (bundle_2026-11-10c.txt) regenerated. CHANGES_2026-11-07b.txt and CHANGES_2026-11-10b.txt are kept for history.
+Status unchanged: self-run, generated with AI assistance, not reproduced by anyone outside the editor.
