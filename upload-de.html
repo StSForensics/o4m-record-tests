@@ -1,0 +1,310 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>VerZan Check</title><meta name="description" content="Kostenloses Werkzeug: Bilden Sie den Fingerabdruck einer Datei in Ihrem Browser (SHA-256) und sehen Sie, was das Löschen eines Eintrags mit einem Protokoll macht. Nichts verlässt die Seite."><meta property="og:title" content="VerZan Check"><meta property="og:description" content="Ist das genau die Datei, die jemand aufgezeichnet hat? Bilden Sie ihren Fingerabdruck in Ihrem Browser und vergleichen Sie. Nichts verlässt die Seite."><meta property="og:type" content="website"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'"><link rel="alternate" hreflang="en" href="https://verzan.org/"><link rel="alternate" hreflang="fr" href="https://verzan.org/fr/"><link rel="alternate" hreflang="de" href="https://verzan.org/de/"><link rel="alternate" hreflang="es" href="https://verzan.org/es/"><link rel="alternate" hreflang="ja" href="https://verzan.org/ja/"><link rel="alternate" hreflang="x-default" href="https://verzan.org/"><link rel="canonical" href="https://verzan.org/de/"><meta name="referrer" content="no-referrer"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20160%20160%22%3E%3Crect%20width%3D%22160%22%20height%3D%22160%22%20rx%3D%2224%22%20fill%3D%22%23FAF9F5%22/%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23182720%22%20stroke-width%3D%228%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%2280%22%20y1%3D%2210%22%20x2%3D%2280%22%20y2%3D%2230%22/%3E%3Cline%20x1%3D%2252%22%20y1%3D%2230%22%20x2%3D%22108%22%20y2%3D%2230%22/%3E%3Crect%20x%3D%2250%22%20y%3D%2242%22%20width%3D%2260%22%20height%3D%2254%22/%3E%3Cline%20x1%3D%2250%22%20y1%3D%2260%22%20x2%3D%22110%22%20y2%3D%2260%22/%3E%3Cline%20x1%3D%2250%22%20y1%3D%2278%22%20x2%3D%22110%22%20y2%3D%2278%22/%3E%3Cline%20x1%3D%2238%22%20y1%3D%22106%22%20x2%3D%22122%22%20y2%3D%22106%22/%3E%3C/g%3E%3Cpath%20d%3D%22M52%20126%20L72%20148%20L118%20116%22%20fill%3D%22none%22%20stroke%3D%22%23458D5F%22%20stroke-width%3D%2212%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<style>
+/* Layout: one narrow evidence column; tool first, then the proof ladder, then the 23 checks as a filterable list */
+:root{
+  --bg:#eef1f3; --panel:#ffffff; --ink:#141a22; --muted:#55606e; --line:#d3d9df;
+  --accent:#2340c8; --accent-ink:#ffffff;
+  --ok:#11734b; --ok-bg:#e1f3ea; --bad:#a3271c; --bad-bg:#fbe6e3; --part:#8a5a00; --part-bg:#fbefd6;
+  --display:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141a; --panel:#171e26; --ink:#e7ecf1; --muted:#9aa6b3; --line:#2b3540;
+  --accent:#8ea2ff; --accent-ink:#0f141a;
+  --ok:#6fd6a6; --ok-bg:#12302a; --bad:#ff8f84; --bad-bg:#3a1a17; --part:#f2c264; --part-bg:#36290f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141a; --panel:#171e26; --ink:#e7ecf1; --muted:#9aa6b3; --line:#2b3540;
+  --accent:#8ea2ff; --accent-ink:#0f141a;
+  --ok:#6fd6a6; --ok-bg:#12302a; --bad:#ff8f84; --bad-bg:#3a1a17; --part:#f2c264; --part-bg:#36290f; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body)}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:grid;gap:36px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:700}
+p{margin:0;max-width:65ch}
+.eyebrow{font:600 .74rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+header{display:grid;gap:10px}
+.lede{font-size:1.12rem;color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px}
+label{font-weight:700;font-size:.95rem}
+textarea,input[type=text]{width:100%;box-sizing:border-box;font:15px/1.5 var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px}
+textarea{min-height:90px;resize:vertical}
+textarea:focus,input:focus,button:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hash{font:600 .9rem/1.5 var(--mono);word-break:break-all;background:var(--bg);border-radius:6px;padding:10px;border:1px dashed var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button,.filebtn{font:700 .92rem var(--body);border:0;border-radius:6px;padding:9px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+input[type=file]{font:14px var(--body);color:var(--muted)}
+.verdict{font:700 1rem var(--body);padding:10px 12px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok)} .verdict.bad{background:var(--bad-bg);color:var(--bad)} .verdict.idle{color:var(--muted);padding-left:0}
+.note{font-size:.9rem;color:var(--muted)}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-left:3px solid var(--line)}
+.ladder li{display:grid;grid-template-columns:2.2rem 1fr;gap:12px;padding:12px 0 12px 12px;border-bottom:1px solid var(--line)}
+.ladder li:last-child{border-bottom:0}
+.rung{font:700 1.05rem var(--mono);color:var(--accent)}
+.ladder .q{font-weight:700}
+.tag{display:inline-block;font:600 .72rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 7px;border-radius:4px;white-space:nowrap}
+.t-yes{background:var(--ok-bg);color:var(--ok)} .t-na{background:var(--bg);color:var(--muted);border:1px solid var(--line)} .t-part{background:var(--part-bg);color:var(--part)} .t-op{background:var(--bad-bg);color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 .85rem var(--body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tests{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.test{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:6px;align-content:start;min-width:0}
+.test .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.cid{font:700 .95rem var(--mono)}
+.test p{font-size:.93rem} .test .own{font-size:.88rem;color:var(--muted)} .steps{margin:0;padding-left:1.2rem;display:grid;gap:8px;max-width:65ch} progress{width:100%}
+.fit{border:1px solid var(--line);border-left:5px solid var(--accent);background:var(--bg);border-radius:8px;padding:16px;display:grid;gap:10px}
+.fit ul{margin:0;padding-left:1.2rem;display:grid;gap:8px;max-width:65ch}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:56px;height:56px;flex:none;color:var(--ink)}
+footer{font-size:.85rem;color:var(--muted);display:grid;gap:6px;border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion:no-preference){.verdict{transition:background .2s}}
+.langbar{font-size:.85rem;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--panel)}.langbar a{color:var(--accent)}
+</style>
+
+
+<div class="wrap">
+  <div class="langbar" role="note">Maschinelle Übersetzung, nicht von Muttersprachlern geprüft. Maßgeblich ist die englische Fassung. <a href="https://verzan.org/" hreflang="en" lang="en">English</a> · <a href="https://verzan.org/fr/" hreflang="fr" lang="fr">Français</a> · <a href="https://verzan.org/es/" hreflang="es" lang="es">Español</a> · <a href="https://verzan.org/ja/" hreflang="ja" lang="ja">日本語</a></div>
+  <header>
+    <span class="eyebrow">Kostenloses Gemeinwohl-Werkzeug von StS Forensics Ltd · läuft vollständig in Ihrem Browser</span>
+    <div class="brand"><svg class="logo" viewBox="0 0 160 160" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><line x1="80" y1="10" x2="80" y2="30"/><line x1="52" y1="30" x2="108" y2="30"/><rect x="50" y="42" width="60" height="54"/><line x1="50" y1="60" x2="110" y2="60"/><line x1="50" y1="78" x2="110" y2="78"/><line x1="38" y1="106" x2="122" y2="106"/></g><path d="M52 126 L72 148 L118 116" fill="none" stroke="#458D5F" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg><h1>VerZan Check</h1></div>
+    <p class="lede">Ist das genau die Datei, die jemand aufgezeichnet hat? Bilden Sie hier ihren Fingerabdruck (Hashwert, SHA-256) und vergleichen Sie. Nichts, was Sie eingeben oder ablegen, verlässt diese Seite.</p>
+    <div class="chips" role="group" aria-label="Wer sind Sie?">
+      <button class="chip mode" data-m="co" aria-pressed="true">Ich prüfe die KI eines Unternehmens</button>
+      <button class="chip mode" data-m="own" aria-pressed="false">Ich betreibe mein eigenes KI-Modell</button>
+    </div>
+  </header>
+
+  <section class="panel" aria-labelledby="why">
+    <h2 id="why">Warum es das gibt</h2>
+    <p>KI-Chatbots und KI-Agenten arbeiten probabilistisch: Stellen Sie dieselbe Frage zweimal, können Sie zwei verschiedene Antworten erhalten. Wenn eine KI eine Erstattung zusagt, einen Preis nennt oder eine Handlung ausführt, ist daher die verlässlichste Darstellung des Geschehens eine im Moment des Geschehens erstellte Aufzeichnung, aufbewahrt dort, wo niemand sie unbemerkt ändern kann, und überprüfbar durch jemand anderen als das Unternehmen, das sie erstellt hat. Ohne sie läuft ein Streit darauf hinaus, dass Ihr Wort gegen ein Protokoll steht, das nur die Gegenseite kontrolliert.</p>
+    <p>Dasselbe gilt, wenn Sie ein KI-Modell selbst betreiben, auf einem Laptop, einem Heimserver oder einer kleinen Platine. Wird jemals bestritten, was Ihr Modell geschrieben oder getan hat, ist eine damals erstellte, von einer externen Uhr versiegelte Aufzeichnung ein weit stärkeres Beweismittel als ein Protokoll, das Sie später hätten bearbeiten können.</p>
+    <p>Auch das Recht bewegt sich in dieselbe Richtung. Nach der neuen EU-Produkthaftungsrichtlinie (Richtlinie (EU) 2024/2853 über die Haftung für fehlerhafte Produkte), die Software einschließlich KI erfasst, die nach dem 9. Dezember 2026 in Verkehr gebracht oder in Betrieb genommen wird, müssen Geschädigte kein Verschulden nachweisen (sie müssen weiterhin nachweisen, dass das Produkt fehlerhaft war, den Schaden und den Zusammenhang zwischen beiden), ein Gericht kann die Offenlegung von Beweismitteln anordnen, und unterbleibt die Offenlegung, kann das Gericht die Fehlerhaftigkeit des Produkts vermuten.<span class="ownonly" hidden> Sie betrifft hauptsächlich Produkte, die im Rahmen einer gewerblichen Tätigkeit bereitgestellt werden. Diese Seite sagt nicht, ob sie auch jemanden erfassen könnte, der ein Modell nur für sich selbst betreibt; beachten Sie, dass die Definition des Herstellers auch eine Person einschließt, die ein Produkt für den Eigenbedarf entwickelt, herstellt oder produziert (Artikel 4 Nummer 10).</span></p>
+    <p><strong>Stellen Sie also zwei Fragen:</strong> Kann ich die Aufzeichnung bekommen? Und kann jemand anderes als Sie sie prüfen? Diese Seite zeigt, wie die erste Prüfung funktioniert.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="try">
+    <h2 id="try">Probieren Sie es aus: Ändern Sie einen Buchstaben</h2>
+    <label for="sample">Text (eine Beispielantwort eines Chatbots)</label>
+    <textarea id="sample">Agent: Ja, ich kann Ihnen Ihre 1.119 Punkte als einmalige Kulanz erstatten. Die Erstattung wurde veranlasst.</textarea>
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">SHA-256-Hashwert (digitaler Fingerabdruck)</div>
+      <div class="hash" id="sampleHash" aria-live="polite">wird berechnet…</div>
+    </div>
+    <p class="note">Ändern Sie oben ein beliebiges Zeichen, auch nur ein Komma, und der Fingerabdruck ändert sich vollständig. Deshalb kann ein früher festgehaltener Fingerabdruck zeigen, dass eine Datei später verändert wurde.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="omit">
+    <h2 id="omit">Probieren Sie es aus: Entfernen Sie einen Eintrag</h2>
+    <p>Hier ist ein Spielzeugprotokoll mit fünf Einträgen. Jeder erhielt seinen Fingerabdruck, als er entstand, und trägt den Fingerabdruck des vorherigen. Löschen Sie einen unbemerkt und führen Sie dann beide Prüfungen aus.</p>
+    <ol id="recs" class="steps"></ol>
+    <div class="row">
+      <button id="del" type="button">Eintrag 3 unbemerkt löschen</button>
+      <button id="rst" type="button" class="ghost">Wieder einfügen</button>
+    </div>
+    <div class="verdict idle" id="vAlt" aria-live="polite"></div>
+    <div class="verdict idle" id="vGap" aria-live="polite"></div>
+    <p class="note">Die erste Prüfung fragt nur, ob jeder verbliebene Eintrag unverändert ist. Einen Eintrag, der nicht mehr da ist, kann sie nicht sehen. Die zweite fragt, ob die Nummern lückenlos laufen und jeder Eintrag auf den vorherigen verweist. Dies ist ein Spielzeug aus wenigen Zeilen, kein KI-Protokoll. Ein echter Betreiber, der die Stelle kontrolliert, an der Einträge erfasst werden, könnte Einträge verwerfen, bevor sie nummeriert werden. Deshalb verlangen die Entwurfstests auch Zählungen, die jemand anderes hält (C14), und einen Nachweis, dass die Aufzeichnung aktiv war (C22).</p>
+  </section>
+
+  <section class="panel" aria-labelledby="regq">
+    <h2 id="regq">Sie bekommen die KI-Aufzeichnungen eines Betreibers? Drei Fragen, die Sie stellen sollten</h2>
+    <p>Für Regulierer, Aufsichtsbehörden, Gerichte, Versicherer, Prüfer und alle, die KI-Aufzeichnungen von dem Unternehmen erhalten, das sie erstellt hat. Diese Seite nennt dieses Unternehmen „Betreiber“; das entspricht in den meisten Fällen dem Betreiber im Sinne der KI-Verordnung der EU.</p>
+    <ol class="steps">
+      <li><strong>Ist die Aufzeichnung für den vom Betreiber erklärten Umfang vollständig?</strong> Fragen Sie zuerst nach der Erklärung: was aufgezeichnet wird, wie oft und was geschieht, wenn die Aufzeichnung ausfällt (C1), und welche Lücken im Voraus erklärt wurden. Die Entwurfstests melden jede erklärte Lücke; ob eine davon jemals als bestanden gelten kann, ist noch offen für Kommentare.</li>
+      <li><strong>Wer sonst hat eine Kopie oder eine Zählung?</strong> Eine Aufzeichnung, die nur gegen sich selbst geprüft wird, kann weder eine vollständige Umschreibung noch eine konsistente Untererfassung zeigen. Suchen Sie nach Kontrollpunkten, die mit einer externen Uhr gestempelt und von anderen bezeugt sind (C6), und nach Zählungen von jemandem, den der Betreiber nicht kontrolliert, etwa der eigenen Rechnung des KI-Anbieters (C14).</li>
+      <li><strong>Wie würde jemand bemerken, wenn ein Eintrag fehlte oder geändert wäre?</strong> Nummerierung und Verknüpfungen (C3) zeigen eine Löschung, wie die Demonstration oben. Zähler (C14) zeigen Einträge, die vor der Nummerierung verworfen wurden. Ein Heartbeat-Signal, also ein regelmäßiges Lebenszeichen (C22), zeigt, wann die Aufzeichnung abgeschaltet war.</li>
+    </ol>
+    <p class="note">Entwurfs-Testvektoren für zwei der Tests, T3 und T14a, zeigen jeden Fall, darunter zwei, in denen eine Prüfung bestanden wird, obwohl etwas schiefgegangen ist, und einen, in dem sie nur offen bleiben kann, weil nur eine externe Kopie oder Zählung ihn erkennen könnte. Dazu gehört ein Index in einfacher Sprache für Aufsichtsbehörden (REGULATOR_QUESTIONS.txt) unter <a href="https://github.com/StSForensics/o4m-record-tests" rel="noopener">github.com/StSForensics/o4m-record-tests</a>. Sie wurden vom Autor selbst ausgeführt. Ein zweiter Leser, von einem Familienmitglied für den Autor eingesetzt, schrieb einen separaten Prüfer, dessen Urteile bei 31 von 50 Eingaben übereinstimmten; sonst hat niemand die Ergebnisse reproduziert. Dies ist eine Lesehilfe, keine Richtlinie einer Aufsichtsbehörde und keine Rechtsberatung.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="check">
+    <h2 id="check">Eine Ihnen übergebene Datei prüfen</h2>
+    <div class="row">
+      <input type="file" id="file" aria-label="Wählen Sie eine Datei, deren Fingerabdruck gebildet werden soll">
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">Fingerabdruck dieser Datei</div>
+      <div class="hash" id="fileHash">Noch keine Datei gewählt.</div>
+      <progress id="prog" max="100" value="0" hidden></progress>
+    </div>
+    <label for="expected">Fingerabdruck, den Sie erwarten sollten</label>
+    <input type="text" id="expected" placeholder="Fügen Sie den 64-stelligen SHA-256 aus dem Register, der Quittung oder der E-Mail ein">
+    <div class="verdict idle" id="verdict" aria-live="polite">Wählen Sie eine Datei und fügen Sie den erwarteten Fingerabdruck zum Vergleich ein.</div>
+    <p class="note">Eine Übereinstimmung zeigt, dass die Datei Byte für Byte diejenige ist, deren Fingerabdruck gebildet wurde. Sie zeigt weder wann noch von wem, noch dass der Inhalt wahr ist. Die Stufenleiter unten zeigt, was dafür jeweils zusätzlich nötig ist.</p>
+    <p class="note">Dies ist ein einfacher Vergleich zweier Zahlen. Es ist keine Tatsachenfeststellung, kein Echtheitsnachweis und keine fachliche Beratung und sollte nicht Ihre einzige Grundlage für eine rechtliche, finanzielle, sicherheitsrelevante oder regulatorische Entscheidung sein.</p>
+    <p class="note">Große Dateien, etwa eine Modellgewichtsdatei von mehreren Gigabyte, werden stückweise verarbeitet. Bei etwa 100 MB pro Sekunde kann eine 40-GB-Datei auf einem Laptop mehrere Minuten dauern, auf einem Telefon oder einer kleinen Platine viel länger. Es wird nichts hochgeladen. Telefone öffnen sehr große Dateien möglicherweise gar nicht.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="ownh" id="ownpanel">
+    <h2 id="ownh">Sie betreiben Ihr eigenes Modell? Führen Sie eine Aufzeichnung, die andere prüfen können</h2>
+    <p>Eine Aufzeichnung, die Sie über sich selbst führen, ist nur so viel wert, wie jemand anderes sie prüfen kann. Diese Schritte machen sie prüfbar. Sie kosten nichts. Für die Schritte 1 bis 4 brauchen Sie Aufzeichnungssoftware. StS stellt keine her.</p>
+    <ol class="steps">
+      <li><strong>Bewahren Sie zu jeder Antwort auf:</strong> was Sie gefragt haben und was zurückkam (auf Ihrem eigenen Rechner), einen Fingerabdruck von beidem, den Fingerabdruck der Modelldatei (nutzen Sie das Feld oben), die Software und ihre Version sowie die Einstellungen (Temperatur, Seed). Ein Fingerabdruck allein kann nicht zeigen, was gesagt wurde.</li>
+      <li><strong>Versiegeln Sie es regelmäßig mit einer externen Uhr.</strong> Senden Sie nur den Fingerabdruck an einen kostenlosen Zeitstempeldienst (RFC 3161) oder ein öffentliches Protokoll und bewahren Sie die zurückgesandte Quittung auf; ohne sie lässt sich das Siegel nicht prüfen. Ihr Inhalt verlässt Ihren Rechner nie. Das Siegel zeigt, dass die Aufzeichnung zu diesem Zeitpunkt existierte, sodass niemand, Sie eingeschlossen, sie zurückdatieren oder später ändern kann, ohne dass es auffällt. Es kann nicht zeigen, dass Sie alles aufgezeichnet haben; das deckt Schritt 3 ab.</li>
+      <li><strong>Zeichnen Sie die ganze Zeit auf, oder sagen Sie, wann nicht.</strong> Eine Lücke, die Sie nicht erklären können, schwächt alles andere.</li>
+      <li><strong>Wenn Ihre KI für Sie handelt</strong> (E-Mail senden, veröffentlichen, kaufen), versiegeln Sie die Handlung, bevor sie ausgeführt wird.</li>
+      <li><strong>Sobald ein Streit wahrscheinlich wird, löschen Sie nichts.</strong> Das Löschen relevanter Aufzeichnungen zu diesem Zeitpunkt kann vor Gericht gegen Sie ausgelegt werden.</li>
+      <li><strong>Auf einem Telefon</strong> können andere Apps in der Regel nicht in die KI-App hineinsehen, die Aufzeichnung hängt also davon ab, was diese App speichert. Läuft das Modell auf dem Telefon selbst, hat sein Hersteller womöglich nichts. Prüfen Sie, ob die App ihren Verlauf exportieren kann, exportieren Sie regelmäßig und bilden Sie von jedem Export den Fingerabdruck und versiegeln Sie ihn (Schritte 1 und 2).</li>
+    </ol>
+    <p class="note">Aufzeichnungen wirken in beide Richtungen: Sie zeigen, was tatsächlich geschah, einschließlich Ihrer eigenen Eingaben. Sie schützen Menschen, die ehrlich gehandelt haben. Dies ist keine Rechtsberatung.</p>
+  </section>
+
+  <section aria-labelledby="ladderh" style="display:grid;gap:14px">
+    <h2 id="ladderh">Was eine Aufzeichnung beweisen kann, Stufe für Stufe</h2>
+    <ol class="ladder">
+      <li><span class="rung">1</span><div><div class="q">Seit der Bildung des Fingerabdrucks unverändert</div><p>Erfordert: einen SHA-256-Fingerabdruck, dem Sie vertrauen. <span class="tag t-yes">Hier prüfbar</span></p></div></li>
+      <li><span class="rung">2</span><div><div class="q">Existierte zu einem bestimmten Zeitpunkt</div><p>Erfordert: den Fingerabdruck, gestempelt von einer unabhängigen Zeitstempelstelle (RFC 3161 oder ein qualifizierter elektronischer Zeitstempel nach der eIDAS-Verordnung). <span class="tag t-part">In Vorbereitung</span></p></div></li>
+      <li><span class="rung">3</span><div><div class="q">Stammt von einer bekannten Partei</div><p>Erfordert: eine digitale Signatur, geprüft gegen den veröffentlichten Schlüssel dieser Partei. <span class="tag t-part">In Vorbereitung</span></p></div></li>
+      <li><span class="rung">4</span><div><div class="q">Niemand hat das Register unbemerkt umgeschrieben</div><p>Erfordert: die Aufnahme der Aufzeichnung in ein öffentliches Transparenzprotokoll, das viele Parteien vergleichen. <span class="tag t-part">In Vorbereitung</span></p></div></li>
+      <li><span class="rung">5</span><div><div class="q">Nichts wurde ausgelassen</div><p>Erfordert: unabhängige Zählungen, etwa die eigene Rechnung des KI-Anbieters, sowie eine Erklärung, wann die Erfassung aktiv war.<span class="ownonly" hidden> Auf Ihrem eigenen Rechner gibt es keine Anbieterrechnung. Ein Heartbeat des Aufzeichnungsprogramms und eine erklärte Liste von Lücken sind der beste Ersatz, können aber nicht zeigen, dass Sie das Modell nie ohne das Aufzeichnungsprogramm betrieben haben.</span> <span class="tag t-op" id="l5">Nur mit dem Betreiber</span></p></div></li>
+      <li><span class="rung">6</span><div><div class="q">Was sie besagt, ist tatsächlich geschehen</div><p>Erfordert: eine Aufzeichnung von jemand anderem, etwa Ihren Kontoauszug, der die Erstattung zeigt. Eine unversehrte Aufzeichnung einer falschen Aussage bleibt falsch.<span class="ownonly" hidden> Für Ihren eigenen Agenten: die Kopie des Empfängers von einer E-Mail, die er gesendet hat, oder der Eintrag Ihrer Bank zu einer Zahlung.</span> <span class="tag t-part">Teilweise von Ihnen prüfbar</span></p></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="testsh" style="display:grid;gap:14px">
+    <h2 id="testsh">Die 23 Prüfungen in einfachen Worten</h2>
+    <p class="note">Aus dem öffentlichen Kommentierungsentwurf „O4M Record Tests 2026 (v1.0)“, Anforderungen C1 bis C23 (<a href="https://doi.org/10.5281/zenodo.23857888" rel="noopener">doi.org/10.5281/zenodo.23857888</a>), CC BY 4.0, veröffentlicht am 1. November 2026 und offen für Kommentare bis 1. Dezember 2026. Die Beschreibungen in einfachen Worten unten sind eine Zusammenfassung; maßgeblich ist der Entwurf. <span id="tagnote">Das Etikett zeigt, ob ein Kunde, der einen Export der Aufzeichnungen besitzt, dies ohne Hilfe des Unternehmens prüfen könnte.</span></p>
+    <div class="chips" role="group" aria-label="Prüfungen filtern">
+      <button class="chip" data-f="all" aria-pressed="true">Alle 23</button>
+      <button class="chip" data-f="yes" aria-pressed="false">Sie können prüfen</button>
+      <button class="chip" data-f="part" aria-pressed="false">Teilweise</button>
+      <button class="chip" data-f="op" aria-pressed="false" id="opchip">Nur mit dem Betreiber</button>
+    </div>
+    <div class="tests" id="tests"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="bg">
+    <h2 id="bg">Hintergrund und Einordnung</h2>
+    <p>Ich habe einen offenen Vergleich britischer und EU-Regeln zu diesem Thema veröffentlicht (<a href="https://doi.org/10.5281/zenodo.23546436" rel="noopener">doi.org/10.5281/zenodo.23546436</a>). Außerhalb der Finanzdienstleistungen verlangt keine der von mir geprüften verbindlichen Regeln eindeutig, dass KI-Protokolle so geführt werden, dass jemand anderes als die Partei, die sie erzeugt hat, sie auf Veränderung oder Auslassung prüfen kann. Am 1. November 2026 habe ich offene Tests für genau diese Eigenschaft veröffentlicht, als öffentlichen Kommentierungsentwurf, offen bis 1. Dezember 2026 (<a href="https://doi.org/10.5281/zenodo.23857888" rel="noopener">doi.org/10.5281/zenodo.23857888</a>).</p>
+    <div class="fit" role="note" aria-labelledby="fith">
+      <h3 id="fith">Konkurriert das mit SCITT, AIUC-1 oder anderen Standards?</h3>
+      <p>Nein, und das ist auch nicht beabsichtigt. Diese Tests und diese Seite definieren weder ein Protokollformat noch einen Standard noch ein Zertifikat. Diese Seite erzeugt keine Aufzeichnungen, und StS Forensics liefert nicht die Systeme, die sie prüft. Die Tests stellen an bereits Bestehendes eine zusätzliche Frage: Könnte jemand außerhalb des Betreibers erkennen, ob etwas ausgelassen oder verändert wurde?</p>
+      <ul>
+        <li><strong>SCITT</strong> (die IETF-Architektur in RFC 9943) ist ein Weg, signierte Aussagen in einem Transparenzdienst zu registrieren. Die Tests stehen daneben. RFC 9943 selbst merkt in Abschnitt 9.3 an, dass Aussteller einige Aussagen einreichen können und andere nicht, und genau auf diese Lücke konzentrieren sich die Tests.</li>
+        <li><strong>AIUC-1</strong> ist ein Standard für KI-Agenten, der vierteljährlich aktualisiert wird; seine Ausgabe für das vierte Quartal 2026 (15. Oktober 2026) ergänzte verpflichtende Drittprüfungen des Daten- und Datenschutzrisikos sowie des Verantwortlichkeitsrisikos. Die Tests könnten einem Prüfer etwas Konkretes zur Prüfung von Aufzeichnungen geben. Sie sind nicht Teil von AIUC-1, und es besteht in keiner Richtung eine Zugehörigkeit oder Billigung.</li>
+        <li><strong>Andere Standards</strong>, zum Beispiel von ETSI, CEN-CENELEC und ISO/IEC, sind eigene Arbeitsstränge. Wo sie Protokolle verlangen, fragen die Tests, ob ein Außenstehender diese Protokolle sowohl auf Auslassung als auch auf Veränderung prüfen könnte.</li>
+      </ul>
+      <p class="note">Eine Aufzeichnung kann jedem dieser Standards folgen und die Tests dennoch nicht bestehen, wenn nichts außerhalb des Betreibers sie auf Auslassung prüfen kann. Korrekturen und Kommentare sind bis 1. Dezember 2026 willkommen: comments@sts-forensics.com, Betreff „O4M Record Tests“.</p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="terms">
+    <h2 id="terms">Nutzungsbedingungen</h2>
+    <ol class="steps">
+      <li>Diese Seite ist kostenlos. Sie wird OHNE MÄNGELGEWÄHR („AS IS“) und OHNE JEDE GEWÄHRLEISTUNG bereitgestellt, unter der Apache License 2.0 (für den Code gelten die Abschnitte 7 und 8 dieser Lizenz).</li>
+      <li>Ihre Nutzung begründet kein Mandats-, Berater-, Gutachter- oder sonstiges Berufsverhältnis zu StS Forensics Ltd oder Gareth Wong. Sie ist weder ein Zertifikat noch eine Bewertung noch eine Zusicherung.</li>
+      <li>Soweit gesetzlich zulässig, haften StS Forensics Ltd, ihr Geschäftsführer (Director) und ihre Mitwirkenden nicht für Verluste, die aus der Nutzung dieser Seite oder dem Vertrauen auf sie entstehen.</li>
+      <li>Nichts hier beschränkt die Haftung für Tod oder Körperverletzung durch Fahrlässigkeit, für Betrug oder arglistige Täuschung oder für alles, was das Gesetz nicht zu beschränken erlaubt. Sind Sie Verbraucher, bleiben Ihre gesetzlichen Rechte unberührt.</li>
+      <li>Die Seite läuft in Ihrem Browser und sendet uns nichts, daher können wir nicht sehen, was Sie prüfen. Der Host dieser Seite (GitHub) kann gewöhnliche Server-Protokolle über Besuche führen.</li>
+      <li>Es gilt englisches Recht, und die Gerichte von England und Wales sind zuständig, vorbehaltlich zwingender Rechte, die Ihnen an Ihrem Wohnort zustehen.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <span><strong>Wer das betreibt:</strong> VerZan Check ist ein kostenloses Werkzeug von StS Forensics Ltd (London), einem Unternehmen, das daran arbeitet, wie Aufzeichnungen von KI-Aktivität von jemand anderem als dem Betreiber des Systems geprüft werden können. Das Werkzeug ist kostenlos. Diese Seite ist eine einzige Datei, ihr Quelltext ist also die Seite selbst: Zeigen Sie den Quelltext an, um jede Zeile zu lesen. Dieselbe Datei ist unter <a href="https://github.com/StSForensics/VerZan">github.com/StSForensics/VerZan</a> unter Apache-2.0 veröffentlicht. Entwurfs-Testvektoren und ein Referenzprüfer für die Tests T3 und T14a (vom Autor selbst ausgeführt; ein zweiter Leser stimmte bei 31 von 50 Eingaben überein; von niemand sonst reproduziert) finden Sie unter <a href="https://github.com/StSForensics/o4m-record-tests">github.com/StSForensics/o4m-record-tests</a>. Text CC BY 4.0. Copyright 2026 StS Forensics Ltd (in England und Wales eingetragen, Registernummer 17054694). Erstellt von Gareth Wong, Geschäftsführer (Director). StS Forensics Ltd freut sich über Anfragen von Organisationen, die Hilfe bei der Prüfung von KI-Aufzeichnungen wünschen. Jede bezahlte Arbeit im Zusammenhang mit diesem Werkzeug wird auf dieser Seite offengelegt. Kontakt: gaptable@sts-forensics.com</span>
+    <span><strong>Datenschutz:</strong> Fingerabdrücke werden in Ihrem Browser berechnet, mit dessen eingebautem Web Crypto oder, bei sehr großen Dateien, einer kleinen Routine in dieser Seite. Es wird keine Datei und kein Text hochgeladen, diese Seite setzt keine Cookies, betreibt kein Tracking und lädt nichts von anderen Websites.</span>
+    <span>Keine Bewertung eines Unternehmens und keine Rechtsberatung. Ein übereinstimmender Fingerabdruck beweist nur Stufe 1 der Leiter. Bereitgestellt ohne Mängelgewähr und ohne jede Gewährleistung, unter der Apache-2.0-Lizenz; wie jede Software kann sie Fehler enthalten, prüfen Sie daher alles Wichtige auch auf anderem Weg.</span>
+    <span>VerZan Check v1.2.12-de (Übersetzungsentwurf, zweiter Terminologiedurchgang), 11. November 2026. Übersetzung der englischen Fassung v1.2.12, die maßgeblich ist. Das Änderungsprotokoll steht auf der englischen Seite.</span>
+  </footer>
+</div>
+
+<script>
+const T=[["C1", "Regeln, die vor jeder Aufzeichnung festgelegt sind: was zählt, wie oft, was bei einem Ausfall geschieht.", "part", "yes", "Schreiben Sie eine einseitige Notiz, was Sie aufzeichnen, wie oft und was bei einem Ausfall der Aufzeichnung geschieht."], ["C2", "Aufzeichnungen werden in einem exakten Byteformat gespeichert, sodass derselbe Eintrag stets denselben Fingerabdruck ergibt.", "yes", "yes", "Aufzeichnungssoftware, die der Spezifikation entspricht, tut dies."], ["C3", "Jeder Eintrag ist nummeriert und mit dem vorherigen verknüpft, sodass eine Lücke, ein Austausch oder eine Einfügung sichtbar wird.", "yes", "yes", "Aufzeichnungssoftware, die der Spezifikation entspricht, tut dies."], ["C4", "Was gefragt und geantwortet wurde, wird als Fingerabdruck versiegelt; der Inhalt selbst kann getrennt aufbewahrt werden.", "part", "yes", "Halten Sie den Inhalt privat auf Ihrem Rechner; nur Fingerabdrücke müssen nach außen gehen."], ["C5", "Jeder Eintrag trägt eine Signatur mit einem Schlüssel, den die Anwendung nicht erreichen kann.", "yes", "part", "Verwenden Sie einen Schlüssel, den Ihre KI-Software nicht erreichen kann, etwa einen Hardware-Sicherheitsschlüssel. Der gewöhnliche Schlüsselbund des Systems steht meist jedem Programm offen, das als Sie läuft, auch Ihrer KI-Software. Er kann nicht vor Ihnen als Eigentümer schützen; das leisten externe Zeitstempel (C6)."], ["C6", "Regelmäßige Kontrollpunkte, gestempelt von einer externen Uhr und gegengezeichnet von unabhängigen Zeugen.", "yes", "yes", "Kostenlose Zeitstempeldienste und öffentliche Protokolle verhindern Rückdatierung, auch durch Sie."], ["C7", "Jede Antwort nennt, welches KI-Modell in welcher Version sie erzeugt hat.", "part", "yes", "Bilden Sie den Fingerabdruck der Modelldatei selbst. Das ist einfacher als bei einer Cloud-KI, bei der die Version verborgen ist."], ["C8", "Hardware-Nachweis, welche Software genau lief.", "op", "na", "Die meisten Heimgeräte können nicht belegen, welche Software lief. Sagen Sie das in Ihrer Aufzeichnung."], ["C9", "Jede Handlung verweist auf die Person oder Rolle, die sie autorisiert hat.", "op", "part", "Wichtig, wenn andere Ihren Rechner oder Heimserver mitnutzen: Geben Sie jeder Person eine eigene Identität."], ["C10", "Eine Historie jedes Signaturschlüssels: wann ausgestellt, gewechselt oder widerrufen.", "yes", "yes", "Halten Sie fest, wann Sie einen Schlüssel erzeugt, gewechselt oder verloren haben."], ["C11", "Ein Export, den man Ihnen geben kann, mit Nachweisen, dass jeder Eintrag zu einem signierten Kontrollpunkt gehört.", "yes", "yes", "Den Export haben Sie bereits; bewahren Sie ihn in einer Form auf, die jemand anderes lesen kann."], ["C12", "Aufzeichnungen werden für den gesamten Zeitraum aufbewahrt, in dem ein Streit entstehen könnte; jede Löschung wird selbst aufgezeichnet.", "part", "part", "Bewahren Sie Sicherungen so lange auf, wie ein Anspruch entstehen kann, was Jahre sein können."], ["C13", "Jeder KI-Agent wird beim Start und beim Stopp registriert.", "op", "yes", "Protokollieren Sie, wann jeder lokale Agent startet und stoppt."], ["C14", "Zählungen empfangener und verworfener Einträge, abgeglichen mit den eigenen Nutzungszahlen des KI-Anbieters.", "part", "na", "Ein lokales Modell hat keine Anbieterrechnung, gegen die gezählt werden könnte. Verlassen Sie sich auf den Heartbeat (C22) und sagen Sie das. Weicht Ihr Aufbau auf eine Cloud-KI aus, gilt C14 weiterhin für diesen Teil."], ["C15", "Zeiten stammen von einer erklärten, vertrauenswürdigen Uhr innerhalb einer genannten Toleranz.", "yes", "yes", "Nutzen Sie die Netzwerkzeit Ihres Computers plus den externen Zeitstempel."], ["C16", "Alle sehen dasselbe Protokoll; verschiedene Versionen für verschiedene Personen sind erkennbar.", "yes", "yes", "Nutzen Sie ein öffentliches Transparenzprotokoll statt Ihres eigenen Servers."], ["C17", "Jede reale Handlung stimmt mit der Aufzeichnung eines anderen überein, etwa einer Bank oder eines Zahlungsdienstleisters.", "part", "part", "Aufzeichnungen anderer über dasselbe Ereignis: die Kopie des Empfängers von einer E-Mail, Ihr Kontoauszug."], ["C18", "Eine Handlung wird in der Aufzeichnung versiegelt, bevor sie wirksam wird, nicht nachträglich verfasst.", "op", "yes", "Versiegeln Sie bei Agenten, die handeln, die Handlung, bevor sie ausgeführt wird."], ["C19", "Fällt ein Zeitstempeldienst aus, wird der Ausfall aufgezeichnet und gekennzeichnet, nie verborgen.", "yes", "yes", "Kostenlose Zeitstempeldienste fallen aus; die Lücke muss in Ihrer Aufzeichnung sichtbar sein."], ["C20", "Die Prüfsoftware ist Open Source und kann von jedem mit demselben Ergebnis neu gebaut werden.", "yes", "yes", "Verwenden Sie offene Prüfsoftware, die jeder neu bauen kann."], ["C21", "Der Prüfer legt offen, wer ihn bezahlt, und wählt Stichproben zufällig, nachdem die Aufzeichnungen versiegelt sind.", "yes", "yes", "Wenn Sie jemanden dafür bezahlen, Ihre Aufzeichnungen zu prüfen, muss er das offenlegen."], ["C22", "Das Aufzeichnungsprogramm sendet einen regelmäßigen Heartbeat; jedes Urteil nennt, wann die Aufzeichnung aktiv, beeinträchtigt oder abwesend war.", "yes", "yes", "Ein Heartbeat, solange das Modell läuft, sodass Ruhezustand und Offline-Zeit als Lücken erscheinen, nicht als Geheimnisse."], ["C23", "Signaturschlüssel werden außerhalb der Reichweite des Unternehmens und seiner KI-Agenten verwahrt.", "part", "part", "Halten Sie Schlüssel von Ihren Agenten fern. Gegenüber dem Eigentümer helfen nur externe Zeitstempel (C6)."]];
+const L={co:{yes:["Sie können prüfen","t-yes"],part:["Teilweise","t-part"],op:["Nur mit dem Betreiber","t-op"]},
+ own:{yes:["Sie können das einrichten","t-yes"],part:["Teilweise","t-part"],na:["Zu Hause meist nicht: erklären Sie es","t-na"]}};
+let mode="co",filt="all";
+const box=document.getElementById('tests');
+function draw(){box.innerHTML="";T.forEach(([id,txt,k,ok,otxt])=>{const tag=mode==="co"?k:ok;
+  if(filt!=="all"&&tag!==filt)return;
+  const d=document.createElement('article');d.className='test';
+  d.innerHTML=`<div class="top"><span class="cid">${id}</span><span class="tag ${L[mode][tag][1]}">${L[mode][tag][0]}</span></div><p>${txt}</p>`+(mode==="own"?`<p class="own">${otxt}</p>`:"");box.appendChild(d);});}
+const chips=[...document.querySelectorAll('.chip:not(.mode)')];
+chips.forEach(b=>b.addEventListener('click',()=>{chips.forEach(c=>c.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');filt=b.dataset.f;draw();}));
+function setMode(m){mode=m;filt="all";chips.forEach(c=>c.setAttribute('aria-pressed',c.dataset.f==="all"?'true':'false'));
+  document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m?'true':'false'));
+  document.querySelector('.chip[data-f=yes]').textContent=m==="co"?"Sie können prüfen":"Sie können das einrichten";
+  const op=document.getElementById('opchip');op.dataset.f=m==="co"?"op":"na";op.textContent=m==="co"?"Nur mit dem Betreiber":"Zu Hause meist nicht";
+  document.getElementById('tagnote').textContent=m==="co"?"Das Etikett zeigt, ob ein Kunde, der einen Export der Aufzeichnungen besitzt, dies ohne Hilfe des Unternehmens prüfen könnte.":"Das Etikett zeigt, ob eine Person, die ihr eigenes Modell betreibt, dies auf einem gewöhnlichen Computer erfüllen könnte, und die graue Zeile sagt, wie.";
+  document.querySelectorAll('.ownonly').forEach(e=>e.hidden=(m!=="own"));
+  const l5=document.getElementById('l5');l5.className="tag "+(m==="co"?"t-op":"t-part");l5.textContent=m==="co"?"Nur mit dem Betreiber":"Teilweise";
+  if(m==="own")document.getElementById('ownpanel').scrollIntoView({behavior:"smooth",block:"start"});
+  draw();}
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+draw();
+
+function Sha256(){
+  const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const H=new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);
+  const W=new Uint32Array(64),buf=new Uint8Array(64);let bl=0,total=0;
+  function block(d,o){
+    for(let i=0;i<16;i++){const j=o+i*4;W[i]=(d[j]<<24)|(d[j+1]<<16)|(d[j+2]<<8)|d[j+3];}
+    for(let i=16;i<64;i++){const a=W[i-15],b=W[i-2];
+      const s0=((a>>>7)|(a<<25))^((a>>>18)|(a<<14))^(a>>>3);
+      const s1=((b>>>17)|(b<<15))^((b>>>19)|(b<<13))^(b>>>10);
+      W[i]=(W[i-16]+s0+W[i-7]+s1)|0;}
+    let a=H[0],b=H[1],c=H[2],e=H[4],f=H[5],g=H[6],h=H[7],dd=H[3];
+    for(let i=0;i<64;i++){
+      const S1=((e>>>6)|(e<<26))^((e>>>11)|(e<<21))^((e>>>25)|(e<<7));
+      const t1=(h+S1+((e&f)^(~e&g))+K[i]+W[i])|0;
+      const S0=((a>>>2)|(a<<30))^((a>>>13)|(a<<19))^((a>>>22)|(a<<10));
+      const t2=(S0+((a&b)^(a&c)^(b&c)))|0;
+      h=g;g=f;f=e;e=(dd+t1)|0;dd=c;c=b;b=a;a=(t1+t2)|0;}
+    H[0]+=a;H[1]+=b;H[2]+=c;H[3]+=dd;H[4]+=e;H[5]+=f;H[6]+=g;H[7]+=h;}
+  this.update=function(d){let i=0;total+=d.length;
+    if(bl>0){while(bl<64&&i<d.length)buf[bl++]=d[i++];if(bl===64){block(buf,0);bl=0;}}
+    for(;i+64<=d.length;i+=64)block(d,i);
+    while(i<d.length)buf[bl++]=d[i++];};
+  this.hex=function(){const bits=total*8,hi=Math.floor(bits/4294967296),lo=bits>>>0;
+    const pad=new Uint8Array(((bl<56)?56:120)-bl+8);pad[0]=0x80;const n=pad.length;
+    pad[n-8]=hi>>>24;pad[n-7]=hi>>>16;pad[n-6]=hi>>>8;pad[n-5]=hi;pad[n-4]=lo>>>24;pad[n-3]=lo>>>16;pad[n-2]=lo>>>8;pad[n-1]=lo;
+    const t=total;this.update(pad);total=t;
+    return [...H].map(x=>x.toString(16).padStart(8,'0')).join('');};
+}
+
+async function sha(buf){const h=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('');}
+const sample=document.getElementById('sample'),sh=document.getElementById('sampleHash');
+async function upd(){try{sh.textContent=await sha(new TextEncoder().encode(sample.value));}catch(e){const s=new Sha256();s.update(new TextEncoder().encode(sample.value));sh.textContent=s.hex();}}
+sample.addEventListener('input',upd);upd();
+
+(function(){
+  const texts=["Der Agent öffnete die Schadenakte.","Der Agent nannte einen Vergleichsbetrag.","Der Agent versprach eine Erstattung von 1.119 Punkten.","Der Agent sendete die Bestätigungs-E-Mail.","Der Agent schloss den Schadenfall."];
+  let recs=[],full=[],deleted=false;
+  const ol=document.getElementById('recs'),vA=document.getElementById('vAlt'),vG=document.getElementById('vGap'),bd=document.getElementById('del');
+  async function build(){let prev="start";full=[];
+    for(let i=0;i<texts.length;i++){const seq=i+1,fp=await sha(new TextEncoder().encode(seq+"|"+prev+"|"+texts[i]));full.push({seq,prev,text:texts[i],fp});prev=fp;}
+    recs=full.slice();deleted=false;await render();}
+  async function render(){
+    ol.innerHTML="";recs.forEach(r=>{const li=document.createElement('li');li.textContent="Eintrag "+r.seq+": "+r.text+" (Fingerabdruck "+r.fp.slice(0,8)+"...)";ol.appendChild(li);});
+    bd.disabled=deleted;
+    let altOk=true;for(const r of recs){const h=await sha(new TextEncoder().encode(r.seq+"|"+r.prev+"|"+r.text));if(h!==r.fp)altOk=false;}
+    vA.className="verdict "+(altOk?"ok":"bad");
+    vA.textContent="Prüfung 1, ist jeder Eintrag unverändert? "+(altOk?"BESTANDEN. Jeder verbliebene Eintrag ist genau so, wie sein Fingerabdruck gebildet wurde.":"NICHT BESTANDEN. Ein Eintrag wurde verändert.");
+    let gap=null;for(let i=0;i<recs.length;i++){const want=i+1;if(recs[i].seq!==want){gap=want;break;}if(i>0&&recs[i].prev!==recs[i-1].fp){gap=recs[i].seq-1;break;}}
+    vG.className="verdict "+(gap===null?"ok":"bad");
+    vG.textContent="Prüfung 2, fehlt etwas? "+(gap===null?"BESTANDEN. Die Nummern laufen von 1 bis "+recs.length+" und jeder Eintrag verweist auf den vorherigen.":"NICHT BESTANDEN. Eintrag "+gap+" fehlt.");}
+  bd.addEventListener('click',()=>{recs=full.filter(r=>r.seq!==3);deleted=true;render();});
+  document.getElementById('rst').addEventListener('click',()=>{recs=full.slice();deleted=false;render();});
+  build();
+})();
+
+const BIG=256*1024*1024,CH=32*1024*1024;
+async function hashFile(f,prog,live){
+  if(f.size<=BIG&&window.crypto&&crypto.subtle){try{return await sha(await f.arrayBuffer());}catch(e){}}
+  const s=new Sha256();prog.hidden=false;prog.value=0;
+  for(let o=0;o<f.size;o+=CH){if(!live())return null;s.update(new Uint8Array(await f.slice(o,o+CH).arrayBuffer()));
+    if(!live())return null;prog.value=Math.round(100*Math.min(o+CH,f.size)/f.size);fh.textContent='Fingerabdruck wird gebildet… '+prog.value+'%';}
+  prog.hidden=true;return s.hex();}
+
+let fileHex="";const fh=document.getElementById('fileHash'),ex=document.getElementById('expected'),v=document.getElementById('verdict'),pg=document.getElementById('prog');
+function compare(){const m64=ex.value.match(/[0-9a-f]{64}/i);const want=m64?m64[0].toLowerCase():ex.value.replace(/[^0-9a-fA-F]/g,'').toLowerCase();
+  if(!fileHex||!want){v.className='verdict idle';v.textContent='Wählen Sie eine Datei und fügen Sie den erwarteten Fingerabdruck zum Vergleich ein.';return;}
+  if(want.length!==64){v.className='verdict bad';v.textContent='Der erwartete Fingerabdruck sollte aus 64 Hexadezimalzeichen bestehen. Prüfen Sie, ob Sie ihn vollständig kopiert haben.';return;}
+  if(want===fileHex){v.className='verdict ok';v.textContent='Übereinstimmung. Diese Datei ist Byte für Byte diejenige, deren Fingerabdruck gebildet wurde.';}
+  else{v.className='verdict bad';v.textContent='Keine Übereinstimmung. Diese Datei weicht von der ab, deren Fingerabdruck gebildet wurde, oder der Fingerabdruck wurde falsch kopiert.';}}
+let run=0;
+document.getElementById('file').addEventListener('change',async e=>{const my=++run;const f=e.target.files[0];fileHex='';compare();if(!f){fh.textContent='Noch keine Datei gewählt.';pg.hidden=true;return;}fh.textContent='wird berechnet…';
+  try{const h=await hashFile(f,pg,()=>my===run);if(my!==run)return;fileHex=h;fh.textContent=fileHex;}catch(err){if(my!==run)return;pg.hidden=true;fh.textContent='Diese Datei konnte nicht gelesen werden. Auf einem Telefon können sehr große Dateien zu groß zum Öffnen sein.';fileHex='';}compare();});
+ex.addEventListener('input',compare);
+</script>
+
+</body></html>

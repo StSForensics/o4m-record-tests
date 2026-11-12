@@ -1,0 +1,310 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>VerZan Check</title><meta name="description" content="無料ツール：ブラウザ内でファイルのハッシュ値（SHA-256）を作成し、記録を1件削除するとログに何が起きるかを確認できます。ページの外には何も送信されません。"><meta property="og:title" content="VerZan Check"><meta property="og:description" content="これは、誰かが記録したファイルと完全に同じものですか。ブラウザ内でハッシュ値を計算して照合します。ページの外には何も送信されません。"><meta property="og:type" content="website"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'"><link rel="alternate" hreflang="en" href="https://verzan.org/"><link rel="alternate" hreflang="fr" href="https://verzan.org/fr/"><link rel="alternate" hreflang="de" href="https://verzan.org/de/"><link rel="alternate" hreflang="es" href="https://verzan.org/es/"><link rel="alternate" hreflang="ja" href="https://verzan.org/ja/"><link rel="alternate" hreflang="x-default" href="https://verzan.org/"><link rel="canonical" href="https://verzan.org/ja/"><meta name="referrer" content="no-referrer"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20160%20160%22%3E%3Crect%20width%3D%22160%22%20height%3D%22160%22%20rx%3D%2224%22%20fill%3D%22%23FAF9F5%22/%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23182720%22%20stroke-width%3D%228%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%2280%22%20y1%3D%2210%22%20x2%3D%2280%22%20y2%3D%2230%22/%3E%3Cline%20x1%3D%2252%22%20y1%3D%2230%22%20x2%3D%22108%22%20y2%3D%2230%22/%3E%3Crect%20x%3D%2250%22%20y%3D%2242%22%20width%3D%2260%22%20height%3D%2254%22/%3E%3Cline%20x1%3D%2250%22%20y1%3D%2260%22%20x2%3D%22110%22%20y2%3D%2260%22/%3E%3Cline%20x1%3D%2250%22%20y1%3D%2278%22%20x2%3D%22110%22%20y2%3D%2278%22/%3E%3Cline%20x1%3D%2238%22%20y1%3D%22106%22%20x2%3D%22122%22%20y2%3D%22106%22/%3E%3C/g%3E%3Cpath%20d%3D%22M52%20126%20L72%20148%20L118%20116%22%20fill%3D%22none%22%20stroke%3D%22%23458D5F%22%20stroke-width%3D%2212%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<style>
+/* Layout: one narrow evidence column; tool first, then the proof ladder, then the 23 checks as a filterable list */
+:root{
+  --bg:#eef1f3; --panel:#ffffff; --ink:#141a22; --muted:#55606e; --line:#d3d9df;
+  --accent:#2340c8; --accent-ink:#ffffff;
+  --ok:#11734b; --ok-bg:#e1f3ea; --bad:#a3271c; --bad-bg:#fbe6e3; --part:#8a5a00; --part-bg:#fbefd6;
+  --display:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141a; --panel:#171e26; --ink:#e7ecf1; --muted:#9aa6b3; --line:#2b3540;
+  --accent:#8ea2ff; --accent-ink:#0f141a;
+  --ok:#6fd6a6; --ok-bg:#12302a; --bad:#ff8f84; --bad-bg:#3a1a17; --part:#f2c264; --part-bg:#36290f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141a; --panel:#171e26; --ink:#e7ecf1; --muted:#9aa6b3; --line:#2b3540;
+  --accent:#8ea2ff; --accent-ink:#0f141a;
+  --ok:#6fd6a6; --ok-bg:#12302a; --bad:#ff8f84; --bad-bg:#3a1a17; --part:#f2c264; --part-bg:#36290f; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body)}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:grid;gap:36px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:700}
+p{margin:0;max-width:65ch}
+.eyebrow{font:600 .74rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+header{display:grid;gap:10px}
+.lede{font-size:1.12rem;color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px}
+label{font-weight:700;font-size:.95rem}
+textarea,input[type=text]{width:100%;box-sizing:border-box;font:15px/1.5 var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px}
+textarea{min-height:90px;resize:vertical}
+textarea:focus,input:focus,button:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hash{font:600 .9rem/1.5 var(--mono);word-break:break-all;background:var(--bg);border-radius:6px;padding:10px;border:1px dashed var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button,.filebtn{font:700 .92rem var(--body);border:0;border-radius:6px;padding:9px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+input[type=file]{font:14px var(--body);color:var(--muted)}
+.verdict{font:700 1rem var(--body);padding:10px 12px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok)} .verdict.bad{background:var(--bad-bg);color:var(--bad)} .verdict.idle{color:var(--muted);padding-left:0}
+.note{font-size:.9rem;color:var(--muted)}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-left:3px solid var(--line)}
+.ladder li{display:grid;grid-template-columns:2.2rem 1fr;gap:12px;padding:12px 0 12px 12px;border-bottom:1px solid var(--line)}
+.ladder li:last-child{border-bottom:0}
+.rung{font:700 1.05rem var(--mono);color:var(--accent)}
+.ladder .q{font-weight:700}
+.tag{display:inline-block;font:600 .72rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 7px;border-radius:4px;white-space:nowrap}
+.t-yes{background:var(--ok-bg);color:var(--ok)} .t-na{background:var(--bg);color:var(--muted);border:1px solid var(--line)} .t-part{background:var(--part-bg);color:var(--part)} .t-op{background:var(--bad-bg);color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 .85rem var(--body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tests{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.test{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:6px;align-content:start;min-width:0}
+.test .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.cid{font:700 .95rem var(--mono)}
+.test p{font-size:.93rem} .test .own{font-size:.88rem;color:var(--muted)} .steps{margin:0;padding-left:1.2rem;display:grid;gap:8px;max-width:65ch} progress{width:100%}
+.fit{border:1px solid var(--line);border-left:5px solid var(--accent);background:var(--bg);border-radius:8px;padding:16px;display:grid;gap:10px}
+.fit ul{margin:0;padding-left:1.2rem;display:grid;gap:8px;max-width:65ch}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:56px;height:56px;flex:none;color:var(--ink)}
+footer{font-size:.85rem;color:var(--muted);display:grid;gap:6px;border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion:no-preference){.verdict{transition:background .2s}}
+.langbar{font-size:.85rem;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--panel)}.langbar a{color:var(--accent)}
+</style>
+
+
+<div class="wrap">
+  <div class="langbar" role="note">機械翻訳であり、ネイティブによる確認は済んでいません。英語版が優先します。 <a href="https://verzan.org/" hreflang="en" lang="en">English</a> · <a href="https://verzan.org/fr/" hreflang="fr" lang="fr">Français</a> · <a href="https://verzan.org/de/" hreflang="de" lang="de">Deutsch</a> · <a href="https://verzan.org/es/" hreflang="es" lang="es">Español</a></div>
+  <header>
+    <span class="eyebrow">StS Forensics Ltd の無料の公益ツール · すべてお使いのブラウザ内で動作します</span>
+    <div class="brand"><svg class="logo" viewBox="0 0 160 160" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><line x1="80" y1="10" x2="80" y2="30"/><line x1="52" y1="30" x2="108" y2="30"/><rect x="50" y="42" width="60" height="54"/><line x1="50" y1="60" x2="110" y2="60"/><line x1="50" y1="78" x2="110" y2="78"/><line x1="38" y1="106" x2="122" y2="106"/></g><path d="M52 126 L72 148 L118 116" fill="none" stroke="#458D5F" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg><h1>VerZan Check</h1></div>
+    <p class="lede">これは、誰かが記録したファイルと完全に同じものですか。ここでハッシュ値（SHA-256）を作成して照合します。入力したものや置いたファイルがこのページの外に出ることはありません。</p>
+    <div class="chips" role="group" aria-label="あなたはどちらですか">
+      <button class="chip mode" data-m="co" aria-pressed="true">企業のAIを確認する立場です</button>
+      <button class="chip mode" data-m="own" aria-pressed="false">自分でAIモデルを動かしています</button>
+    </div>
+  </header>
+
+  <section class="panel" aria-labelledby="why">
+    <h2 id="why">このツールがある理由</h2>
+    <p>AIチャットボットやAIエージェントは確率的に動作します。同じ質問を2回しても、異なる答えが返ることがあります。そのため、AIが返金を約束したり、価格を提示したり、操作を実行したりしたとき、何が起きたかを最も確かに示すのは、その時点で作られ、誰にもこっそり変更できない場所に保管され、作成した企業以外の人が確認できる記録です。それがなければ、紛争は、あなたの言い分と、相手方だけが管理するログとの対立になってしまいます。</p>
+    <p>ご自身でAIモデルを動かす場合も同じです。ノートPC、自宅のサーバー、小型ボードのいずれでも、モデルが書いたこと、行ったことが後で争われたとき、その時点で作られ外部の時計で封印された記録は、後から編集できたかもしれないログよりはるかに強い証拠になります。</p>
+    <p>法律も同じ方向に進んでいます。2026年12月9日より後に市場に出されるか使用開始されるソフトウェア（AIを含む）を対象とするEUの新しい製造物責任指令（指令（EU）2024/2853）では、被害者は過失を証明する必要がなく（製品に欠陥があったこと、損害、その両者の因果関係は、引き続き証明する必要があります）、裁判所は証拠の開示を命じることができ、開示しなかった場合、裁判所は製品に欠陥があったと推定することがあります。<span class="ownonly" hidden> 主として事業の過程で提供される製品を対象としています。このページは、自分だけのためにモデルを動かしている人にも及び得るかどうかは述べていません。ただし、製造者の定義には、自己使用のために製品を開発または製造する者が含まれる点に留意してください（第4条第10号）。</span></p>
+    <p><strong>そこで、2つの問いを立ててください。</strong>記録を入手できますか。そして、あなた以外の誰かがそれを確認できますか。このページでは、1つ目の確認の仕組みを示します。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="try">
+    <h2 id="try">試す：1文字だけ変えてみる</h2>
+    <label for="sample">テキスト（チャットボットの返答例）</label>
+    <textarea id="sample">AIエージェント：はい、1,119ポイントを特別対応として1回限り返金できます。返金手続きが完了しました。</textarea>
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">SHA-256 ハッシュ値（ファイルの「指紋」）</div>
+      <div class="hash" id="sampleHash" aria-live="polite">計算中…</div>
+    </div>
+    <p class="note">上の文字を1つ、たとえば読点1つでも変えると、ハッシュ値はまったく別のものになります。だから、先に記録されたハッシュ値があれば、ファイルが後から改変されたことを示せるのです。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="omit">
+    <h2 id="omit">試す：記録を1件取り除く</h2>
+    <p>5件の記録からなる簡単なログです。各記録は作られた時点でハッシュ値が計算され、1つ前の記録のハッシュ値を持っています。1件をこっそり削除してから、2つの確認を実行してください。</p>
+    <ol id="recs" class="steps"></ol>
+    <div class="row">
+      <button id="del" type="button">記録3をこっそり削除する</button>
+      <button id="rst" type="button" class="ghost">元に戻す</button>
+    </div>
+    <div class="verdict idle" id="vAlt" aria-live="polite"></div>
+    <div class="verdict idle" id="vGap" aria-live="polite"></div>
+    <p class="note">1つ目の確認は、残っている各記録が変更されていないかだけを調べます。なくなった記録は見えません。2つ目は、番号が欠けなく続いているか、各記録が1つ前の記録を指しているかを調べます。これは数行の簡易デモであり、AIのログではありません。実際の運用者が記録の取り込み地点を管理していれば、番号を振る前に記録を捨てることができます。そのため、草案のテストは、第三者が持つ件数（C14）と、記録が稼働していたことの証明（C22）も求めています。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="regq">
+    <h2 id="regq">運用者のAI記録を渡されましたか。尋ねるべき3つの質問</h2>
+    <p>規制当局、監督当局、裁判所、保険会社、監査人、そして記録を作成した企業からAI記録を受け取るすべての方向けです。このページでいう「運用者」は、AIを組み込んだサービスを提供または運用する事業者を指し、日本の「AI事業者ガイドライン」でいう「AI提供者」や「AI利用者」におおむね当たります。モデルそのものを提供する事業者（同ガイドラインの「AI開発者」など）は「AIモデルの提供元」と呼びます。</p>
+    <ol class="steps">
+      <li><strong>運用者が宣言した範囲について、完全ですか。</strong>まず宣言を求めてください。何を記録するか、どのくらいの頻度か、記録が失敗したときに何が起きるか（C1）、そして事前に宣言された欠落はどれか。草案のテストは、宣言された欠落をすべて報告します。そのうち合格と数えられるものがあり得るかどうかは、まだコメントを募集している論点です。</li>
+      <li><strong>ほかに誰がコピーや件数を持っていますか。</strong>それ自身とだけ照合された記録では、全面的な書き換えも、一貫した過少計上も見抜けません。外部の時計で時刻が刻まれ、他者が立ち会ったチェックポイント（C6）や、AIモデルの提供元自身の請求書のような、運用者が管理していない相手の件数（C14）を探してください。</li>
+      <li><strong>項目が欠けたり変更されたりしたら、どうやって気づけますか。</strong>上のデモのように、番号とリンク（C3）は削除を示します。カウンター（C14）は、番号が振られる前に捨てられた項目を示します。ハートビート、つまり定期的に送られる稼働確認の信号（C22）は、記録が止まっていた時間を示します。</li>
+    </ol>
+    <p class="note">2つのテスト、T3とT14aの草案テストベクターは、各ケースを示します。そのなかには、何かがおかしいのに確認が通ってしまう2つのケースと、外部のコピーや件数でしか捉えられないため保留にしかなり得ない1つのケースが含まれます。監督当局向けの平易な索引（REGULATOR_QUESTIONS.txt）が付属しており、<a href="https://github.com/StSForensics/o4m-record-tests" rel="noopener">github.com/StSForensics/o4m-record-tests</a> にあります。これらは作者自身が実行したものです。作者のために家族が手配した第2の読み手が別のチェッカーを書き、その判定は50件の入力のうち31件で一致しました。ほかの誰も結果を再現していません。これは読解の補助であり、いかなる規制当局の指針でも法的助言でもありません。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="check">
+    <h2 id="check">渡されたファイルを確認する</h2>
+    <div class="row">
+      <input type="file" id="file" aria-label="ハッシュ値を計算するファイルを選択">
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">このファイルのハッシュ値</div>
+      <div class="hash" id="fileHash">まだファイルが選ばれていません。</div>
+      <progress id="prog" max="100" value="0" hidden></progress>
+    </div>
+    <label for="expected">期待するよう伝えられたハッシュ値</label>
+    <input type="text" id="expected" placeholder="登録簿、受領書、メールにある64文字のSHA-256を貼り付けてください">
+    <div class="verdict idle" id="verdict" aria-live="polite">ファイルを選び、期待されるハッシュ値を貼り付けて比較してください。</div>
+    <p class="note">一致は、そのファイルが、ハッシュ値が計算されたものとバイト単位で同一であることを示します。いつ、誰によって作られたか、内容が真実かどうかは示しません。それぞれに何が追加で必要かは、下の段階表に示します。</p>
+    <p class="note">これは2つの数値の単純な比較です。事実認定でも、真正性の証拠でも、専門的助言でもなく、法律、金銭、安全、規制に関する判断の唯一の根拠にすべきではありません。</p>
+    <p class="note">数ギガバイトのモデル重みファイルのような大きなファイルは、分割して処理します。毎秒約100MBの速度で、40GBのファイルはノートPCで数分かかることがあり、スマートフォンや小型ボードではさらに長くかかります。何もアップロードされません。スマートフォンでは非常に大きなファイルをそもそも開けない場合があります。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="ownh" id="ownpanel">
+    <h2 id="ownh">自分のモデルを動かしていますか。他の人が確認できる記録を残しましょう</h2>
+    <p>自分自身について残す記録は、他の誰かが確認できる範囲でしか価値を持ちません。次の手順で確認可能にできます。費用はかかりません。手順1から4には記録用ソフトウェアが必要です。StSはそれを作っていません。</p>
+    <ol class="steps">
+      <li><strong>回答ごとに残すもの：</strong>尋ねたことと返ってきたもの（ご自身のマシン上に）、それぞれのハッシュ値、モデルファイルのハッシュ値（上のボックスを使います）、ソフトウェアとそのバージョン、設定（温度、シード）。ハッシュ値だけでは、何が語られたかは示せません。</li>
+      <li><strong>外部の時計で定期的に封印します。</strong>ハッシュ値だけを無料のタイムスタンプサービス（RFC 3161）または公開ログに送り、返ってきた受領証を保管してください。それがなければ封印は確認できません。内容がマシンの外に出ることはありません。封印は、その時刻までに記録が存在したことを示すので、あなたを含め誰も、気づかれずに日付をさかのぼらせたり後から変更したりできません。すべてを記録したことまでは示せません。それは手順3の役割です。</li>
+      <li><strong>常に記録するか、記録しなかった時間を明示します。</strong>説明できない空白があると、ほかのすべてが弱くなります。</li>
+      <li><strong>AIがあなたに代わって動作する場合</strong>（メール送信、投稿、購入など）、実行する前にその操作を封印してください。</li>
+      <li><strong>紛争が起こりそうになったら、何も削除しないでください。</strong>その時点で関連する記録を削除すると、裁判で不利に扱われる可能性があります。</li>
+      <li><strong>スマートフォンでは</strong>、他のアプリは通常AIアプリの内部を見られないため、記録はそのアプリが保存する内容に依存します。モデルがスマートフォン上で動く場合、提供元は何も保持していないかもしれません。アプリが履歴をエクスポートできるか確認し、定期的にエクスポートして、各エクスポートのハッシュ値を計算し封印してください（手順1と2）。</li>
+    </ol>
+    <p class="note">記録は諸刃の剣です。あなた自身の入力を含め、実際に起きたことを示します。誠実に行動した人を守ります。これは法的助言ではありません。</p>
+  </section>
+
+  <section aria-labelledby="ladderh" style="display:grid;gap:14px">
+    <h2 id="ladderh">記録が証明できること、一段ずつ</h2>
+    <ol class="ladder">
+      <li><span class="rung">1</span><div><div class="q">ハッシュ値が計算されてから変更されていない</div><p>必要なもの：信頼できるSHA-256ハッシュ値。 <span class="tag t-yes">ここで確認可能</span></p></div></li>
+      <li><span class="rung">2</span><div><div class="q">ある時刻までに存在していた</div><p>必要なもの：独立したタイムスタンプ機関（RFC 3161、またはEUのeIDAS規則に基づく適格電子タイムスタンプ）が刻印したハッシュ値。 <span class="tag t-part">次に対応予定</span></p></div></li>
+      <li><span class="rung">3</span><div><div class="q">既知の当事者から出たものである</div><p>必要なもの：その当事者が公開した鍵で検証したデジタル署名。 <span class="tag t-part">次に対応予定</span></p></div></li>
+      <li><span class="rung">4</span><div><div class="q">誰も登録簿をこっそり書き換えていない</div><p>必要なもの：多数の当事者が照合する公開の透明性ログに、記録が載っていること。 <span class="tag t-part">次に対応予定</span></p></div></li>
+      <li><span class="rung">5</span><div><div class="q">何も省かれていない</div><p>必要なもの：AIモデルの提供元自身の請求書のような独立した件数と、取り込みがいつ稼働していたかの声明。<span class="ownonly" hidden> ご自身のマシンにはプロバイダーの請求書がありません。記録ソフトのハートビートと、宣言した欠落の一覧が最善の代用ですが、記録ソフトなしでモデルを動かしたことが一度もないことまでは示せません。</span> <span class="tag t-op" id="l5">運用者の協力が必要</span></p></div></li>
+      <li><span class="rung">6</span><div><div class="q">そこに書かれていることが実際に起きた</div><p>必要なもの：返金を示すあなたの銀行明細のような、第三者による記録。虚偽の記述の記録は、損なわれていなくても虚偽のままです。<span class="ownonly" hidden> ご自身のエージェントの場合：送信したメールの受信者側のコピー、または支払いに関する銀行の記録。</span> <span class="tag t-part">一部はご自身で確認可能</span></p></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="testsh" style="display:grid;gap:14px">
+    <h2 id="testsh">23のチェックを、やさしい言葉で</h2>
+    <p class="note">公開コメント募集草案「O4M Record Tests 2026（v1.0）」の要件C1からC23に基づきます（<a href="https://doi.org/10.5281/zenodo.23857888" rel="noopener">doi.org/10.5281/zenodo.23857888</a>）。CC BY 4.0、2026年11月1日公表、2026年12月1日までコメントを募集しています。以下のやさしい言葉による説明は要約であり、草案が正本です。 <span id="tagnote">タグは、記録のエクスポートを持つ顧客が、企業の助けなしに確認できるかどうかを示します。</span></p>
+    <div class="chips" role="group" aria-label="チェックを絞り込む">
+      <button class="chip" data-f="all" aria-pressed="true">全23項目</button>
+      <button class="chip" data-f="yes" aria-pressed="false">確認できる</button>
+      <button class="chip" data-f="part" aria-pressed="false">一部</button>
+      <button class="chip" data-f="op" aria-pressed="false" id="opchip">運用者の協力が必要</button>
+    </div>
+    <div class="tests" id="tests"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="bg">
+    <h2 id="bg">背景と、このツールの位置づけ</h2>
+    <p>私は、この点に関する英国とEUの規則を比較した公開文書を発表しました（<a href="https://doi.org/10.5281/zenodo.23546436" rel="noopener">doi.org/10.5281/zenodo.23546436</a>）。金融サービス以外では、私が検討した拘束力のある規則のうち、AIのログを、作成した当事者以外の人が改変や欠落について確認できるように保存することを明確に求めているものはありませんでした。2026年11月1日に、まさにその性質を対象とした公開テストを、2026年12月1日までコメントを募集する公開コメント募集草案として公表しました（<a href="https://doi.org/10.5281/zenodo.23857888" rel="noopener">doi.org/10.5281/zenodo.23857888</a>）。</p>
+    <div class="fit" role="note" aria-labelledby="fith">
+      <h3 id="fith">SCITT、AIUC-1、その他の標準と競合しますか</h3>
+      <p>いいえ。競合するつもりもありません。これらのテストとこのページは、ログの形式も、標準も、証明書も定めません。このページは記録を作りませんし、StS Forensicsは、確認の対象となるシステムを提供しません。テストは、すでに存在する仕組みに、もう1つだけ問いを加えます。運用者の外にいる人が、何かが省かれたり変更されたりしたことに気づけるか。</p>
+      <ul>
+        <li><strong>SCITT</strong>（RFC 9943のIETFアーキテクチャ）は、署名付き声明を透明性サービスに登録する方法です。テストはその隣に位置します。RFC 9943自身が9.3節で、発行者が一部の声明を提出し、他を提出しないことができると述べており、これがテストの焦点とする欠落です。</li>
+        <li><strong>AIUC-1</strong>は、四半期ごとに更新されるAIエージェント向けの標準です。2026年第4四半期版（2026年10月15日）は、データとプライバシーのリスク、および説明責任のリスクについて、第三者によるテストを必須としました。テストは、記録について確認すべき具体的なものをテスターに提供し得ます。AIUC-1の一部ではなく、どちらの側にも提携や推奨はありません。</li>
+        <li><strong>その他の標準</strong>、たとえばETSI、CEN-CENELEC、ISO/IECのものは、別の取り組みです。それらがログを求める場合、テストは、部外者がそのログを改変だけでなく欠落についても確認できるかを問います。</li>
+      </ul>
+      <p class="note">記録がこれらすべてに従っていても、運用者以外の誰も欠落を確認できなければ、テストには合格しないことがあります。訂正やコメントは2026年12月1日まで歓迎します：comments@sts-forensics.com、件名「O4M Record Tests」。</p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="terms">
+    <h2 id="terms">利用条件</h2>
+    <ol class="steps">
+      <li>このページは無料です。Apache License 2.0に基づき、現状有姿で、いかなる種類の保証もなく提供されます（コードにはそのライセンスの第7条と第8条が適用されます）。</li>
+      <li>利用により、StS Forensics Ltd または Gareth Wong との間に、顧客、助言者、専門家その他の専門的関係は生じません。これは証明書でも、格付けでも、保証でもありません。</li>
+      <li>法律が認める最大限の範囲で、StS Forensics Ltd、その取締役および貢献者は、このページの利用またはそれへの依拠から生じる損失について責任を負いません。</li>
+      <li>ここに記載されたいかなる内容も、過失による死亡または人身傷害、詐欺または詐欺的な不実表示、その他法律上制限が認められないものについての責任を制限するものではありません。消費者の方の法律上の権利は影響を受けません。</li>
+      <li>このページはお使いのブラウザ内で動作し、当方には何も送信しないため、何を確認されたかを当方が知ることはできません。このページのホスト（GitHub）は、訪問に関する通常のサーバーログを保持することがあります。</li>
+      <li>イングランド法が適用され、イングランドおよびウェールズの裁判所が管轄権を有します。ただし、お住まいの地域で認められている強行法規上の権利は妨げられません。</li>
+    </ol>
+  </section>
+
+  <footer>
+    <span><strong>運営：</strong>VerZan Check は、StS Forensics Ltd（ロンドン）が作った無料ツールです。同社は、AIの活動の記録を、システムの運用者以外の人が確認できるようにする方法に取り組んでいます。このツールは無料です。このページは1つのファイルなので、ソースはページそのものです。ソースを表示すれば、すべての行を読めます。同じファイルが <a href="https://github.com/StSForensics/VerZan">github.com/StSForensics/VerZan</a> でApache-2.0のもとで公開されています。テストT3とT14aの草案テストベクターと参照検証ツール（作者自身が実行、第2の読み手が50件中31件で一致、ほかの誰も再現していません）は <a href="https://github.com/StSForensics/o4m-record-tests">github.com/StSForensics/o4m-record-tests</a> にあります。テキストはCC BY 4.0。Copyright 2026 StS Forensics Ltd（会社番号 17054694）。作成者：取締役 Gareth Wong。StS Forensics Ltd は、AI記録の確認に助けを求める組織からの問い合わせを歓迎します。このツールに関連する有償の仕事は、このページで開示します。連絡先：gaptable@sts-forensics.com</span>
+    <span><strong>プライバシー：</strong>ハッシュ値は、ブラウザ内蔵のWeb Crypto、または非常に大きなファイルの場合はこのページ内の小さなルーチンで、お使いのブラウザ内で計算されます。ファイルもテキストもアップロードされず、このページはCookieを設定せず、追跡を行わず、他のウェブサイトから何も読み込みません。</span>
+    <span>特定の企業の格付けではなく、法的助言でもありません。ハッシュ値が一致しても、段階表の段階1しか証明できません。Apache-2.0ライセンスのもと、現状有姿で、いかなる保証もなく提供されます。ソフトウェアの常として誤りを含むことがあるため、重要なことは別の方法でも確認してください。</span>
+    <span>VerZan Check v1.2.12-ja（翻訳草案、用語見直し第2版）、2026年11月11日。英語版v1.2.12の翻訳であり、英語版が優先します。変更履歴は英語版のページにあります。</span>
+  </footer>
+</div>
+
+<script>
+const T=[["C1", "何かを記録する前に書き出された規則：何が対象か、頻度、失敗したときの扱い。", "part", "yes", "何を記録するか、どのくらいの頻度か、記録が失敗したらどうなるかを、1ページのメモにまとめましょう。"], ["C2", "記録は、同じ記録なら常に同じハッシュ値になるよう、厳密に1つのバイト形式で保存されます。", "yes", "yes", "仕様を満たす記録ソフトウェアがこれを行います。"], ["C3", "各記録には番号が振られ、1つ前の記録とつながっているので、欠落、差し替え、挿入が見えます。", "yes", "yes", "仕様を満たす記録ソフトウェアがこれを行います。"], ["C4", "尋ねたことと答えたことはハッシュ値として封印され、内容そのものは別に保管できます。", "part", "yes", "内容はご自身のマシン上で非公開にし、外に出すのはハッシュ値だけにします。"], ["C5", "各記録には、アプリケーションが触れられない鍵による署名が付きます。", "yes", "part", "ハードウェアセキュリティキーなど、AIソフトウェアが触れられない鍵を使ってください。通常のシステムのキーチェーンは、あなたとして動作するあらゆるプログラム、つまりAIソフトウェアにも開かれているのが普通です。所有者であるあなたに対しては守れません。それは外部タイムスタンプ（C6）の役割です。"], ["C6", "外部の時計で刻印され、独立した立会人が連署する定期的なチェックポイント。", "yes", "yes", "無料のタイムスタンプサービスや公開ログは、あなた自身によるものも含め、日付のさかのぼりを防ぎます。"], ["C7", "各回答に、どのAIモデルのどのバージョンが生成したかが記される。", "part", "yes", "モデルファイルそのもののハッシュ値を計算してください。バージョンが隠されているクラウドAIより簡単です。"], ["C8", "どのソフトウェアが動いていたかを示すハードウェア上の証拠。", "op", "na", "家庭用機器の多くは、どのソフトウェアが動いたかを証明できません。その旨を記録に書いてください。"], ["C9", "各操作は、それを承認した人または役割にさかのぼれる。", "op", "part", "他の人があなたのマシンや自宅サーバーを共用する場合に重要です。1人ずつ別のIDを与えてください。"], ["C10", "すべての署名鍵の履歴：いつ発行、更新、失効されたか。", "yes", "yes", "鍵をいつ作り、変更し、失ったかを書き留めてください。"], ["C11", "記録がそれぞれ署名付きチェックポイントに属することの証明を伴う、提供可能なエクスポート。", "yes", "yes", "エクスポートはすでにお手元にあります。他の人が読める形で保管してください。"], ["C12", "紛争が起こり得る全期間にわたって記録が保管され、削除自体も記録される。", "part", "part", "請求が起こり得る期間、バックアップを保管してください。数年に及ぶことがあります。"], ["C13", "すべてのAIエージェントは、開始時と停止時に登録される。", "op", "yes", "ローカルの各エージェントの開始と停止を記録してください。"], ["C14", "受信した記録と捨てた記録の件数を、AIモデルの提供元自身の利用実績と突き合わせる。", "part", "na", "ローカルモデルには、突き合わせるプロバイダーの請求書がありません。ハートビート（C22）に頼り、その旨を明記してください。構成がクラウドAIにフォールバックする場合、その部分にはC14が引き続き適用されます。"], ["C15", "時刻は、宣言された信頼できる時計から、明示された許容誤差内で取得される。", "yes", "yes", "コンピューターのネットワーク時刻と、外部のタイムスタンプを使ってください。"], ["C16", "全員が同じログを見る。人によって異なる版を見せることは検出できる。", "yes", "yes", "自前のサーバーではなく、公開の透明性ログを使ってください。"], ["C17", "現実の各操作は、銀行や決済事業者など他者の記録と一致する。", "part", "part", "同じ出来事についての他者の記録：メールの受信者側のコピー、銀行明細。"], ["C18", "操作は、後から書き起こすのではなく、効力が生じる前に記録へ封印される。", "op", "yes", "動作するエージェントでは、実行前にその操作を封印してください。"], ["C19", "タイムスタンプサービスが停止していれば、その停止が記録され、フラグが立てられ、決して隠されない。", "yes", "yes", "無料のタイムスタンプサービスは止まることがあります。その空白は記録に現れなければなりません。"], ["C20", "確認用ソフトウェアはオープンソースで、誰でも同じ結果になるよう再ビルドできる。", "yes", "yes", "誰でも再ビルドできるオープンな確認用ソフトウェアを使ってください。"], ["C21", "確認者は、誰から報酬を得ているかを開示し、記録が封印された後にサンプルを無作為に選ぶ。", "yes", "yes", "記録の確認を誰かに依頼して報酬を払う場合、その人は報酬の出所を開示しなければなりません。"], ["C22", "記録ソフトが定期的にハートビートを送り、各判定には、記録が稼働中、劣化、不在のいずれだったかが示される。", "yes", "yes", "モデルが動いている間はハートビートを出し、スリープやオフラインの時間が、秘密ではなく空白として現れるようにします。"], ["C23", "署名鍵は、企業とそのAIエージェントの手の届かない場所で保持される。", "part", "part", "鍵をエージェントから遠ざけてください。所有者に対しては、外部タイムスタンプ（C6）だけが助けになります。"]];
+const L={co:{yes:["確認できる","t-yes"],part:["一部","t-part"],op:["運用者の協力が必要","t-op"]},
+ own:{yes:["自分で設定できる","t-yes"],part:["一部","t-part"],na:["家庭では通常難しい：その旨を宣言","t-na"]}};
+let mode="co",filt="all";
+const box=document.getElementById('tests');
+function draw(){box.innerHTML="";T.forEach(([id,txt,k,ok,otxt])=>{const tag=mode==="co"?k:ok;
+  if(filt!=="all"&&tag!==filt)return;
+  const d=document.createElement('article');d.className='test';
+  d.innerHTML=`<div class="top"><span class="cid">${id}</span><span class="tag ${L[mode][tag][1]}">${L[mode][tag][0]}</span></div><p>${txt}</p>`+(mode==="own"?`<p class="own">${otxt}</p>`:"");box.appendChild(d);});}
+const chips=[...document.querySelectorAll('.chip:not(.mode)')];
+chips.forEach(b=>b.addEventListener('click',()=>{chips.forEach(c=>c.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');filt=b.dataset.f;draw();}));
+function setMode(m){mode=m;filt="all";chips.forEach(c=>c.setAttribute('aria-pressed',c.dataset.f==="all"?'true':'false'));
+  document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m?'true':'false'));
+  document.querySelector('.chip[data-f=yes]').textContent=m==="co"?"確認できる":"自分で設定できる";
+  const op=document.getElementById('opchip');op.dataset.f=m==="co"?"op":"na";op.textContent=m==="co"?"運用者の協力が必要":"家庭では通常難しい";
+  document.getElementById('tagnote').textContent=m==="co"?"タグは、記録のエクスポートを持つ顧客が、企業の助けなしに確認できるかどうかを示します。":"タグは、自分のモデルを動かしている人が普通のコンピューターで満たせるかどうかを示し、灰色の行がその方法を説明します。";
+  document.querySelectorAll('.ownonly').forEach(e=>e.hidden=(m!=="own"));
+  const l5=document.getElementById('l5');l5.className="tag "+(m==="co"?"t-op":"t-part");l5.textContent=m==="co"?"運用者の協力が必要":"一部";
+  if(m==="own")document.getElementById('ownpanel').scrollIntoView({behavior:"smooth",block:"start"});
+  draw();}
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+draw();
+
+function Sha256(){
+  const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const H=new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);
+  const W=new Uint32Array(64),buf=new Uint8Array(64);let bl=0,total=0;
+  function block(d,o){
+    for(let i=0;i<16;i++){const j=o+i*4;W[i]=(d[j]<<24)|(d[j+1]<<16)|(d[j+2]<<8)|d[j+3];}
+    for(let i=16;i<64;i++){const a=W[i-15],b=W[i-2];
+      const s0=((a>>>7)|(a<<25))^((a>>>18)|(a<<14))^(a>>>3);
+      const s1=((b>>>17)|(b<<15))^((b>>>19)|(b<<13))^(b>>>10);
+      W[i]=(W[i-16]+s0+W[i-7]+s1)|0;}
+    let a=H[0],b=H[1],c=H[2],e=H[4],f=H[5],g=H[6],h=H[7],dd=H[3];
+    for(let i=0;i<64;i++){
+      const S1=((e>>>6)|(e<<26))^((e>>>11)|(e<<21))^((e>>>25)|(e<<7));
+      const t1=(h+S1+((e&f)^(~e&g))+K[i]+W[i])|0;
+      const S0=((a>>>2)|(a<<30))^((a>>>13)|(a<<19))^((a>>>22)|(a<<10));
+      const t2=(S0+((a&b)^(a&c)^(b&c)))|0;
+      h=g;g=f;f=e;e=(dd+t1)|0;dd=c;c=b;b=a;a=(t1+t2)|0;}
+    H[0]+=a;H[1]+=b;H[2]+=c;H[3]+=dd;H[4]+=e;H[5]+=f;H[6]+=g;H[7]+=h;}
+  this.update=function(d){let i=0;total+=d.length;
+    if(bl>0){while(bl<64&&i<d.length)buf[bl++]=d[i++];if(bl===64){block(buf,0);bl=0;}}
+    for(;i+64<=d.length;i+=64)block(d,i);
+    while(i<d.length)buf[bl++]=d[i++];};
+  this.hex=function(){const bits=total*8,hi=Math.floor(bits/4294967296),lo=bits>>>0;
+    const pad=new Uint8Array(((bl<56)?56:120)-bl+8);pad[0]=0x80;const n=pad.length;
+    pad[n-8]=hi>>>24;pad[n-7]=hi>>>16;pad[n-6]=hi>>>8;pad[n-5]=hi;pad[n-4]=lo>>>24;pad[n-3]=lo>>>16;pad[n-2]=lo>>>8;pad[n-1]=lo;
+    const t=total;this.update(pad);total=t;
+    return [...H].map(x=>x.toString(16).padStart(8,'0')).join('');};
+}
+
+async function sha(buf){const h=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('');}
+const sample=document.getElementById('sample'),sh=document.getElementById('sampleHash');
+async function upd(){try{sh.textContent=await sha(new TextEncoder().encode(sample.value));}catch(e){const s=new Sha256();s.update(new TextEncoder().encode(sample.value));sh.textContent=s.hex();}}
+sample.addEventListener('input',upd);upd();
+
+(function(){
+  const texts=["エージェントが請求ファイルを開いた。","エージェントが和解額を提示した。","エージェントが1,119ポイントの返金を約束した。","エージェントが確認メールを送信した。","エージェントが請求を完了とした。"];
+  let recs=[],full=[],deleted=false;
+  const ol=document.getElementById('recs'),vA=document.getElementById('vAlt'),vG=document.getElementById('vGap'),bd=document.getElementById('del');
+  async function build(){let prev="start";full=[];
+    for(let i=0;i<texts.length;i++){const seq=i+1,fp=await sha(new TextEncoder().encode(seq+"|"+prev+"|"+texts[i]));full.push({seq,prev,text:texts[i],fp});prev=fp;}
+    recs=full.slice();deleted=false;await render();}
+  async function render(){
+    ol.innerHTML="";recs.forEach(r=>{const li=document.createElement('li');li.textContent="記録"+r.seq+"："+r.text+"（ハッシュ値 "+r.fp.slice(0,8)+"...)";ol.appendChild(li);});
+    bd.disabled=deleted;
+    let altOk=true;for(const r of recs){const h=await sha(new TextEncoder().encode(r.seq+"|"+r.prev+"|"+r.text));if(h!==r.fp)altOk=false;}
+    vA.className="verdict "+(altOk?"ok":"bad");
+    vA.textContent="確認1、各記録は変更されていませんか。"+(altOk?"合格。残っている記録はすべて、ハッシュ値が計算されたときのままです。":"不合格。記録が改変されています。");
+    let gap=null;for(let i=0;i<recs.length;i++){const want=i+1;if(recs[i].seq!==want){gap=want;break;}if(i>0&&recs[i].prev!==recs[i-1].fp){gap=recs[i].seq-1;break;}}
+    vG.className="verdict "+(gap===null?"ok":"bad");
+    vG.textContent="確認2、欠けているものはありませんか。"+(gap===null?"合格。番号は1から"+recs.length+"まで続き、各記録は1つ前の記録を指しています。":"不合格。記録"+gap+"が欠けています。");}
+  bd.addEventListener('click',()=>{recs=full.filter(r=>r.seq!==3);deleted=true;render();});
+  document.getElementById('rst').addEventListener('click',()=>{recs=full.slice();deleted=false;render();});
+  build();
+})();
+
+const BIG=256*1024*1024,CH=32*1024*1024;
+async function hashFile(f,prog,live){
+  if(f.size<=BIG&&window.crypto&&crypto.subtle){try{return await sha(await f.arrayBuffer());}catch(e){}}
+  const s=new Sha256();prog.hidden=false;prog.value=0;
+  for(let o=0;o<f.size;o+=CH){if(!live())return null;s.update(new Uint8Array(await f.slice(o,o+CH).arrayBuffer()));
+    if(!live())return null;prog.value=Math.round(100*Math.min(o+CH,f.size)/f.size);fh.textContent='ハッシュ値を計算中… '+prog.value+'%';}
+  prog.hidden=true;return s.hex();}
+
+let fileHex="";const fh=document.getElementById('fileHash'),ex=document.getElementById('expected'),v=document.getElementById('verdict'),pg=document.getElementById('prog');
+function compare(){const m64=ex.value.match(/[0-9a-f]{64}/i);const want=m64?m64[0].toLowerCase():ex.value.replace(/[^0-9a-fA-F]/g,'').toLowerCase();
+  if(!fileHex||!want){v.className='verdict idle';v.textContent='ファイルを選び、期待されるハッシュ値を貼り付けて比較してください。';return;}
+  if(want.length!==64){v.className='verdict bad';v.textContent='期待されるハッシュ値は16進数64文字のはずです。すべてコピーできているか確認してください。';return;}
+  if(want===fileHex){v.className='verdict ok';v.textContent='一致しました。このファイルは、ハッシュ値が計算されたものとバイト単位で同一です。';}
+  else{v.className='verdict bad';v.textContent='一致しません。このファイルは、ハッシュ値が計算されたものと異なるか、ハッシュ値のコピーが誤っています。';}}
+let run=0;
+document.getElementById('file').addEventListener('change',async e=>{const my=++run;const f=e.target.files[0];fileHex='';compare();if(!f){fh.textContent='まだファイルが選ばれていません。';pg.hidden=true;return;}fh.textContent='計算中…';
+  try{const h=await hashFile(f,pg,()=>my===run);if(my!==run)return;fileHex=h;fh.textContent=fileHex;}catch(err){if(my!==run)return;pg.hidden=true;fh.textContent='そのファイルを読み込めませんでした。スマートフォンでは、非常に大きなファイルは開けないことがあります。';fileHex='';}compare();});
+ex.addEventListener('input',compare);
+</script>
+
+</body></html>

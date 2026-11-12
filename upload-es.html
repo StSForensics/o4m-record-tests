@@ -1,0 +1,310 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>VerZan Check</title><meta name="description" content="Herramienta gratuita: obtenga la huella de un archivo en su navegador (SHA-256) y vea qué le hace a un registro la eliminación de una entrada. Nada sale de la página."><meta property="og:title" content="VerZan Check"><meta property="og:description" content="¿Es exactamente el archivo que alguien registró? Obtenga su huella en su navegador y compárela. Nada sale de la página."><meta property="og:type" content="website"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'"><link rel="alternate" hreflang="en" href="https://verzan.org/"><link rel="alternate" hreflang="fr" href="https://verzan.org/fr/"><link rel="alternate" hreflang="de" href="https://verzan.org/de/"><link rel="alternate" hreflang="es" href="https://verzan.org/es/"><link rel="alternate" hreflang="ja" href="https://verzan.org/ja/"><link rel="alternate" hreflang="x-default" href="https://verzan.org/"><link rel="canonical" href="https://verzan.org/es/"><meta name="referrer" content="no-referrer"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20160%20160%22%3E%3Crect%20width%3D%22160%22%20height%3D%22160%22%20rx%3D%2224%22%20fill%3D%22%23FAF9F5%22/%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23182720%22%20stroke-width%3D%228%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%2280%22%20y1%3D%2210%22%20x2%3D%2280%22%20y2%3D%2230%22/%3E%3Cline%20x1%3D%2252%22%20y1%3D%2230%22%20x2%3D%22108%22%20y2%3D%2230%22/%3E%3Crect%20x%3D%2250%22%20y%3D%2242%22%20width%3D%2260%22%20height%3D%2254%22/%3E%3Cline%20x1%3D%2250%22%20y1%3D%2260%22%20x2%3D%22110%22%20y2%3D%2260%22/%3E%3Cline%20x1%3D%2250%22%20y1%3D%2278%22%20x2%3D%22110%22%20y2%3D%2278%22/%3E%3Cline%20x1%3D%2238%22%20y1%3D%22106%22%20x2%3D%22122%22%20y2%3D%22106%22/%3E%3C/g%3E%3Cpath%20d%3D%22M52%20126%20L72%20148%20L118%20116%22%20fill%3D%22none%22%20stroke%3D%22%23458D5F%22%20stroke-width%3D%2212%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<style>
+/* Layout: one narrow evidence column; tool first, then the proof ladder, then the 23 checks as a filterable list */
+:root{
+  --bg:#eef1f3; --panel:#ffffff; --ink:#141a22; --muted:#55606e; --line:#d3d9df;
+  --accent:#2340c8; --accent-ink:#ffffff;
+  --ok:#11734b; --ok-bg:#e1f3ea; --bad:#a3271c; --bad-bg:#fbe6e3; --part:#8a5a00; --part-bg:#fbefd6;
+  --display:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141a; --panel:#171e26; --ink:#e7ecf1; --muted:#9aa6b3; --line:#2b3540;
+  --accent:#8ea2ff; --accent-ink:#0f141a;
+  --ok:#6fd6a6; --ok-bg:#12302a; --bad:#ff8f84; --bad-bg:#3a1a17; --part:#f2c264; --part-bg:#36290f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141a; --panel:#171e26; --ink:#e7ecf1; --muted:#9aa6b3; --line:#2b3540;
+  --accent:#8ea2ff; --accent-ink:#0f141a;
+  --ok:#6fd6a6; --ok-bg:#12302a; --bad:#ff8f84; --bad-bg:#3a1a17; --part:#f2c264; --part-bg:#36290f; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body)}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:grid;gap:36px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:700}
+p{margin:0;max-width:65ch}
+.eyebrow{font:600 .74rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+header{display:grid;gap:10px}
+.lede{font-size:1.12rem;color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px}
+label{font-weight:700;font-size:.95rem}
+textarea,input[type=text]{width:100%;box-sizing:border-box;font:15px/1.5 var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px}
+textarea{min-height:90px;resize:vertical}
+textarea:focus,input:focus,button:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hash{font:600 .9rem/1.5 var(--mono);word-break:break-all;background:var(--bg);border-radius:6px;padding:10px;border:1px dashed var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button,.filebtn{font:700 .92rem var(--body);border:0;border-radius:6px;padding:9px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+input[type=file]{font:14px var(--body);color:var(--muted)}
+.verdict{font:700 1rem var(--body);padding:10px 12px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok)} .verdict.bad{background:var(--bad-bg);color:var(--bad)} .verdict.idle{color:var(--muted);padding-left:0}
+.note{font-size:.9rem;color:var(--muted)}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-left:3px solid var(--line)}
+.ladder li{display:grid;grid-template-columns:2.2rem 1fr;gap:12px;padding:12px 0 12px 12px;border-bottom:1px solid var(--line)}
+.ladder li:last-child{border-bottom:0}
+.rung{font:700 1.05rem var(--mono);color:var(--accent)}
+.ladder .q{font-weight:700}
+.tag{display:inline-block;font:600 .72rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 7px;border-radius:4px;white-space:nowrap}
+.t-yes{background:var(--ok-bg);color:var(--ok)} .t-na{background:var(--bg);color:var(--muted);border:1px solid var(--line)} .t-part{background:var(--part-bg);color:var(--part)} .t-op{background:var(--bad-bg);color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 .85rem var(--body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tests{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.test{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:6px;align-content:start;min-width:0}
+.test .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.cid{font:700 .95rem var(--mono)}
+.test p{font-size:.93rem} .test .own{font-size:.88rem;color:var(--muted)} .steps{margin:0;padding-left:1.2rem;display:grid;gap:8px;max-width:65ch} progress{width:100%}
+.fit{border:1px solid var(--line);border-left:5px solid var(--accent);background:var(--bg);border-radius:8px;padding:16px;display:grid;gap:10px}
+.fit ul{margin:0;padding-left:1.2rem;display:grid;gap:8px;max-width:65ch}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:56px;height:56px;flex:none;color:var(--ink)}
+footer{font-size:.85rem;color:var(--muted);display:grid;gap:6px;border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion:no-preference){.verdict{transition:background .2s}}
+.langbar{font-size:.85rem;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--panel)}.langbar a{color:var(--accent)}
+</style>
+
+
+<div class="wrap">
+  <div class="langbar" role="note">Traducción automática, no revisada por un hablante nativo. Prevalece el inglés. <a href="https://verzan.org/" hreflang="en" lang="en">English</a> · <a href="https://verzan.org/fr/" hreflang="fr" lang="fr">Français</a> · <a href="https://verzan.org/de/" hreflang="de" lang="de">Deutsch</a> · <a href="https://verzan.org/ja/" hreflang="ja" lang="ja">日本語</a></div>
+  <header>
+    <span class="eyebrow">Herramienta gratuita de interés público de StS Forensics Ltd · funciona por completo en su navegador</span>
+    <div class="brand"><svg class="logo" viewBox="0 0 160 160" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><line x1="80" y1="10" x2="80" y2="30"/><line x1="52" y1="30" x2="108" y2="30"/><rect x="50" y="42" width="60" height="54"/><line x1="50" y1="60" x2="110" y2="60"/><line x1="50" y1="78" x2="110" y2="78"/><line x1="38" y1="106" x2="122" y2="106"/></g><path d="M52 126 L72 148 L118 116" fill="none" stroke="#458D5F" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg><h1>VerZan Check</h1></div>
+    <p class="lede">¿Es exactamente el archivo que alguien registró? Obtenga aquí su huella digital (su valor hash SHA-256) y compárela. Nada de lo que escriba o suelte sale de esta página.</p>
+    <div class="chips" role="group" aria-label="¿Quién es usted?">
+      <button class="chip mode" data-m="co" aria-pressed="true">Compruebo la IA de una empresa</button>
+      <button class="chip mode" data-m="own" aria-pressed="false">Ejecuto mi propio modelo de IA</button>
+    </div>
+  </header>
+
+  <section class="panel" aria-labelledby="why">
+    <h2 id="why">Por qué existe esto</h2>
+    <p>Los chatbots y los agentes de IA son probabilísticos: si hace la misma pregunta dos veces, puede recibir dos respuestas distintas. Por eso, cuando una IA promete un reembolso, indica un precio o realiza una acción, la constancia más fiable de lo ocurrido es un registro hecho en ese momento, guardado donde nadie pueda alterarlo en silencio y que pueda comprobar alguien distinto de la empresa que lo creó. Sin él, una disputa se reduce a su palabra frente a un registro que solo controla la otra parte.</p>
+    <p>Lo mismo vale si usted mismo ejecuta un modelo de IA, en un portátil, un servidor doméstico o una placa pequeña. Si alguna vez se disputa lo que su modelo escribió o hizo, un registro hecho en su momento y sellado por un reloj externo es una prueba mucho más sólida que un registro que usted pudo editar después.</p>
+    <p>El derecho avanza en la misma dirección. Según la nueva Directiva europea sobre responsabilidad por los daños causados por productos defectuosos (Directiva (UE) 2024/2853), que abarca el software, incluida la IA, introducido en el mercado o puesto en servicio después del 9 de diciembre de 2026, los perjudicados no tienen que probar la culpa (sí tienen que probar que el producto era defectuoso, el daño y el nexo entre ambos), un órgano jurisdiccional puede ordenar la exhibición de pruebas, y no exhibirlas puede llevarle a presumir el carácter defectuoso del producto.<span class="ownonly" hidden> Se refiere sobre todo a productos suministrados en el curso de una actividad comercial. Esta página no dice si podría alcanzar a quien ejecuta un modelo solo para sí mismo; tenga en cuenta que su definición de fabricante incluye a quien desarrolla o produce un producto para su propio uso (artículo 4, punto 10).</span></p>
+    <p><strong>Así que haga dos preguntas:</strong> ¿puedo obtener el registro? ¿Y puede alguien distinto de usted comprobarlo? Esta página muestra cómo funciona la primera comprobación.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="try">
+    <h2 id="try">Pruébelo: cambie una sola letra</h2>
+    <label for="sample">Texto (ejemplo de respuesta de un chatbot)</label>
+    <textarea id="sample">Agente: Sí, puedo reembolsarle sus 1.119 puntos como gesto comercial excepcional. El reembolso ha sido procesado.</textarea>
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">Huella digital SHA-256 (hash)</div>
+      <div class="hash" id="sampleHash" aria-live="polite">calculando…</div>
+    </div>
+    <p class="note">Edite cualquier carácter de arriba, incluso una coma, y la huella cambia por completo. Por eso una huella registrada antes puede demostrar que un archivo fue alterado después.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="omit">
+    <h2 id="omit">Pruébelo: quite una entrada</h2>
+    <p>Aquí hay un registro de juguete con cinco entradas. Cada una recibió su huella cuando se hizo y lleva la huella de la anterior. Borre una en silencio y ejecute las dos comprobaciones.</p>
+    <ol id="recs" class="steps"></ol>
+    <div class="row">
+      <button id="del" type="button">Borrar en silencio la entrada 3</button>
+      <button id="rst" type="button" class="ghost">Volver a ponerla</button>
+    </div>
+    <div class="verdict idle" id="vAlt" aria-live="polite"></div>
+    <div class="verdict idle" id="vGap" aria-live="polite"></div>
+    <p class="note">La primera comprobación solo pregunta si cada registro restante está sin cambios. No puede ver un registro que ya no está. La segunda pregunta si los números se suceden sin huecos y si cada registro apunta al anterior. Es un juguete de unas pocas líneas, no un registro de IA. Un operador real que controle el punto donde se capturan los registros podría descartar algunos antes de numerarlos, y por eso las pruebas propuestas piden también recuentos en manos de un tercero (C14) y la prueba de que el registro estaba activo (C22).</p>
+  </section>
+
+  <section class="panel" aria-labelledby="regq">
+    <h2 id="regq">¿Le entregan los registros de IA de un operador? Tres preguntas que hacer</h2>
+    <p>Para reguladores, supervisores, tribunales, aseguradoras, auditores y cualquier persona que reciba registros de IA de la empresa que los generó. Esta página llama «operador» a esa empresa; en el Reglamento europeo de IA suele corresponder al «responsable del despliegue».</p>
+    <ol class="steps">
+      <li><strong>¿Está completo para el alcance que declaró el operador?</strong> Pida primero la declaración: qué se registra, con qué frecuencia y qué ocurre cuando falla el registro (C1), y qué lagunas se declararon de antemano. Las pruebas propuestas señalan cada laguna declarada; si alguna puede llegar a considerarse superada es una cuestión aún abierta a comentarios.</li>
+      <li><strong>¿Quién más tiene una copia o un recuento?</strong> Un registro comprobado solo contra sí mismo no puede mostrar una reescritura completa ni un recuento a la baja coherente. Busque puntos de control sellados por un reloj externo y atestiguados por terceros (C6), y recuentos de alguien a quien el operador no controla, como la propia factura del proveedor de IA (C14).</li>
+      <li><strong>Si faltara una entrada o se hubiera cambiado, ¿cómo lo notaría alguien?</strong> La numeración y los enlaces (C3) muestran un borrado, como hace la demostración de arriba. Los contadores (C14) muestran entradas descartadas antes de numerarse. Una señal de latido periódica, o heartbeat (C22), muestra cuándo estaba apagado el registro.</li>
+    </ol>
+    <p class="note">Los vectores de prueba provisionales de dos de las pruebas, T3 y T14a, muestran cada caso, incluidos dos en los que una comprobación se supera aunque algo haya salido mal y uno en el que solo puede quedar en suspenso, porque solo una copia o un recuento externos podrían detectarlo. Vienen con un índice en lenguaje sencillo para supervisores (REGULATOR_QUESTIONS.txt) en <a href="https://github.com/StSForensics/o4m-record-tests" rel="noopener">github.com/StSForensics/o4m-record-tests</a>. Los ejecutó el propio autor. Un segundo lector, a quien un familiar puso a trabajar para el autor, escribió un verificador independiente cuyos veredictos coincidieron en 31 de 50 entradas; nadie más ha reproducido los resultados. Esto es una ayuda de lectura, no una orientación de ningún regulador ni asesoramiento jurídico.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="check">
+    <h2 id="check">Compruebe un archivo que le hayan entregado</h2>
+    <div class="row">
+      <input type="file" id="file" aria-label="Elija un archivo del que obtener la huella">
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">Huella de este archivo</div>
+      <div class="hash" id="fileHash">Aún no se ha elegido ningún archivo.</div>
+      <progress id="prog" max="100" value="0" hidden></progress>
+    </div>
+    <label for="expected">Huella que le dijeron que esperara</label>
+    <input type="text" id="expected" placeholder="Pegue el SHA-256 de 64 caracteres del registro, el recibo o el correo">
+    <div class="verdict idle" id="verdict" aria-live="polite">Elija un archivo y pegue la huella esperada para comparar.</div>
+    <p class="note">Una coincidencia muestra que el archivo es, byte por byte, el mismo del que se obtuvo la huella. No muestra cuándo, por quién, ni que el contenido sea verdadero. La escalera de abajo indica qué más hace falta para cada uno de esos puntos.</p>
+    <p class="note">Es una simple comparación de dos números. No es una constatación de hechos, ni una prueba de autenticidad ni asesoramiento profesional, y no debe ser su única base para una decisión jurídica, financiera, de seguridad o regulatoria.</p>
+    <p class="note">Los archivos grandes, como un archivo de pesos de modelo de varios gigabytes, se procesan por partes. A unos 100 MB por segundo, un archivo de 40 GB puede tardar varios minutos en un portátil, y mucho más en un teléfono o una placa pequeña. No se sube nada. Es posible que los teléfonos no abran archivos muy grandes.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="ownh" id="ownpanel">
+    <h2 id="ownh">¿Ejecuta su propio modelo? Guarde un registro que otros puedan comprobar</h2>
+    <p>Un registro que usted mismo lleva sobre sí vale solo lo que otra persona pueda comprobar. Estos pasos lo hacen comprobable. No cuestan nada. Necesita software de registro para los pasos 1 a 4. StS no lo fabrica.</p>
+    <ol class="steps">
+      <li><strong>Por cada respuesta, guarde:</strong> lo que preguntó y lo que volvió (en su propia máquina), una huella de cada cosa, la huella del archivo del modelo (use el cuadro de arriba), el software y su versión, y los ajustes (temperatura, semilla). Una huella sola no puede mostrar lo que se dijo.</li>
+      <li><strong>Séllelo con un reloj externo, con regularidad.</strong> Envíe solo la huella a un servicio gratuito de sellado de tiempo (RFC 3161) o a un registro público, y conserve el recibo que le devuelva; sin él, el sello no se puede comprobar. Su contenido nunca sale de su máquina. El sello demuestra que el registro existía en ese momento, de modo que nadie, usted incluido, puede cambiarle la fecha ni modificarlo después sin que se note. No puede demostrar que lo registró todo; de eso se ocupa el paso 3.</li>
+      <li><strong>Registre todo el tiempo, o diga cuándo no lo hizo.</strong> Un hueco que no pueda explicar debilita todo lo demás.</li>
+      <li><strong>Si su IA actúa en su nombre</strong> (envía un correo, publica, compra), selle la acción antes de que se ejecute.</li>
+      <li><strong>Cuando una disputa parezca probable, no borre nada.</strong> Borrar en ese momento registros relevantes puede jugar en su contra ante un tribunal.</li>
+      <li><strong>En un teléfono</strong>, las demás aplicaciones normalmente no pueden ver dentro de la aplicación de IA, así que el registro depende de lo que esa aplicación guarde. Si el modelo se ejecuta en el propio teléfono, su fabricante puede no tener nada. Compruebe si la aplicación puede exportar su historial, exporte con regularidad, y obtenga la huella y selle cada exportación (pasos 1 y 2).</li>
+    </ol>
+    <p class="note">Los registros son un arma de doble filo: muestran lo que realmente ocurrió, incluidas sus propias instrucciones. Protegen a quienes actuaron con honestidad. Esto no es asesoramiento jurídico.</p>
+  </section>
+
+  <section aria-labelledby="ladderh" style="display:grid;gap:14px">
+    <h2 id="ladderh">Qué puede probar un registro, paso a paso</h2>
+    <ol class="ladder">
+      <li><span class="rung">1</span><div><div class="q">Sin cambios desde que se obtuvo su huella</div><p>Requiere: una huella SHA-256 de confianza. <span class="tag t-yes">Se comprueba aquí</span></p></div></li>
+      <li><span class="rung">2</span><div><div class="q">Existía en un momento determinado</div><p>Requiere: la huella sellada por una autoridad de sellado de tiempo independiente (RFC 3161, o un sello cualificado de tiempo electrónico conforme al Reglamento eIDAS). <span class="tag t-part">Próximamente</span></p></div></li>
+      <li><span class="rung">3</span><div><div class="q">Procede de una parte conocida</div><p>Requiere: una firma digital comprobada con la clave publicada de esa parte. <span class="tag t-part">Próximamente</span></p></div></li>
+      <li><span class="rung">4</span><div><div class="q">Nadie reescribió en silencio el registro</div><p>Requiere: que el registro figure en un registro público de transparencia que muchas partes comparan. <span class="tag t-part">Próximamente</span></p></div></li>
+      <li><span class="rung">5</span><div><div class="q">No se omitió nada</div><p>Requiere: recuentos independientes, como la propia factura del proveedor de IA, más una declaración de cuándo estaba activa la captura.<span class="ownonly" hidden> En su propia máquina no hay factura de proveedor. Un latido del registrador y una lista declarada de interrupciones son el mejor sustituto, pero no pueden demostrar que nunca ejecutó el modelo sin el registrador.</span> <span class="tag t-op" id="l5">Depende del operador</span></p></div></li>
+      <li><span class="rung">6</span><div><div class="q">Lo que dice es lo que realmente ocurrió</div><p>Requiere: un registro de otra persona, como el extracto de su banco que muestre el reembolso. Un registro intacto de una afirmación falsa sigue siendo falso.<span class="ownonly" hidden> Para su propio agente: la copia del destinatario de un correo que envió, o el registro de su banco de un pago.</span> <span class="tag t-part">En parte le corresponde comprobarlo</span></p></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="testsh" style="display:grid;gap:14px">
+    <h2 id="testsh">Las 23 comprobaciones, en palabras sencillas</h2>
+    <p class="note">Procede del borrador público para comentarios «O4M Record Tests 2026 (v1.0)», requisitos C1 a C23 (<a href="https://doi.org/10.5281/zenodo.23857888" rel="noopener">doi.org/10.5281/zenodo.23857888</a>), CC BY 4.0, publicado el 1 de noviembre de 2026 y abierto a comentarios hasta el 1 de diciembre de 2026. Las descripciones en palabras sencillas de abajo son un resumen; el borrador es la referencia. <span id="tagnote">La etiqueta indica si un cliente que tenga una exportación de los registros podría comprobarlo sin la ayuda de la empresa.</span></p>
+    <div class="chips" role="group" aria-label="Filtrar las comprobaciones">
+      <button class="chip" data-f="all" aria-pressed="true">Las 23</button>
+      <button class="chip" data-f="yes" aria-pressed="false">Puede comprobarlo</button>
+      <button class="chip" data-f="part" aria-pressed="false">En parte</button>
+      <button class="chip" data-f="op" aria-pressed="false" id="opchip">Depende del operador</button>
+    </div>
+    <div class="tests" id="tests"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="bg">
+    <h2 id="bg">Contexto y dónde encaja esto</h2>
+    <p>He publicado una comparación abierta de las normas del Reino Unido y de la UE sobre este tema (<a href="https://doi.org/10.5281/zenodo.23546436" rel="noopener">doi.org/10.5281/zenodo.23546436</a>). Fuera de los servicios financieros, ninguna de las normas vinculantes que revisé exige con claridad que los registros de IA se conserven de modo que alguien distinto de quien los generó pueda comprobar si han sido alterados u omitidos. El 1 de noviembre de 2026 publiqué pruebas abiertas precisamente para esa propiedad, como borrador público para comentarios abierto hasta el 1 de diciembre de 2026 (<a href="https://doi.org/10.5281/zenodo.23857888" rel="noopener">doi.org/10.5281/zenodo.23857888</a>).</p>
+    <div class="fit" role="note" aria-labelledby="fith">
+      <h3 id="fith">¿Compite con SCITT, AIUC-1 u otras normas?</h3>
+      <p>No, ni pretende hacerlo. Estas pruebas y esta página no definen un formato de registro, una norma ni un certificado. Esta página no genera registros, y StS Forensics no suministra los sistemas que comprueba. Las pruebas plantean una pregunta más a un trabajo que ya existe: ¿podría alguien ajeno al operador saber si algo se omitió o se cambió?</p>
+      <ul>
+        <li><strong>SCITT</strong> (la arquitectura de la IETF en la RFC 9943) es una forma de registrar declaraciones firmadas en un servicio de transparencia. Las pruebas van a su lado. La propia RFC 9943 señala, en la sección 9.3, que los emisores pueden enviar algunas declaraciones y otras no, que es la laguna en la que se centran las pruebas.</li>
+        <li><strong>AIUC-1</strong> es una norma para agentes de IA que se actualiza cada trimestre; su versión del cuarto trimestre de 2026 (15 de octubre de 2026) añadió pruebas obligatorias de terceros sobre el riesgo de datos y privacidad y sobre el riesgo de responsabilidad. Las pruebas podrían dar a un evaluador algo concreto que comprobar sobre los registros. No forman parte de AIUC-1, y no hay afiliación ni respaldo en ningún sentido.</li>
+        <li><strong>Otras normas</strong>, por ejemplo de ETSI, CEN-CENELEC e ISO/IEC, son trabajos distintos. Donde piden registros, las pruebas preguntan si alguien externo podría comprobar esos registros tanto en busca de omisiones como de alteraciones.</li>
+      </ul>
+      <p class="note">Un registro puede cumplir todas estas normas y aun así no superar las pruebas si nada ajeno al operador puede comprobar que no se omitió nada. Se agradecen correcciones y comentarios hasta el 1 de diciembre de 2026: comments@sts-forensics.com, asunto «O4M Record Tests».</p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="terms">
+    <h2 id="terms">Condiciones de uso</h2>
+    <ol class="steps">
+      <li>Esta página es gratuita. Se ofrece TAL CUAL, SIN GARANTÍA DE NINGÚN TIPO, bajo la licencia Apache 2.0 (a su código se aplican las secciones 7 y 8 de esa licencia).</li>
+      <li>Usarla no crea una relación de cliente, asesor, perito ni otra relación profesional con StS Forensics Ltd ni con Gareth Wong. No es un certificado, una calificación ni una garantía.</li>
+      <li>En la máxima medida que permita la ley, StS Forensics Ltd, su administrador y sus colaboradores no responden de ninguna pérdida derivada del uso de esta página o de la confianza depositada en ella.</li>
+      <li>Nada de lo aquí dispuesto limita la responsabilidad por muerte o lesiones personales causadas por negligencia, por fraude o declaración fraudulenta, ni por nada que la ley no permita limitar. Si es usted consumidor, sus derechos legales no se ven afectados.</li>
+      <li>La página funciona en su navegador y no nos envía nada, de modo que no podemos ver lo que usted comprueba. El anfitrión de esta página (GitHub) puede conservar los registros ordinarios del servidor sobre las visitas.</li>
+      <li>Se aplica la ley inglesa y tienen jurisdicción los tribunales de Inglaterra y Gales, sin perjuicio de los derechos imperativos de que usted disfrute donde viva.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <span><strong>Quién lo gestiona:</strong> VerZan Check es una herramienta gratuita creada por StS Forensics Ltd (Londres), una empresa que trabaja en cómo pueden comprobar los registros de la actividad de una IA personas distintas del operador del sistema. La herramienta es gratuita. Esta página es un solo archivo, así que su código fuente es la propia página: vea el código fuente para leer cada línea. El mismo archivo se publica en <a href="https://github.com/StSForensics/VerZan">github.com/StSForensics/VerZan</a> bajo Apache-2.0. Los vectores de prueba provisionales y un verificador de referencia para las pruebas T3 y T14a (ejecutados por el autor; un segundo lector coincidió en 31 de 50 entradas; nadie más los ha reproducido) están en <a href="https://github.com/StSForensics/o4m-record-tests">github.com/StSForensics/o4m-record-tests</a>. Texto CC BY 4.0. Copyright 2026 StS Forensics Ltd (sociedad inscrita en Inglaterra y Gales con el n.º 17054694). Creado por Gareth Wong, administrador (director). StS Forensics Ltd acoge consultas de organizaciones que quieran ayuda para comprobar registros de IA. Cualquier trabajo remunerado relacionado con esta herramienta se declarará en esta página. Contacto: gaptable@sts-forensics.com</span>
+    <span><strong>Privacidad:</strong> las huellas se calculan en su navegador, con su Web Crypto integrado o, para archivos muy grandes, una pequeña rutina incluida en esta página. No se sube ningún archivo ni texto, esta página no instala cookies, no hace seguimiento y no carga nada de otros sitios web.</span>
+    <span>No es una calificación de ninguna empresa ni asesoramiento jurídico. Una huella coincidente solo prueba el paso 1 de la escalera. Se ofrece tal cual, sin garantía de ningún tipo, bajo la licencia Apache-2.0; como cualquier software, puede contener errores, así que compruebe también de otra forma cualquier cosa importante.</span>
+    <span>VerZan Check v1.2.12-es (borrador de traducción, segunda revisión terminológica), 11 de noviembre de 2026. Traducción de la versión inglesa v1.2.12, que prevalece. El historial de cambios figura en la página en inglés.</span>
+  </footer>
+</div>
+
+<script>
+const T=[["C1", "Reglas escritas antes de registrar nada: qué cuenta, con qué frecuencia, qué pasa si falla.", "part", "yes", "Escriba una nota de una página sobre lo que registra, con qué frecuencia y qué ocurre si el registro falla."], ["C2", "Los registros se guardan en un único formato de bytes exacto, de modo que el mismo registro siempre da la misma huella.", "yes", "yes", "El software de registro que cumple la especificación lo hace."], ["C3", "Cada registro está numerado y enlazado con el anterior, de modo que un hueco, un cambio o una inserción se notan.", "yes", "yes", "El software de registro que cumple la especificación lo hace."], ["C4", "Lo que se preguntó y se respondió se sella como huella; el contenido en sí puede guardarse aparte.", "part", "yes", "Mantenga el contenido privado en su máquina; solo las huellas necesitan salir."], ["C5", "Cada registro lleva una firma de una clave a la que la aplicación no puede acceder.", "yes", "part", "Use una clave a la que su software de IA no pueda acceder, como una llave de seguridad de hardware. El llavero ordinario del sistema suele estar abierto a cualquier programa que se ejecute como usted, incluido su software de IA. No puede proteger frente a usted, el propietario; para eso sirven los sellos de tiempo externos (C6)."], ["C6", "Puntos de control regulares, sellados por un reloj externo y cofirmados por testigos independientes.", "yes", "yes", "Los servicios gratuitos de sellado de tiempo y los registros públicos impiden cambiar fechas hacia atrás, incluso por usted."], ["C7", "Cada respuesta indica qué modelo de IA y qué versión la produjo.", "part", "yes", "Obtenga la huella del propio archivo del modelo. Es más fácil que con una IA en la nube, donde la versión está oculta."], ["C8", "Prueba de hardware de qué software se estaba ejecutando exactamente.", "op", "na", "La mayoría de los dispositivos domésticos no pueden probar qué software se ejecutó. Dígalo en su registro."], ["C9", "Cada acción remite a la persona o al rol que la autorizó.", "op", "part", "Importa si otras personas comparten su máquina o su servidor doméstico: dé a cada una su propia identidad."], ["C10", "Un historial de cada clave de firma: cuándo se emitió, rotó o revocó.", "yes", "yes", "Anote cuándo creó, cambió o perdió una clave."], ["C11", "Una exportación que se le puede entregar, con pruebas de que cada registro pertenece a un punto de control firmado.", "yes", "yes", "Usted ya tiene la exportación; consérvela en una forma que otra persona pueda leer."], ["C12", "Registros conservados durante todo el período en que pueda surgir una disputa; cualquier borrado queda a su vez registrado.", "part", "part", "Conserve copias de seguridad todo el tiempo que pueda surgir una reclamación, lo que puede ser años."], ["C13", "Cada agente de IA se registra al arrancar y al detenerse.", "op", "yes", "Registre cuándo arranca y se detiene cada agente local."], ["C14", "Recuentos de registros recibidos y descartados, cotejados con las cifras de uso del propio proveedor de IA.", "part", "na", "Un modelo local no tiene factura de proveedor con la que contar. Apóyese en el latido (C22) y dígalo. Si su configuración recurre a una IA en la nube, C14 sigue aplicándose a esa parte."], ["C15", "Las horas proceden de un reloj declarado y fiable, dentro de una tolerancia indicada.", "yes", "yes", "Use la hora de red de su ordenador más el sello de tiempo externo."], ["C16", "Todos ven el mismo registro; mostrar versiones distintas a personas distintas es detectable.", "yes", "yes", "Use un registro público de transparencia en lugar de su propio servidor."], ["C17", "Cada acción real coincide con el registro de otra persona, como un banco o un procesador de pagos.", "part", "part", "Registros de otras personas sobre el mismo suceso: la copia del destinatario de un correo, su extracto bancario."], ["C18", "Una acción se sella en el registro antes de surtir efecto, no se documenta después.", "op", "yes", "Para los agentes que actúan, selle la acción antes de que se ejecute."], ["C19", "Si un servicio de sellado de tiempo está caído, la caída se registra y se señala, nunca se oculta.", "yes", "yes", "Los servicios gratuitos de sellado de tiempo se caen; el hueco debe verse en su registro."], ["C20", "El software de comprobación es de código abierto y cualquiera puede reconstruirlo con el mismo resultado.", "yes", "yes", "Use software de comprobación abierto que cualquiera pueda reconstruir."], ["C21", "El verificador declara quién le paga y elige muestras al azar después de sellados los registros.", "yes", "yes", "Si paga a alguien para que compruebe sus registros, debe decirlo."], ["C22", "El registrador envía un latido regular; cada veredicto indica cuándo estaba el registro activo, degradado o ausente.", "yes", "yes", "Un latido mientras el modelo funciona, de modo que la suspensión y el tiempo sin conexión aparezcan como huecos, no como secretos."], ["C23", "Las claves de firma se guardan fuera del alcance de la empresa y de sus agentes de IA.", "part", "part", "Mantenga las claves lejos de sus agentes. Frente al propietario, solo ayudan los sellos de tiempo externos (C6)."]];
+const L={co:{yes:["Puede comprobarlo","t-yes"],part:["En parte","t-part"],op:["Depende del operador","t-op"]},
+ own:{yes:["Puede ponerlo en marcha","t-yes"],part:["En parte","t-part"],na:["Normalmente no en casa: declárelo","t-na"]}};
+let mode="co",filt="all";
+const box=document.getElementById('tests');
+function draw(){box.innerHTML="";T.forEach(([id,txt,k,ok,otxt])=>{const tag=mode==="co"?k:ok;
+  if(filt!=="all"&&tag!==filt)return;
+  const d=document.createElement('article');d.className='test';
+  d.innerHTML=`<div class="top"><span class="cid">${id}</span><span class="tag ${L[mode][tag][1]}">${L[mode][tag][0]}</span></div><p>${txt}</p>`+(mode==="own"?`<p class="own">${otxt}</p>`:"");box.appendChild(d);});}
+const chips=[...document.querySelectorAll('.chip:not(.mode)')];
+chips.forEach(b=>b.addEventListener('click',()=>{chips.forEach(c=>c.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');filt=b.dataset.f;draw();}));
+function setMode(m){mode=m;filt="all";chips.forEach(c=>c.setAttribute('aria-pressed',c.dataset.f==="all"?'true':'false'));
+  document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m?'true':'false'));
+  document.querySelector('.chip[data-f=yes]').textContent=m==="co"?"Puede comprobarlo":"Puede ponerlo en marcha";
+  const op=document.getElementById('opchip');op.dataset.f=m==="co"?"op":"na";op.textContent=m==="co"?"Depende del operador":"Normalmente no en casa";
+  document.getElementById('tagnote').textContent=m==="co"?"La etiqueta indica si un cliente que tenga una exportación de los registros podría comprobarlo sin la ayuda de la empresa.":"La etiqueta indica si una persona que ejecuta su propio modelo podría cumplirlo en un ordenador corriente, y la línea gris dice cómo.";
+  document.querySelectorAll('.ownonly').forEach(e=>e.hidden=(m!=="own"));
+  const l5=document.getElementById('l5');l5.className="tag "+(m==="co"?"t-op":"t-part");l5.textContent=m==="co"?"Depende del operador":"En parte";
+  if(m==="own")document.getElementById('ownpanel').scrollIntoView({behavior:"smooth",block:"start"});
+  draw();}
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+draw();
+
+function Sha256(){
+  const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const H=new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);
+  const W=new Uint32Array(64),buf=new Uint8Array(64);let bl=0,total=0;
+  function block(d,o){
+    for(let i=0;i<16;i++){const j=o+i*4;W[i]=(d[j]<<24)|(d[j+1]<<16)|(d[j+2]<<8)|d[j+3];}
+    for(let i=16;i<64;i++){const a=W[i-15],b=W[i-2];
+      const s0=((a>>>7)|(a<<25))^((a>>>18)|(a<<14))^(a>>>3);
+      const s1=((b>>>17)|(b<<15))^((b>>>19)|(b<<13))^(b>>>10);
+      W[i]=(W[i-16]+s0+W[i-7]+s1)|0;}
+    let a=H[0],b=H[1],c=H[2],e=H[4],f=H[5],g=H[6],h=H[7],dd=H[3];
+    for(let i=0;i<64;i++){
+      const S1=((e>>>6)|(e<<26))^((e>>>11)|(e<<21))^((e>>>25)|(e<<7));
+      const t1=(h+S1+((e&f)^(~e&g))+K[i]+W[i])|0;
+      const S0=((a>>>2)|(a<<30))^((a>>>13)|(a<<19))^((a>>>22)|(a<<10));
+      const t2=(S0+((a&b)^(a&c)^(b&c)))|0;
+      h=g;g=f;f=e;e=(dd+t1)|0;dd=c;c=b;b=a;a=(t1+t2)|0;}
+    H[0]+=a;H[1]+=b;H[2]+=c;H[3]+=dd;H[4]+=e;H[5]+=f;H[6]+=g;H[7]+=h;}
+  this.update=function(d){let i=0;total+=d.length;
+    if(bl>0){while(bl<64&&i<d.length)buf[bl++]=d[i++];if(bl===64){block(buf,0);bl=0;}}
+    for(;i+64<=d.length;i+=64)block(d,i);
+    while(i<d.length)buf[bl++]=d[i++];};
+  this.hex=function(){const bits=total*8,hi=Math.floor(bits/4294967296),lo=bits>>>0;
+    const pad=new Uint8Array(((bl<56)?56:120)-bl+8);pad[0]=0x80;const n=pad.length;
+    pad[n-8]=hi>>>24;pad[n-7]=hi>>>16;pad[n-6]=hi>>>8;pad[n-5]=hi;pad[n-4]=lo>>>24;pad[n-3]=lo>>>16;pad[n-2]=lo>>>8;pad[n-1]=lo;
+    const t=total;this.update(pad);total=t;
+    return [...H].map(x=>x.toString(16).padStart(8,'0')).join('');};
+}
+
+async function sha(buf){const h=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('');}
+const sample=document.getElementById('sample'),sh=document.getElementById('sampleHash');
+async function upd(){try{sh.textContent=await sha(new TextEncoder().encode(sample.value));}catch(e){const s=new Sha256();s.update(new TextEncoder().encode(sample.value));sh.textContent=s.hex();}}
+sample.addEventListener('input',upd);upd();
+
+(function(){
+  const texts=["El agente abrió el expediente de la reclamación.","El agente indicó una cifra de acuerdo.","El agente prometió un reembolso de 1.119 puntos.","El agente envió el correo de confirmación.","El agente cerró la reclamación."];
+  let recs=[],full=[],deleted=false;
+  const ol=document.getElementById('recs'),vA=document.getElementById('vAlt'),vG=document.getElementById('vGap'),bd=document.getElementById('del');
+  async function build(){let prev="start";full=[];
+    for(let i=0;i<texts.length;i++){const seq=i+1,fp=await sha(new TextEncoder().encode(seq+"|"+prev+"|"+texts[i]));full.push({seq,prev,text:texts[i],fp});prev=fp;}
+    recs=full.slice();deleted=false;await render();}
+  async function render(){
+    ol.innerHTML="";recs.forEach(r=>{const li=document.createElement('li');li.textContent="Entrada "+r.seq+": "+r.text+" (huella "+r.fp.slice(0,8)+"...)";ol.appendChild(li);});
+    bd.disabled=deleted;
+    let altOk=true;for(const r of recs){const h=await sha(new TextEncoder().encode(r.seq+"|"+r.prev+"|"+r.text));if(h!==r.fp)altOk=false;}
+    vA.className="verdict "+(altOk?"ok":"bad");
+    vA.textContent="Comprobación 1, ¿está cada entrada sin cambios? "+(altOk?"SUPERADA. Cada entrada que queda está exactamente como cuando se obtuvo su huella.":"FALLIDA. Una entrada ha sido alterada.");
+    let gap=null;for(let i=0;i<recs.length;i++){const want=i+1;if(recs[i].seq!==want){gap=want;break;}if(i>0&&recs[i].prev!==recs[i-1].fp){gap=recs[i].seq-1;break;}}
+    vG.className="verdict "+(gap===null?"ok":"bad");
+    vG.textContent="Comprobación 2, ¿falta algo? "+(gap===null?"SUPERADA. Los números van de 1 a "+recs.length+" y cada entrada apunta a la anterior.":"FALLIDA. Falta la entrada "+gap+".");}
+  bd.addEventListener('click',()=>{recs=full.filter(r=>r.seq!==3);deleted=true;render();});
+  document.getElementById('rst').addEventListener('click',()=>{recs=full.slice();deleted=false;render();});
+  build();
+})();
+
+const BIG=256*1024*1024,CH=32*1024*1024;
+async function hashFile(f,prog,live){
+  if(f.size<=BIG&&window.crypto&&crypto.subtle){try{return await sha(await f.arrayBuffer());}catch(e){}}
+  const s=new Sha256();prog.hidden=false;prog.value=0;
+  for(let o=0;o<f.size;o+=CH){if(!live())return null;s.update(new Uint8Array(await f.slice(o,o+CH).arrayBuffer()));
+    if(!live())return null;prog.value=Math.round(100*Math.min(o+CH,f.size)/f.size);fh.textContent='calculando la huella… '+prog.value+'%';}
+  prog.hidden=true;return s.hex();}
+
+let fileHex="";const fh=document.getElementById('fileHash'),ex=document.getElementById('expected'),v=document.getElementById('verdict'),pg=document.getElementById('prog');
+function compare(){const m64=ex.value.match(/[0-9a-f]{64}/i);const want=m64?m64[0].toLowerCase():ex.value.replace(/[^0-9a-fA-F]/g,'').toLowerCase();
+  if(!fileHex||!want){v.className='verdict idle';v.textContent='Elija un archivo y pegue la huella esperada para comparar.';return;}
+  if(want.length!==64){v.className='verdict bad';v.textContent='La huella esperada debe tener 64 caracteres hexadecimales. Compruebe que la copió entera.';return;}
+  if(want===fileHex){v.className='verdict ok';v.textContent='Coincide. Este archivo es, byte por byte, el mismo del que se obtuvo la huella.';}
+  else{v.className='verdict bad';v.textContent='No coincide. Este archivo difiere del que se obtuvo la huella, o la huella se copió mal.';}}
+let run=0;
+document.getElementById('file').addEventListener('change',async e=>{const my=++run;const f=e.target.files[0];fileHex='';compare();if(!f){fh.textContent='Aún no se ha elegido ningún archivo.';pg.hidden=true;return;}fh.textContent='calculando…';
+  try{const h=await hashFile(f,pg,()=>my===run);if(my!==run)return;fileHex=h;fh.textContent=fileHex;}catch(err){if(my!==run)return;pg.hidden=true;fh.textContent='No se pudo leer ese archivo. En un teléfono, los archivos muy grandes pueden ser demasiado grandes para abrirse.';fileHex='';}compare();});
+ex.addEventListener('input',compare);
+</script>
+
+</body></html>

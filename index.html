@@ -1,0 +1,308 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>VerZan Check</title><meta name="description" content="Free tool: fingerprint a file in your browser (SHA-256) and see what a deleted record does to a log. Nothing leaves the page."><meta property="og:title" content="VerZan Check"><meta property="og:description" content="Is this exactly the file someone recorded? Fingerprint it in your browser and compare. Nothing leaves the page."><meta property="og:type" content="website"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'"><link rel="alternate" hreflang="en" href="https://verzan.org/"><link rel="alternate" hreflang="fr" href="https://verzan.org/fr/"><link rel="alternate" hreflang="de" href="https://verzan.org/de/"><link rel="alternate" hreflang="es" href="https://verzan.org/es/"><link rel="alternate" hreflang="ja" href="https://verzan.org/ja/"><link rel="alternate" hreflang="x-default" href="https://verzan.org/"><link rel="canonical" href="https://verzan.org/"><meta name="referrer" content="no-referrer"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20160%20160%22%3E%3Crect%20width%3D%22160%22%20height%3D%22160%22%20rx%3D%2224%22%20fill%3D%22%23FAF9F5%22/%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23182720%22%20stroke-width%3D%228%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%2280%22%20y1%3D%2210%22%20x2%3D%2280%22%20y2%3D%2230%22/%3E%3Cline%20x1%3D%2252%22%20y1%3D%2230%22%20x2%3D%22108%22%20y2%3D%2230%22/%3E%3Crect%20x%3D%2250%22%20y%3D%2242%22%20width%3D%2260%22%20height%3D%2254%22/%3E%3Cline%20x1%3D%2250%22%20y1%3D%2260%22%20x2%3D%22110%22%20y2%3D%2260%22/%3E%3Cline%20x1%3D%2250%22%20y1%3D%2278%22%20x2%3D%22110%22%20y2%3D%2278%22/%3E%3Cline%20x1%3D%2238%22%20y1%3D%22106%22%20x2%3D%22122%22%20y2%3D%22106%22/%3E%3C/g%3E%3Cpath%20d%3D%22M52%20126%20L72%20148%20L118%20116%22%20fill%3D%22none%22%20stroke%3D%22%23458D5F%22%20stroke-width%3D%2212%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}.langbar{font-size:.85rem;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:8px 12px;background:var(--panel)}.langbar a{color:var(--accent)} </style></head><body>
+<style>
+/* Layout: one narrow evidence column; tool first, then the proof ladder, then the 23 checks as a filterable list */
+:root{
+  --bg:#eef1f3; --panel:#ffffff; --ink:#141a22; --muted:#55606e; --line:#d3d9df;
+  --accent:#2340c8; --accent-ink:#ffffff;
+  --ok:#11734b; --ok-bg:#e1f3ea; --bad:#a3271c; --bad-bg:#fbe6e3; --part:#8a5a00; --part-bg:#fbefd6;
+  --display:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141a; --panel:#171e26; --ink:#e7ecf1; --muted:#9aa6b3; --line:#2b3540;
+  --accent:#8ea2ff; --accent-ink:#0f141a;
+  --ok:#6fd6a6; --ok-bg:#12302a; --bad:#ff8f84; --bad-bg:#3a1a17; --part:#f2c264; --part-bg:#36290f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141a; --panel:#171e26; --ink:#e7ecf1; --muted:#9aa6b3; --line:#2b3540;
+  --accent:#8ea2ff; --accent-ink:#0f141a;
+  --ok:#6fd6a6; --ok-bg:#12302a; --bad:#ff8f84; --bad-bg:#3a1a17; --part:#f2c264; --part-bg:#36290f; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--body)}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:grid;gap:36px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1.02rem;font-weight:700}
+p{margin:0;max-width:65ch}
+.eyebrow{font:600 .74rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+header{display:grid;gap:10px}
+.lede{font-size:1.12rem;color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px}
+label{font-weight:700;font-size:.95rem}
+textarea,input[type=text]{width:100%;box-sizing:border-box;font:15px/1.5 var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px}
+textarea{min-height:90px;resize:vertical}
+textarea:focus,input:focus,button:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hash{font:600 .9rem/1.5 var(--mono);word-break:break-all;background:var(--bg);border-radius:6px;padding:10px;border:1px dashed var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button,.filebtn{font:700 .92rem var(--body);border:0;border-radius:6px;padding:9px 14px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+input[type=file]{font:14px var(--body);color:var(--muted)}
+.verdict{font:700 1rem var(--body);padding:10px 12px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok)} .verdict.bad{background:var(--bad-bg);color:var(--bad)} .verdict.idle{color:var(--muted);padding-left:0}
+.note{font-size:.9rem;color:var(--muted)}
+.ladder{list-style:none;margin:0;padding:0;display:grid;gap:0;border-left:3px solid var(--line)}
+.ladder li{display:grid;grid-template-columns:2.2rem 1fr;gap:12px;padding:12px 0 12px 12px;border-bottom:1px solid var(--line)}
+.ladder li:last-child{border-bottom:0}
+.rung{font:700 1.05rem var(--mono);color:var(--accent)}
+.ladder .q{font-weight:700}
+.tag{display:inline-block;font:600 .72rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 7px;border-radius:4px;white-space:nowrap}
+.t-yes{background:var(--ok-bg);color:var(--ok)} .t-na{background:var(--bg);color:var(--muted);border:1px solid var(--line)} .t-part{background:var(--part-bg);color:var(--part)} .t-op{background:var(--bad-bg);color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 .85rem var(--body);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tests{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.test{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:6px;align-content:start;min-width:0}
+.test .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.cid{font:700 .95rem var(--mono)}
+.test p{font-size:.93rem} .test .own{font-size:.88rem;color:var(--muted)} .steps{margin:0;padding-left:1.2rem;display:grid;gap:8px;max-width:65ch} progress{width:100%}
+.fit{border:1px solid var(--line);border-left:5px solid var(--accent);background:var(--bg);border-radius:8px;padding:16px;display:grid;gap:10px}
+.fit ul{margin:0;padding-left:1.2rem;display:grid;gap:8px;max-width:65ch}
+.brand{display:flex;align-items:center;gap:14px}.logo{width:56px;height:56px;flex:none;color:var(--ink)}
+footer{font-size:.85rem;color:var(--muted);display:grid;gap:6px;border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion:no-preference){.verdict{transition:background .2s}}
+</style>
+
+<div class="wrap">
+  <div class="langbar" role="note">Also available in: <a href="https://verzan.org/fr/" hreflang="fr" lang="fr">Français</a> · <a href="https://verzan.org/de/" hreflang="de" lang="de">Deutsch</a> · <a href="https://verzan.org/es/" hreflang="es" lang="es">Español</a> · <a href="https://verzan.org/ja/" hreflang="ja" lang="ja">日本語</a>. These are machine translations not yet checked by native speakers; this English page prevails.</div>
+  <header>
+    <span class="eyebrow">Free public-benefit tool from StS Forensics Ltd · runs entirely in your browser</span>
+    <div class="brand"><svg class="logo" viewBox="0 0 160 160" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><line x1="80" y1="10" x2="80" y2="30"/><line x1="52" y1="30" x2="108" y2="30"/><rect x="50" y="42" width="60" height="54"/><line x1="50" y1="60" x2="110" y2="60"/><line x1="50" y1="78" x2="110" y2="78"/><line x1="38" y1="106" x2="122" y2="106"/></g><path d="M52 126 L72 148 L118 116" fill="none" stroke="#458D5F" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg><h1>VerZan Check</h1></div>
+    <p class="lede">Is this exactly the file someone recorded? Make its fingerprint here and compare. Nothing you type or drop leaves this page.</p>
+    <div class="chips" role="group" aria-label="Who are you?">
+      <button class="chip mode" data-m="co" aria-pressed="true">I'm checking a company's AI</button>
+      <button class="chip mode" data-m="own" aria-pressed="false">I run my own AI model</button>
+    </div>
+  </header>
+
+  <section class="panel" aria-labelledby="why">
+    <h2 id="why">Why this exists</h2>
+    <p>AI chatbots and agents are probabilistic: ask the same question twice and you can get two different answers. So when an AI promises a refund, quotes a price or takes an action, the most reliable account of what happened is a record made at that moment, kept where nobody can quietly change it, and checkable by someone other than the company that made it. Without one, a dispute comes down to your word against a log only the other side controls.</p>
+    <p>The same holds if you run an AI model yourself, on a laptop, a home server or a small board. If what your model wrote or did is ever disputed, a record made at the time, sealed by an outside clock, is far stronger evidence than a log you could have edited later.</p>
+    <p>The law is moving the same way. Under the EU's new Product Liability Directive, which covers software including AI placed on the market or put into service after 9 December 2026, injured people do not have to prove fault (they still have to prove the product was defective, the damage, and the link between them), a court can order evidence to be disclosed, and failing to disclose it can lead the court to presume the product was defective.<span class="ownonly" hidden> It is mainly about products supplied in the course of business. This page does not say whether it could reach someone running a model only for themselves; note that its definition of manufacturer includes a person who develops or produces a product for their own use (Article 4(10)).</span></p>
+    <p><strong>So ask two questions:</strong> can I have the record? And can someone other than you check it? This page shows how the first check works.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="try">
+    <h2 id="try">Try it: change one letter</h2>
+    <label for="sample">Text (an example chatbot reply)</label>
+    <textarea id="sample">Agent: Yes, I can refund your 1,119 points as a one-time goodwill gesture. The refund has been processed.</textarea>
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">SHA-256 fingerprint</div>
+      <div class="hash" id="sampleHash" aria-live="polite">computing…</div>
+    </div>
+    <p class="note">Edit any character above, even a comma, and the fingerprint changes completely. That is why a fingerprint recorded earlier can show a file was later altered.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="omit">
+    <h2 id="omit">Try it: remove one record</h2>
+    <p>Here is a toy log of five records. Each was fingerprinted when it was made, and each carries the fingerprint of the one before it. Quietly delete one, then run both checks.</p>
+    <ol id="recs" class="steps"></ol>
+    <div class="row">
+      <button id="del" type="button">Quietly delete record 3</button>
+      <button id="rst" type="button" class="ghost">Put it back</button>
+    </div>
+    <div class="verdict idle" id="vAlt" aria-live="polite"></div>
+    <div class="verdict idle" id="vGap" aria-live="polite"></div>
+    <p class="note">The first check only asks whether each remaining record is unchanged. It cannot see a record that is no longer there. The second asks whether the numbers run without a gap and each record points to the one before. This is a toy of a few lines, not an AI log. A real operator who controls the point where records are captured could drop records before they are numbered, which is why the draft tests also ask for counts held by someone else (C14) and for proof that recording was live (C22).</p>
+  </section>
+
+  <section class="panel" aria-labelledby="regq">
+    <h2 id="regq">Handed an operator's AI records? Three questions to ask</h2>
+    <p>For regulators, supervisors, courts, insurers, auditors and anyone else who receives AI records from the company that made them. This page calls that company the “operator”; under the EU AI Act it is most often the “deployer”.</p>
+    <ol class="steps">
+      <li><strong>Is it complete for the scope the operator declared?</strong> Ask for the declaration first: what is recorded, how often, and what happens when recording fails (C1), and which gaps were declared in advance. The draft tests report every declared gap; whether one can ever count as a pass is a point still open for comment.</li>
+      <li><strong>Who else holds a copy or a count?</strong> A record checked only against itself cannot show a full rewrite or a consistent under-count. Look for checkpoints stamped by an outside clock and witnessed by others (C6), and counts from someone the operator does not control, such as the AI provider's own bill (C14).</li>
+      <li><strong>If an entry were missing or changed, how would anyone notice?</strong> Numbering and links (C3) show a deletion, as the demonstration above does. Counters (C14) show entries dropped before they were numbered. A heartbeat (C22) shows when recording was off.</li>
+    </ol>
+    <p class="note">Draft test vectors for two of the tests, T3 and T14a, show each case, including two where a check passes although something went wrong and one where it can only hold, because only an outside copy or count could catch them. They come with a plain-language index for supervisors (REGULATOR_QUESTIONS.txt) at <a href="https://github.com/StSForensics/o4m-record-tests" rel="noopener">github.com/StSForensics/o4m-record-tests</a>. They are self-run. One second reader, run for the author by a family member, wrote a separate checker whose verdicts matched on 31 of 50 inputs; nobody else has reproduced the results. This is a reading aid, not guidance from any regulator and not legal advice.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="check">
+    <h2 id="check">Check a file you were given</h2>
+    <div class="row">
+      <input type="file" id="file" aria-label="Choose a file to fingerprint">
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">This file's fingerprint</div>
+      <div class="hash" id="fileHash">No file chosen yet.</div>
+      <progress id="prog" max="100" value="0" hidden></progress>
+    </div>
+    <label for="expected">Fingerprint you were told to expect</label>
+    <input type="text" id="expected" placeholder="Paste the 64-character SHA-256 from the register, receipt or email">
+    <div class="verdict idle" id="verdict" aria-live="polite">Choose a file and paste the expected fingerprint to compare.</div>
+    <p class="note">A match shows the file is byte-for-byte the one that was fingerprinted. It does not show when, by whom, or that the content is true. The ladder below shows what else is needed for each of those.</p>
+    <p class="note">This is a simple comparison of two numbers. It is not a finding of fact, evidence of authenticity or professional advice, and should not be your only basis for a legal, financial, safety or regulatory decision.</p>
+    <p class="note">Large files, such as a model weights file of several gigabytes, are fingerprinted in pieces. At roughly 100 MB a second, a 40 GB file can take several minutes on a laptop, and much longer on a phone or small board. Nothing is uploaded. Phones may not open very large files at all.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="ownh" id="ownpanel">
+    <h2 id="ownh">Running your own model? Keep a record that others can check</h2>
+    <p>A record you keep about yourself is worth only as much as someone else can check. These steps make it checkable. They cost nothing. You need recording software for steps 1 to 4. StS does not make one.</p>
+    <ol class="steps">
+      <li><strong>For every answer, keep:</strong> what you asked and what came back (on your own machine), a fingerprint of each, the fingerprint of the model file (use the box above), the software and its version, and the settings (temperature, seed). A fingerprint alone cannot show what was said.</li>
+      <li><strong>Seal it with an outside clock, regularly.</strong> Send only the fingerprint to a free timestamp service (RFC 3161) or a public log, and keep the receipt it sends back; without it the seal cannot be checked. Your content never leaves your machine. The seal shows the record existed by that time, so nobody, you included, can backdate it or change it afterwards without it showing. It cannot show you recorded everything; step 3 covers that.</li>
+      <li><strong>Record all the time, or say when you didn't.</strong> A gap you cannot explain weakens everything else.</li>
+      <li><strong>If your AI acts for you</strong> (sends an email, posts, buys), seal the action before it runs.</li>
+      <li><strong>Once a dispute looks likely, delete nothing.</strong> Deleting relevant records at that point can count against you in court.</li>
+      <li><strong>On a phone</strong>, other apps usually cannot see inside the AI app, so the record depends on what that app saves. If the model runs on the phone itself, its maker may hold nothing. Check whether the app can export its history, export regularly, and fingerprint and seal each export (steps 1 and 2).</li>
+    </ol>
+    <p class="note">Records cut both ways: they show what actually happened, including your own prompts. They protect people who acted honestly. This is not legal advice.</p>
+  </section>
+
+  <section aria-labelledby="ladderh" style="display:grid;gap:14px">
+    <h2 id="ladderh">What a record can prove, one step at a time</h2>
+    <ol class="ladder">
+      <li><span class="rung">1</span><div><div class="q">Unchanged since it was fingerprinted</div><p>Needs: a SHA-256 fingerprint you trust. <span class="tag t-yes">Checkable here</span></p></div></li>
+      <li><span class="rung">2</span><div><div class="q">Existed by a certain time</div><p>Needs: the fingerprint stamped by an independent timestamp authority (RFC 3161, or an EU qualified timestamp). <span class="tag t-part">Coming next</span></p></div></li>
+      <li><span class="rung">3</span><div><div class="q">Came from a known party</div><p>Needs: a digital signature checked against that party's published key. <span class="tag t-part">Coming next</span></p></div></li>
+      <li><span class="rung">4</span><div><div class="q">Nobody quietly rewrote the register</div><p>Needs: the record listed in a public transparency log that many parties compare. <span class="tag t-part">Coming next</span></p></div></li>
+      <li><span class="rung">5</span><div><div class="q">Nothing was left out</div><p>Needs: independent counts, such as the AI provider's own bill, plus a statement of when capture was live.<span class="ownonly" hidden> On your own machine there is no provider bill. A recorder heartbeat and a declared list of gaps are the best substitute, but they cannot show you never ran the model without the recorder.</span> <span class="tag t-op" id="l5">Needs the operator</span></p></div></li>
+      <li><span class="rung">6</span><div><div class="q">What it says actually happened</div><p>Needs: a record from someone else, such as your bank statement showing the refund. An intact record of a false statement is still false.<span class="ownonly" hidden> For your own agent: the recipient's copy of an email it sent, or your bank's record of a payment.</span> <span class="tag t-part">Partly yours to check</span></p></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="testsh" style="display:grid;gap:14px">
+    <h2 id="testsh">The 23 checks, in plain words</h2>
+    <p class="note">From the public comment draft "O4M Record Tests 2026 (v1.0)", requirements C1 to C23 (<a href="https://doi.org/10.5281/zenodo.23857888" rel="noopener">doi.org/10.5281/zenodo.23857888</a>), CC BY 4.0, published 1 November 2026 and open for comment until 1 December 2026. The plain-words descriptions below are a summary; the draft is the authority. <span id="tagnote">The tag shows whether a customer holding an export of the records could check it without the company's help.</span></p>
+    <div class="chips" role="group" aria-label="Filter checks">
+      <button class="chip" data-f="all" aria-pressed="true">All 23</button>
+      <button class="chip" data-f="yes" aria-pressed="false">You can check</button>
+      <button class="chip" data-f="part" aria-pressed="false">Partly</button>
+      <button class="chip" data-f="op" aria-pressed="false" id="opchip">Needs the operator</button>
+    </div>
+    <div class="tests" id="tests"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="bg">
+    <h2 id="bg">Background, and where this fits</h2>
+    <p>I have published an open comparison of UK and EU rules on this (<a href="https://doi.org/10.5281/zenodo.23546436" rel="noopener">doi.org/10.5281/zenodo.23546436</a>). Outside financial services, none of the binding rules I reviewed clearly requires AI logs to be kept so that someone other than the party that produced them can check them for alteration or omission. On 1 November 2026 I published open tests for exactly that property, as a public comment draft open until 1 December 2026 (<a href="https://doi.org/10.5281/zenodo.23857888" rel="noopener">doi.org/10.5281/zenodo.23857888</a>).</p>
+    <div class="fit" role="note" aria-labelledby="fith">
+      <h3 id="fith">Does this compete with SCITT, AIUC-1 or other standards?</h3>
+      <p>No, and it is not meant to. These tests and this page do not define a log format, a standard or a certificate. This page makes no records, and StS Forensics does not supply the systems it checks. The tests ask one extra question of work that already exists: could someone outside the operator tell if anything was left out or changed?</p>
+      <ul>
+        <li><strong>SCITT</strong> (the IETF architecture in RFC 9943) is a way to register signed statements in a transparency service. The tests sit beside it. RFC 9943 itself notes, in section 9.3, that issuers can submit some statements and not others, which is the gap the tests focus on.</li>
+        <li><strong>AIUC-1</strong> is a standard for AI agents that is updated every quarter; its Q4 2026 release (15 October 2026) added mandatory third-party testing of data and privacy risk and of accountability risk. The tests could give a tester something concrete to check about records. They are not part of AIUC-1, and there is no affiliation or endorsement either way.</li>
+        <li><strong>Other standards</strong>, for example from ETSI, CEN-CENELEC and ISO/IEC, are separate bodies of work. Where they ask for logs, the tests ask whether an outsider could check those logs for omission as well as alteration.</li>
+      </ul>
+      <p class="note">A record can follow every one of these and still fail the tests if nothing outside the operator can check it for omission. Corrections and comments are welcome until 1 December 2026: comments@sts-forensics.com, subject "O4M Record Tests".</p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="terms">
+    <h2 id="terms">Terms of use</h2>
+    <ol class="steps">
+      <li>This page is free. It is provided AS IS, WITHOUT WARRANTY OF ANY KIND, under the Apache License 2.0 (sections 7 and 8 of that licence apply to the code).</li>
+      <li>Using it does not create a client, adviser, expert or other professional relationship with StS Forensics Ltd or Gareth Wong. It is not a certificate, a rating or an assurance.</li>
+      <li>To the fullest extent the law allows, StS Forensics Ltd, its director and contributors are not liable for any loss arising from use of, or reliance on, this page.</li>
+      <li>Nothing here limits liability for death or personal injury caused by negligence, for fraud or fraudulent misrepresentation, or for anything else the law does not allow to be limited. If you are a consumer, your legal rights are not affected.</li>
+      <li>The page runs in your browser and sends nothing to us, so we cannot see what you check. The host of this page (GitHub) may keep ordinary server logs of visits.</li>
+      <li>English law applies and the courts of England and Wales have jurisdiction, subject to any mandatory rights you have where you live.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <span><strong>Who runs this:</strong> VerZan Check is a free tool made by StS Forensics Ltd (London), a company working on how records of AI activity can be checked by someone other than the system's operator. The tool is free. This page is one file, so its source is the page itself: view source to read every line. The same file is published at <a href="https://github.com/StSForensics/VerZan">github.com/StSForensics/VerZan</a> under Apache-2.0. Draft test vectors and a reference verifier for tests T3 and T14a (self-run; one second reader matched 31 of 50 inputs; not reproduced by anyone else) are at <a href="https://github.com/StSForensics/o4m-record-tests">github.com/StSForensics/o4m-record-tests</a>. Text CC BY 4.0. Copyright 2026 StS Forensics Ltd (company 17054694, registered in England and Wales). Created by Gareth Wong, director. StS Forensics Ltd welcomes enquiries from organisations that want help checking AI records. Any paid work related to this tool will be declared on this page. Contact: gaptable@sts-forensics.com</span>
+    <span><strong>Privacy:</strong> fingerprints are computed in your browser, with its built-in Web Crypto or, for very large files, a small routine inside this page. No file or text is uploaded, and this page sets no cookies, runs no tracking and loads nothing from other websites.</span>
+    <span>Not a rating of any company and not legal advice. A matching fingerprint proves step 1 of the ladder only. Provided as is, without warranty of any kind, under the Apache-2.0 licence; like any software it can contain errors, so check anything important another way too.</span>
+    <span>VerZan Check v1.2.12, 11 November 2026. Changes from v1.2.11: language links to draft machine translations in French, German, Spanish and Japanese; the footer states the registered jurisdiction; the “operator” line now says it is most often the “deployer” under the EU AI Act. Changes from v1.2.10 to v1.2.11: the two lines about the draft test vectors now state the second-reader result (31 of 50 inputs matched), as the Zenodo record does. Changes from v1.2.9 to v1.2.10: the AIUC-1 sentence now says what the 15 October 2026 release added (mandatory third-party testing of data and privacy risk and of accountability risk), and the Product Liability Directive line now says "placed on the market or put into service", as the Directive does. Changes from v1.2.7 to v1.2.9: the footer no longer calls the company an independent verifier of AI records, welcomes enquiries, and says that any paid work related to this tool will be declared on this page; the DRCF line is removed. Changes from v1.2.6 to v1.2.7: the company name is spelled StS throughout. Changes from v1.2.5 to v1.2.6: three questions for anyone handed AI records; a link to the draft test vectors; the Product Liability Directive lines now say what a claimant still has to prove and quote the Directive's own-use definition of manufacturer; the page title and preview text are set for link previews; a content security rule now stops the page loading anything from other websites. Changes from v1.2 to v1.2.5: the logo is added, the source is published on GitHub, the footer and specification wording now match what has been published, a new demonstration shows what removing one record does, a background section explains how this fits with SCITT, AIUC-1 and other standards, and the footer and a Terms of use section state the copyright holder, the no-warranty terms and the limits of liability.</span>
+  </footer>
+</div>
+
+<script>
+const T=[["C1", "Rules written down before anything is recorded: what counts, how often, what happens on failure.", "part", "yes", "Write a one-page note of what you record, how often, and what happens if recording fails."], ["C2", "Records are stored in one exact byte format, so the same record always gives the same fingerprint.", "yes", "yes", "Recording software that meets the spec does this."], ["C3", "Every record is numbered and linked to the one before, so a gap, swap or insertion shows.", "yes", "yes", "Recording software that meets the spec does this."], ["C4", "What was asked and answered is sealed as a fingerprint; the content itself can be kept apart.", "part", "yes", "Keep the content private on your machine; only fingerprints need to go out."], ["C5", "Every record carries a signature from a key the application cannot reach.", "yes", "part", "Use a key your AI software cannot reach, such as a hardware security key. The ordinary system keychain is usually open to any program running as you, including your AI software. It cannot protect against you, the owner; outside timestamps (C6) do that."], ["C6", "Regular checkpoints, stamped by an outside clock and co-signed by independent witnesses.", "yes", "yes", "Free timestamp services and public logs stop backdating, even by you."], ["C7", "Each answer names which AI model and version produced it.", "part", "yes", "Fingerprint the model file itself. Easier than with a cloud AI, where the version is hidden."], ["C8", "Hardware evidence of exactly which software was running.", "op", "na", "Most home devices cannot prove which software ran. Say so in your record."], ["C9", "Each action links back to the person or role who authorised it.", "op", "part", "Matters if others share your machine or home server: give each person their own identity."], ["C10", "A history of every signing key: when issued, rotated or revoked.", "yes", "yes", "Note when you made, changed or lost a key."], ["C11", "An export you can be given, with proofs that each record belongs to a signed checkpoint.", "yes", "yes", "You hold the export already; keep it in a form someone else can read."], ["C12", "Records kept for the whole period a dispute could arise; any deletion is itself recorded.", "part", "part", "Keep backups for as long as a claim could arise, which can be years."], ["C13", "Every AI agent is registered when it starts and when it stops.", "op", "yes", "Log when each local agent starts and stops."], ["C14", "Counts of records received and dropped, matched against the AI provider's own usage figures.", "part", "na", "A local model has no provider bill to count against. Rely on the heartbeat (C22) and say so. If your setup falls back to a cloud AI, C14 still applies to that part."], ["C15", "Times come from a declared, trustworthy clock within a stated tolerance.", "yes", "yes", "Use your computer's network time plus the outside timestamp."], ["C16", "Everyone sees the same log; showing different versions to different people is detectable.", "yes", "yes", "Use a public transparency log rather than your own server."], ["C17", "Each real-world action matches someone else's record, such as a bank or payment processor.", "part", "part", "Other people's records of the same event: the recipient's copy of an email, your bank statement."], ["C18", "An action is sealed in the record before it takes effect, not written up afterwards.", "op", "yes", "For agents that act, seal the action before it runs."], ["C19", "If a timestamp service is down, the outage is recorded and flagged, never hidden.", "yes", "yes", "Free timestamp services go down; the gap must show in your record."], ["C20", "The checking software is open source and can be rebuilt by anyone to the same result.", "yes", "yes", "Use open checking software that anyone can rebuild."], ["C21", "The checker discloses who pays it and picks samples at random after the records are sealed.", "yes", "yes", "If you pay someone to check your records, they must say so."], ["C22", "The recorder sends a regular heartbeat; every verdict prints when recording was live, degraded or absent.", "yes", "yes", "A heartbeat while the model runs, so sleep and offline time show as gaps, not secrets."], ["C23", "Signing keys are held outside the reach of the company and its AI agents.", "part", "part", "Keep keys away from your agents. Against the owner, only outside timestamps help (C6)."]];
+const L={co:{yes:["You can check","t-yes"],part:["Partly","t-part"],op:["Needs the operator","t-op"]},
+ own:{yes:["You can set this up","t-yes"],part:["Partly","t-part"],na:["Usually not at home: declare it","t-na"]}};
+let mode="co",filt="all";
+const box=document.getElementById('tests');
+function draw(){box.innerHTML="";T.forEach(([id,txt,k,ok,otxt])=>{const tag=mode==="co"?k:ok;
+  if(filt!=="all"&&tag!==filt)return;
+  const d=document.createElement('article');d.className='test';
+  d.innerHTML=`<div class="top"><span class="cid">${id}</span><span class="tag ${L[mode][tag][1]}">${L[mode][tag][0]}</span></div><p>${txt}</p>`+(mode==="own"?`<p class="own">${otxt}</p>`:"");box.appendChild(d);});}
+const chips=[...document.querySelectorAll('.chip:not(.mode)')];
+chips.forEach(b=>b.addEventListener('click',()=>{chips.forEach(c=>c.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');filt=b.dataset.f;draw();}));
+function setMode(m){mode=m;filt="all";chips.forEach(c=>c.setAttribute('aria-pressed',c.dataset.f==="all"?'true':'false'));
+  document.querySelectorAll('.mode').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m?'true':'false'));
+  document.querySelector('.chip[data-f=yes]').textContent=m==="co"?"You can check":"You can set this up";
+  const op=document.getElementById('opchip');op.dataset.f=m==="co"?"op":"na";op.textContent=m==="co"?"Needs the operator":"Usually not at home";
+  document.getElementById('tagnote').textContent=m==="co"?"The tag shows whether a customer holding an export of the records could check it without the company's help.":"The tag shows whether a person running their own model could meet it on an ordinary computer, and the grey line says how.";
+  document.querySelectorAll('.ownonly').forEach(e=>e.hidden=(m!=="own"));
+  const l5=document.getElementById('l5');l5.className="tag "+(m==="co"?"t-op":"t-part");l5.textContent=m==="co"?"Needs the operator":"Partly";
+  if(m==="own")document.getElementById('ownpanel').scrollIntoView({behavior:"smooth",block:"start"});
+  draw();}
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+draw();
+
+function Sha256(){
+  const K=new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+  const H=new Uint32Array([0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19]);
+  const W=new Uint32Array(64),buf=new Uint8Array(64);let bl=0,total=0;
+  function block(d,o){
+    for(let i=0;i<16;i++){const j=o+i*4;W[i]=(d[j]<<24)|(d[j+1]<<16)|(d[j+2]<<8)|d[j+3];}
+    for(let i=16;i<64;i++){const a=W[i-15],b=W[i-2];
+      const s0=((a>>>7)|(a<<25))^((a>>>18)|(a<<14))^(a>>>3);
+      const s1=((b>>>17)|(b<<15))^((b>>>19)|(b<<13))^(b>>>10);
+      W[i]=(W[i-16]+s0+W[i-7]+s1)|0;}
+    let a=H[0],b=H[1],c=H[2],e=H[4],f=H[5],g=H[6],h=H[7],dd=H[3];
+    for(let i=0;i<64;i++){
+      const S1=((e>>>6)|(e<<26))^((e>>>11)|(e<<21))^((e>>>25)|(e<<7));
+      const t1=(h+S1+((e&f)^(~e&g))+K[i]+W[i])|0;
+      const S0=((a>>>2)|(a<<30))^((a>>>13)|(a<<19))^((a>>>22)|(a<<10));
+      const t2=(S0+((a&b)^(a&c)^(b&c)))|0;
+      h=g;g=f;f=e;e=(dd+t1)|0;dd=c;c=b;b=a;a=(t1+t2)|0;}
+    H[0]+=a;H[1]+=b;H[2]+=c;H[3]+=dd;H[4]+=e;H[5]+=f;H[6]+=g;H[7]+=h;}
+  this.update=function(d){let i=0;total+=d.length;
+    if(bl>0){while(bl<64&&i<d.length)buf[bl++]=d[i++];if(bl===64){block(buf,0);bl=0;}}
+    for(;i+64<=d.length;i+=64)block(d,i);
+    while(i<d.length)buf[bl++]=d[i++];};
+  this.hex=function(){const bits=total*8,hi=Math.floor(bits/4294967296),lo=bits>>>0;
+    const pad=new Uint8Array(((bl<56)?56:120)-bl+8);pad[0]=0x80;const n=pad.length;
+    pad[n-8]=hi>>>24;pad[n-7]=hi>>>16;pad[n-6]=hi>>>8;pad[n-5]=hi;pad[n-4]=lo>>>24;pad[n-3]=lo>>>16;pad[n-2]=lo>>>8;pad[n-1]=lo;
+    const t=total;this.update(pad);total=t;
+    return [...H].map(x=>x.toString(16).padStart(8,'0')).join('');};
+}
+
+async function sha(buf){const h=await crypto.subtle.digest('SHA-256',buf);return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('');}
+const sample=document.getElementById('sample'),sh=document.getElementById('sampleHash');
+async function upd(){try{sh.textContent=await sha(new TextEncoder().encode(sample.value));}catch(e){const s=new Sha256();s.update(new TextEncoder().encode(sample.value));sh.textContent=s.hex();}}
+sample.addEventListener('input',upd);upd();
+
+(function(){
+  const texts=["Agent opened the claim file.","Agent quoted a settlement figure.","Agent promised a refund of 1,119 points.","Agent sent the confirmation email.","Agent closed the claim."];
+  let recs=[],full=[],deleted=false;
+  const ol=document.getElementById('recs'),vA=document.getElementById('vAlt'),vG=document.getElementById('vGap'),bd=document.getElementById('del');
+  async function build(){let prev="start";full=[];
+    for(let i=0;i<texts.length;i++){const seq=i+1,fp=await sha(new TextEncoder().encode(seq+"|"+prev+"|"+texts[i]));full.push({seq,prev,text:texts[i],fp});prev=fp;}
+    recs=full.slice();deleted=false;await render();}
+  async function render(){
+    ol.innerHTML="";recs.forEach(r=>{const li=document.createElement('li');li.textContent="Record "+r.seq+": "+r.text+" (fingerprint "+r.fp.slice(0,8)+"...)";ol.appendChild(li);});
+    bd.disabled=deleted;
+    let altOk=true;for(const r of recs){const h=await sha(new TextEncoder().encode(r.seq+"|"+r.prev+"|"+r.text));if(h!==r.fp)altOk=false;}
+    vA.className="verdict "+(altOk?"ok":"bad");
+    vA.textContent="Check 1, is each record unchanged? "+(altOk?"PASS. Every record that remains is exactly as it was fingerprinted.":"FAIL. A record has been altered.");
+    let gap=null;for(let i=0;i<recs.length;i++){const want=i+1;if(recs[i].seq!==want){gap=want;break;}if(i>0&&recs[i].prev!==recs[i-1].fp){gap=recs[i].seq-1;break;}}
+    vG.className="verdict "+(gap===null?"ok":"bad");
+    vG.textContent="Check 2, is anything missing? "+(gap===null?"PASS. Numbers run 1 to "+recs.length+" and every record points to the one before.":"FAIL. Record "+gap+" is missing.");}
+  bd.addEventListener('click',()=>{recs=full.filter(r=>r.seq!==3);deleted=true;render();});
+  document.getElementById('rst').addEventListener('click',()=>{recs=full.slice();deleted=false;render();});
+  build();
+})();
+
+const BIG=256*1024*1024,CH=32*1024*1024;
+async function hashFile(f,prog,live){
+  if(f.size<=BIG&&window.crypto&&crypto.subtle){try{return await sha(await f.arrayBuffer());}catch(e){}}
+  const s=new Sha256();prog.hidden=false;prog.value=0;
+  for(let o=0;o<f.size;o+=CH){if(!live())return null;s.update(new Uint8Array(await f.slice(o,o+CH).arrayBuffer()));
+    if(!live())return null;prog.value=Math.round(100*Math.min(o+CH,f.size)/f.size);fh.textContent='fingerprinting… '+prog.value+'%';}
+  prog.hidden=true;return s.hex();}
+
+let fileHex="";const fh=document.getElementById('fileHash'),ex=document.getElementById('expected'),v=document.getElementById('verdict'),pg=document.getElementById('prog');
+function compare(){const m64=ex.value.match(/[0-9a-f]{64}/i);const want=m64?m64[0].toLowerCase():ex.value.replace(/[^0-9a-fA-F]/g,'').toLowerCase();
+  if(!fileHex||!want){v.className='verdict idle';v.textContent='Choose a file and paste the expected fingerprint to compare.';return;}
+  if(want.length!==64){v.className='verdict bad';v.textContent='The expected fingerprint should be 64 hexadecimal characters. Check you copied all of it.';return;}
+  if(want===fileHex){v.className='verdict ok';v.textContent='Match. This file is byte-for-byte the one that was fingerprinted.';}
+  else{v.className='verdict bad';v.textContent='No match. This file differs from the one that was fingerprinted, or the fingerprint was copied wrongly.';}}
+let run=0;
+document.getElementById('file').addEventListener('change',async e=>{const my=++run;const f=e.target.files[0];fileHex='';compare();if(!f){fh.textContent='No file chosen yet.';pg.hidden=true;return;}fh.textContent='computing…';
+  try{const h=await hashFile(f,pg,()=>my===run);if(my!==run)return;fileHex=h;fh.textContent=fileHex;}catch(err){if(my!==run)return;pg.hidden=true;fh.textContent='Could not read that file. On a phone, very large files may be too big to open.';fileHex='';}compare();});
+ex.addEventListener('input',compare);
+</script>
+
+</body></html>
