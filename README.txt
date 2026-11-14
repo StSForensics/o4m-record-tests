@@ -1,3 +1,9 @@
+START HERE (feedback welcome, no expertise needed)
+Want to help? Go to the section "Help us test it" below (about 15 minutes). Tell us what you find: open the Issues tab, tap New issue, and choose Comment, Reader report or Repeat run. Or email comments@sts-forensics.com with the subject "O4M Record Tests". Comment draft closes 1 Dec 2026.
+The format sheet for readers is PROFILE_V0.txt (in this folder). 
+The 50 test inputs are in blind_inputs. 
+Open items are in ERRATA.txt.
+
 O4M RECORD TESTS 2026 v1.0: TEST VECTORS FOR T3 AND T14a (DRAFT PACKAGE, 10 Nov 2026, revision c of the package first issued 7 Nov 2026)
 
 What this is
