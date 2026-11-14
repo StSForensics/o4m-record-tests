@@ -1,0 +1,36 @@
+name: Repeat run (I ran verify.py on my machine)
+description: Tell us whether our results repeat on your computer.
+title: "Repeat run: "
+labels: ["repeat-run"]
+body:
+  - type: input
+    id: system
+    attributes:
+      label: Operating system and Python version (for example "Windows 11, Python 3.12.3")
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: What you ran (paste the commands)
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options: ["Every vector matched its expected.txt and exit code", "Some vectors differed", "I could not run it"]
+    validations:
+      required: true
+  - type: textarea
+    id: differences
+    attributes:
+      label: Vectors that differed, or the error you saw
+      description: "One line each: vector id, what you got. Paste the first lines of any error."
+  - type: dropdown
+    id: credit
+    attributes:
+      label: How may we credit you?
+      options: ["By name", "By organisation", "By name and organisation", "Do not credit me"]
+    validations:
+      required: true

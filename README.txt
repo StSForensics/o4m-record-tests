@@ -1,7 +1,7 @@
 O4M RECORD TESTS 2026 v1.0: TEST VECTORS FOR T3 AND T14a (DRAFT PACKAGE, 10 Nov 2026, revision c of the package first issued 7 Nov 2026)
 
 What this is
-A small package of test vectors for two of the O4M Record Tests: T3 (chain walk per stream, requirement C3) and T14a (capture counters balance, requirement C14). It holds a reference verifier written in Python with the standard library only, a deterministic generator that rebuilds every vector byte for byte, 55 vectors with their expected verdicts and exit codes, a mutation-kill record, a short script that checks the exit-3 paths, an ambiguity log and a list of proposed reason codes.
+A small package of test vectors for two of the O4M Record Tests: T3 (chain walk per stream, requirement C3) and T14a (capture counters balance, requirement C14). It holds a reference verifier written in Python with the standard library only, a deterministic generator that rebuilds every vector byte for byte, 55 vectors with their expected verdicts and exit codes, a mutation-kill record, a short script that checks the exit-3 paths, an ambiguity log and a list of proposed reason codes. It also holds PROFILE_V0.txt (how the inputs are written, with no expected results), blind_inputs (the 50 inputs with no expected results), ERRATA.txt (open items and dated changes) and forms for comments, reader reports and repeat runs.
 Specification: O4M Record Tests 2026 v1.0, DOI 10.5281/zenodo.23857888 (https://doi.org/10.5281/zenodo.23857888). Markdown source SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d.
 
 Status, plainly
@@ -40,6 +40,33 @@ REGULATOR_QUESTIONS.txt indexes the vectors by three questions: is the record co
 Second reader
 SECOND_READER_PACKET holds what an independent second implementer should get: instructions, the published specification, and the vector inputs to hand over only after they have written their own verifier. It contains no reference code and no expected outputs. A second reader from the same AI vendor as the author is weak evidence; a different vendor or a human is better. Agreement counts show agreement only.
 
+Help us test it (no expertise needed, about 15 minutes)
+We want to know two things. Do our results repeat on your machine? And can someone who reads only the specification reach the same verdicts? Pick one way.
+
+Way 1, use any chatbot.
+1. Get the specification: DOI 10.5281/zenodo.23857888, file "O4M Record Tests 2026 v1_0 2026-11-01.md" (SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d).
+2. Get PROFILE_V0.txt and the folder blind_inputs from this repository. blind_inputs holds the 50 test inputs and no expected results.
+3. Paste the prompt below into the chatbot and attach the specification and PROFILE_V0.txt.
+4. Save the program it writes as reader.py and run it: python reader.py blind_inputs > results.csv
+5. Send us four things: reader.py, CHOICES.txt, results.csv, and the name and exact version of the chatbot. Use the "Reader report" form (open an issue), or email comments@sts-forensics.com with the subject "O4M Record Tests".
+Way 2, you are a person. Write the program yourself from the same two files and send the same four things (say "human" for the chatbot).
+Way 3, just run ours. Run python verify.py on every vector as shown under "How to run" and tell us any vector whose output differs from its expected.txt. Use the "Repeat run" form.
+Harder and stronger: give the chatbot the specification only, without PROFILE_V0.txt, and write "strict" in your report. Expect more disagreement about field names.
+Two rules. Do not open expected.txt, about.txt, verify.py or AMBIGUITY_LOG.txt until you have finished. If you did, say so in your report. And do not search the web for these tests while you work.
+
+The prompt (copy everything from START to END)
+START
+I am testing a draft technical specification. I need you to act as an independent second reader.
+I have attached two files. SPEC is the specification (only requirements C3 and C14, and the tests T3 and T14a, matter). PROFILE is a one-page sheet that says how the test inputs are written (field names, types, hash method, numbering). It does not say what verdicts the inputs deserve.
+1. Write one Python 3 program, standard library only, called reader.py. It reads every file in a folder given on the command line. Each file name ends with __T3.json or __T14a.json, which tells you which test to apply. For each file it decides PASS, FAIL or HOLD using only SPEC and PROFILE, and prints one line: vector_id,verdict,reason (vector_id is the part of the file name before the two underscores).
+2. Do not ask me questions. Where the text does not tell you what to do, take the most natural reading and write each such choice in a file CHOICES.txt, one line per choice, in the form: section | what was unclear | what I chose.
+3. You have not been shown any expected results, and I will not show you any. Do not try to find them.
+4. Give me reader.py and CHOICES.txt. If you can run code, also run it on the folder I give you and give me results.csv. If you cannot, tell me the one command to run on my computer.
+END
+
+What we do with your report
+We reply in the issue. We say whether we will change the specification text, a vector's expected result, or nothing, and why. Every change is dated in ERRATA.txt. No expected result is changed silently. We do not publish your name or organisation without your yes. A count of agreements shows agreement only, so we read your CHOICES.txt more closely than your score.
+
 Disclaimer and terms of use
 1. This package is free. It is provided AS IS, WITHOUT WARRANTY OF ANY KIND, under the Apache License 2.0 (sections 7 and 8 of that licence apply). Like any software it can contain errors; check anything important another way too.
 2. A verdict from verify.py is an unsigned comparison of an input against the draft tests under vector profile v0. It is not a finding of fact, a rating of any company, a certificate, an assurance or an approval, and it should not be your only basis for a legal, financial, safety or regulatory decision.
@@ -64,7 +91,8 @@ The editor used AI assistants (Claude, by Anthropic) to help draft and edit requ
 The reference verifier, vectors and mutation harness in this package were generated by an AI assistant from the requirement text above and are not yet reviewed or reproduced by anyone else.
 
 Comments
-Send comments to comments@sts-forensics.com with the subject "O4M Record Tests", or open an issue in this repository. Comments and the editor's replies are kept in a public comment log. Comments sent by email are copied there only with the sender's permission.
-Public comment log: https://github.com/StSForensics/o4m-record-tests/issues
+Use the forms at https://github.com/StSForensics/o4m-record-tests/issues/new/choose (Comment, Reader report, Repeat run), or email comments@sts-forensics.com with the subject "O4M Record Tests". One finding per issue, please, so each can be answered and closed on its own. Comments and the editor's replies are kept in the public comment log, which is this repository's Issues page. Comments sent by email are copied there only with the sender's permission.
+Contributions to the code and vectors are accepted under Apache-2.0 with a Developer Certificate of Origin sign-off (a line "Signed-off-by: Your Name <your email>" in the commit). Contributions to the specification text are under CC BY 4.0.
+Open items and changes are listed in ERRATA.txt.
 
 Copyright 2026 Gareth Wong.

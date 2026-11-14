@@ -1,0 +1,13 @@
+ERRATA AND OPEN ITEMS, O4M Record Tests 2026 v1.0 tests T3 and T14a, vector profile v0
+Opened 14 November 2026. Rule: no expected result is changed silently. Each change is dated here with its reason. Status words: UNDER REVIEW (keys unchanged), CHANGED (date and reason given), NO CHANGE (reason given).
+
+Source of the first entries: comment C-001, 14 November 2026, four model-written readers run by an outside party. Their logs have not yet been seen, so their results are not yet reproduced here.
+
+E-001 t14a-009, t14a-010, t14a-012, t14a-015, t3-022, t3-023. UNDER REVIEW. Key is HOLD. The outside readers chose FAIL for t14a-009, t14a-010, t14a-012 and t3-023, and no reader matched the key on t14a-015 or t3-022. The author's verifier reproduces the key. The key follows rules written in AMBIGUITY_LOG.txt entries 3, 6, 14 and 23 (a malformed input is HOLD). Those rules are not in the specification text and the blind readers are not given the log. Question for decision: add a malformed-input rule to the next version of the specification, or change the keys.
+E-002 t3-018, t3-021. UNDER REVIEW. Key is FAIL (non-NFC string, duplicate key; AMBIGUITY_LOG.txt entries 4 and 5). Two outside readers chose HOLD. Open question: when is a rejected input FAIL (an attack) and when HOLD (unreadable)? The line is a judgement and is not written in the specification.
+E-003 t14a-016. UNDER REVIEW. Key is FAIL (T14A-POLICY: checkpoint policy differs from the declared fail mode; AMBIGUITY_LOG.txt entry 19). Four outside readers chose PASS. The T14a text in the specification says only "counters balance", so a literal reader sees balanced counters. Question for decision: add the policy comparison to T14a, or move it to another test.
+E-004 t3-015. UNDER REVIEW. Key is PASS (the verifier walks each stream by seq; file order is not meaningful; AMBIGUITY_LOG.txt entry 11). One outside reader walked file order and chose FAIL. The specification does not say which.
+E-005 T1b and declared gaps (t3-019, t3-020). UNDER REVIEW. The verifier prints "T1b: not run" and the declared-gap shape (AMBIGUITY_LOG.txt entries 26 and 27) means "declared gaps cover every action type" would be DECL-LOOSE if T1b were run. The outside party raised the same point. Needs a clearer definition of how a declared gap covers an action type.
+E-006 Second reader packet. UNDER REVIEW. Outside readers could not use the inputs without choosing field names, and chose between 16 and 23 of the 29 names in use. PROFILE_V0.txt (format only, no expected results) now exists so a reader can be given the format without the verdict rules. Whether to hand it to every reader, or only to some, is recorded with each report as "standard" or "strict".
+
+Changes made: none yet.

@@ -1,0 +1,66 @@
+{
+  "declaration": {
+    "consequential_action_types": [
+      "payment"
+    ],
+    "tolerances": {
+      "max_gap": 0,
+      "max_clock_skew_s": 5,
+      "max_unsealed_window_s": 60
+    },
+    "fail_mode": "fail-closed",
+    "monitors": [],
+    "declared_gaps": [
+      {
+        "stream_id": "s1",
+        "from_seq": 3,
+        "to_seq": 3,
+        "action_type": "payment",
+        "reason": "capture point restarted; record not captured"
+      }
+    ]
+  },
+  "records": [
+    {
+      "stream_id": "s1",
+      "seq": 1,
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "type": "event",
+      "data": "s1 event 1",
+      "hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 2,
+      "prev_hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f",
+      "type": "event",
+      "data": "s1 event 2",
+      "hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 4,
+      "prev_hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd",
+      "type": "event",
+      "data": "s1 event 4",
+      "hash": "a2919e770743c0003f5fbdbd817e749d7cbedbce6ddf43c808697c4d2973e533"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 5,
+      "prev_hash": "a2919e770743c0003f5fbdbd817e749d7cbedbce6ddf43c808697c4d2973e533",
+      "type": "event",
+      "data": "s1 event 5",
+      "hash": "a632182b50a310d74a55b7da994e00c5df78dc869970dcdc087c0195c44821a6"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 6,
+      "prev_hash": "a632182b50a310d74a55b7da994e00c5df78dc869970dcdc087c0195c44821a6",
+      "type": "teardown",
+      "data": "s1 teardown",
+      "last_seq": 5,
+      "hash": "942d98720bf70f2799bf5b054d53bb2610d872e959aae0d808f56190fa97dc3c"
+    }
+  ]
+}

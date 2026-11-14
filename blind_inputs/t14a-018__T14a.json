@@ -1,0 +1,25 @@
+{
+  "declaration": {
+    "consequential_action_types": [
+      "payment"
+    ],
+    "tolerances": {
+      "max_gap": 0,
+      "max_clock_skew_s": 5,
+      "max_unsealed_window_s": 60
+    },
+    "fail_mode": "fail-closed",
+    "monitors": [],
+    "declared_gaps": []
+  },
+  "checkpoints": [
+    {
+      "checkpoint_id": "cp-1",
+      "received": 100,
+      "accepted": 100,
+      "dropped": 0,
+      "policy": "fail-closed",
+      "provenance": "INDEPENDENTLY-RECONCILED"
+    }
+  ]
+}

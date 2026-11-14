@@ -1,0 +1,46 @@
+name: Comment on the tests, the text or a vector
+description: One finding per issue.
+title: "Comment: "
+labels: ["comment"]
+body:
+  - type: dropdown
+    id: about
+    attributes:
+      label: What is this about?
+      options: ["The specification text", "A vector (give its id below)", "The verifier", "The README or PROFILE_V0.txt", "Something else"]
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where exactly? (vector id, requirement number, section name or line)
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: saw
+    attributes:
+      label: What did you see?
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What change do you suggest? (optional)
+  - type: dropdown
+    id: credit
+    attributes:
+      label: How may we credit you?
+      options: ["By name", "By organisation", "By name and organisation", "Do not credit me"]
+    validations:
+      required: true
+  - type: checkboxes
+    id: licence
+    attributes:
+      label: Licence
+      options:
+        - label: I agree that anything I contribute is under Apache-2.0 (code, vectors) or CC BY 4.0 (text).
+          required: true

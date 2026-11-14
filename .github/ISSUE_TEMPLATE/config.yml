@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Email instead
+    url: mailto:comments@sts-forensics.com?subject=O4M%20Record%20Tests
+    about: Email comments@sts-forensics.com with the subject "O4M Record Tests". We copy email comments to the public log only with your permission.

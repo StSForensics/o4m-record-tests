@@ -1,0 +1,64 @@
+name: Reader report (I wrote my own reader)
+description: Tell us what your own reader decided on the 50 inputs. One report per reader.
+title: "Reader report: "
+labels: ["reader-report"]
+body:
+  - type: markdown
+    attributes:
+      value: "Thank you. Please fill in each box. If something is hard, write what you can and say what is missing."
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Who wrote the reader?
+      options: ["A person", "A chatbot (I ran it)", "A chatbot (someone else ran it)"]
+    validations:
+      required: true
+  - type: input
+    id: name_version
+    attributes:
+      label: Chatbot name and exact version (write "human" if a person)
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: What did the reader get?
+      options: ["Specification and PROFILE_V0.txt (standard)", "Specification only (strict)", "Something else (say below)"]
+    validations:
+      required: true
+  - type: dropdown
+    id: saw
+    attributes:
+      label: Before finishing, did the reader or you see any expected result, about.txt, verify.py, AMBIGUITY_LOG.txt or the author's messages?
+      options: ["No", "Yes (say what below)"]
+    validations:
+      required: true
+  - type: textarea
+    id: differences
+    attributes:
+      label: Vectors where your result differs from expected.txt (after you finish and look)
+      description: "One line each: vector id, your result, your reason. Write 'none' if none."
+  - type: textarea
+    id: choices
+    attributes:
+      label: CHOICES.txt (paste it, or attach the file)
+      description: "One line per choice: section | what was unclear | what I chose."
+  - type: textarea
+    id: files
+    attributes:
+      label: Links or attachments
+      description: "reader.py, results.csv, the prompt you used, and the raw answer if you have them. Please leave the code unchanged, including any defect."
+  - type: dropdown
+    id: credit
+    attributes:
+      label: How may we credit you?
+      options: ["By name", "By organisation", "By name and organisation", "Do not credit me"]
+    validations:
+      required: true
+  - type: checkboxes
+    id: licence
+    attributes:
+      label: Licence
+      options:
+        - label: I agree that code and vectors I send are under Apache-2.0 (with a Signed-off-by line if I make a commit) and text under CC BY 4.0.
+          required: true

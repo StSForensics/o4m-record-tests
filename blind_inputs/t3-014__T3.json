@@ -1,0 +1,66 @@
+{
+  "declaration": {
+    "consequential_action_types": [
+      "payment"
+    ],
+    "tolerances": {
+      "max_gap": 0,
+      "max_clock_skew_s": 5,
+      "max_unsealed_window_s": 60
+    },
+    "fail_mode": "fail-closed",
+    "monitors": [],
+    "declared_gaps": []
+  },
+  "records": [
+    {
+      "stream_id": "s1",
+      "seq": 0,
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "type": "event",
+      "data": "s1 event 0",
+      "hash": "38f488c5b4002caddeeedd51ae20893991f997f81e061f2bb368113e65fcabe0"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 1,
+      "prev_hash": "38f488c5b4002caddeeedd51ae20893991f997f81e061f2bb368113e65fcabe0",
+      "type": "event",
+      "data": "s1 event 1",
+      "hash": "ddd3fc59641d1c4b6937e935176bdfc53c324a014f6aef462f15d5e88076567e"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 2,
+      "prev_hash": "ddd3fc59641d1c4b6937e935176bdfc53c324a014f6aef462f15d5e88076567e",
+      "type": "event",
+      "data": "s1 event 2",
+      "hash": "589e06f64ed70c152c2a59eb8bf14c0aa9b23bf74d85f798e9bf3efffe434652"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 3,
+      "prev_hash": "589e06f64ed70c152c2a59eb8bf14c0aa9b23bf74d85f798e9bf3efffe434652",
+      "type": "event",
+      "data": "s1 event 3",
+      "hash": "f649e43f85d16fd19e382fb3651fc99640118d55dbfde0d9ee46d84ec32e51e6"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 4,
+      "prev_hash": "f649e43f85d16fd19e382fb3651fc99640118d55dbfde0d9ee46d84ec32e51e6",
+      "type": "event",
+      "data": "s1 event 4",
+      "hash": "fdec395397c4ebcf3bb5d08a6edfc94c36f7c73f6da0ad6872681d533d21b375"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 5,
+      "prev_hash": "fdec395397c4ebcf3bb5d08a6edfc94c36f7c73f6da0ad6872681d533d21b375",
+      "type": "teardown",
+      "data": "s1 teardown",
+      "last_seq": 4,
+      "hash": "174e8ace1aed653272e85362c9dc43ca8d13c8ccc7d3cc3b3890b734af312c19"
+    }
+  ]
+}
