@@ -1,0 +1,39 @@
+name: Unpack upload zip
+# One-click helper (no command line needed). Unpacks a zip that you uploaded to the repo root,
+# puts every file in its folder (including the hidden .github folder), removes the zip, and commits.
+on:
+  workflow_dispatch:
+    inputs:
+      zipfile:
+        description: "Name of the zip in the repo root"
+        required: true
+        default: "tests-upload.zip"
+permissions:
+  contents: write
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check and unpack
+        env:
+          ZIP: ${{ inputs.zipfile }}
+        run: |
+          set -eu
+          test -f "$ZIP" || { echo "Zip not found in the repo root: $ZIP"; exit 1; }
+          unzip -Z1 "$ZIP" > /tmp/names.txt
+          if grep -E '^/|\.\.|^\.github/workflows' /tmp/names.txt; then
+            echo "Refusing: the zip has unsafe paths or workflow files"; exit 1
+          fi
+          UNZ=$(mktemp -d)
+          unzip -q "$ZIP" -d "$UNZ"
+          cp -a "$UNZ"/. ./
+          rm -f "$ZIP"
+          echo "Unpacked $(grep -vc '/$' /tmp/names.txt) files from $ZIP"
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Unpack ${{ inputs.zipfile }}" || echo "Nothing to commit"
+          git push
