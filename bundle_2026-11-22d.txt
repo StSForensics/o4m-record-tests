@@ -170,7 +170,7 @@ Nothing but documentation changed. verify.py, gen_vectors.py, check_exit_codes.p
 Status unchanged: self-run, generated with AI assistance, not reproduced by anyone outside the editor.
 END OF FILE: CHANGES_2026-11-10c.txt
 
-FILE: CHANGES_2026-11-22d.txt (SHA-256 70a17951e5cdfe8e88fcd307badd2ab828fed285a949069499dbce1ccfc6f61c)
+FILE: CHANGES_2026-11-22d.txt (SHA-256 b0787707955cdbf6c26dab6cbdd2c08152a15941ac77c58a411226f7207dc072)
 CHANGES, package o4m-record-tests-vectors-2026-11-22d (build d, 22 Nov 2026), on top of the repository state of 14 Nov 2026 (README, ERRATA, PROFILE_V0, blind_inputs, issue forms and translations as published then).
 Rule: no expected result of an earlier vector is changed. A diff of the 55 earlier expected.txt and expected_exit.txt files against the 14 Nov repository shows no difference. The specification (DOI 10.5281/zenodo.23857888) is not touched; its comment draft stays open to 1 Dec 2026.
 
@@ -195,13 +195,16 @@ README.txt (build date, vector count, status paragraph, run record, SHA256SUMS s
 Not changed, on purpose
 The rule for rejected input (HOLD or FAIL, E-001 and E-002), the policy comparison in T14a (E-003), declared gaps and T1b (E-005) and the whole-missing-stream question (E-010). These wait for outside readers' results. blind_inputs and SECOND_READER_PACKET are unchanged; the four new vectors are not in them.
 Status unchanged: self-run, generated with AI assistance, not reproduced by anyone outside the editor.
+
+Credits (added 22 Nov 2026 evening, documents only; code and vectors unchanged from commit e27e666)
+Findings behind E-007 and E-008: Konrad Gruszka, b7n0de, https://proofbundle.dev. Four-reader run behind E-001 to E-006: Toshikatsu Oga, The HORIZONs Co., Ltd. (HORIZON SHIELD). Both are named with their written consent of 22 November 2026, in the wording they gave. Naming does not mean either has reproduced or endorsed the verifier.
 END OF FILE: CHANGES_2026-11-22d.txt
 
-FILE: ERRATA.txt (SHA-256 4de4a8fd7fc1fbd524910dab1e42102dea190bd7ef2a93aea9c80e3b03ecc015)
+FILE: ERRATA.txt (SHA-256 ce30cf264372ba85a4a86ffe236219e126178da7ba5c385c8a9323643f4d7d42)
 ERRATA AND OPEN ITEMS, O4M Record Tests 2026 v1.0 tests T3 and T14a, vector profile v0
 Opened 14 November 2026. Rule: no expected result is changed silently. Each change is dated here with its reason. Status words: UNDER REVIEW (keys unchanged), CHANGED (date and reason given), NO CHANGE (reason given).
 
-Source of the first entries: comment C-001, 14 November 2026, four model-written readers run by an outside party. Their logs have not yet been seen, so their results are not yet reproduced here.
+Source of the first entries: comment C-001, 14 November 2026, four model-written readers run by Toshikatsu Oga, The HORIZONs Co., Ltd. (HORIZON SHIELD). Their logs have not yet been seen, so their results are not yet reproduced here. He has said he will send them by 25 November 2026.
 
 E-001 t14a-009, t14a-010, t14a-012, t14a-015, t3-022, t3-023. UNDER REVIEW. Key is HOLD. The outside readers chose FAIL for t14a-009, t14a-010, t14a-012 and t3-023, and no reader matched the key on t14a-015 or t3-022. The author's verifier reproduces the key. The key follows rules written in AMBIGUITY_LOG.txt entries 3, 6, 14 and 23 (a malformed input is HOLD). Those rules are not in the specification text and the blind readers are not given the log. Question for decision: add a malformed-input rule to the next version of the specification, or change the keys.
 E-002 t3-018, t3-021. UNDER REVIEW. Key is FAIL (non-NFC string, duplicate key; AMBIGUITY_LOG.txt entries 4 and 5). Two outside readers chose HOLD. Open question: when is a rejected input FAIL (an attack) and when HOLD (unreadable)? The line is a judgement and is not written in the specification.
@@ -210,7 +213,7 @@ E-004 t3-015. UNDER REVIEW. Key is PASS (the verifier walks each stream by seq; 
 E-005 T1b and declared gaps (t3-019, t3-020). UNDER REVIEW. The verifier prints "T1b: not run" and the declared-gap shape (AMBIGUITY_LOG.txt entries 26 and 27) means "declared gaps cover every action type" would be DECL-LOOSE if T1b were run. The outside party raised the same point. Needs a clearer definition of how a declared gap covers an action type.
 E-006 Second reader packet. UNDER REVIEW. Outside readers could not use the inputs without choosing field names, and chose between 16 and 23 of the 29 names in use. PROFILE_V0.txt (format only, no expected results) now exists so a reader can be given the format without the verdict rules. Whether to hand it to every reader, or only to some, is recorded with each report as "standard" or "strict".
 
-E-007 Truncated file with a repeated key. CHANGED 22 November 2026 (no expected result in the 55 published vectors changed). Source: an outside reader's review of 16 November 2026, reproduced by the editor on 22 November 2026. Before build 2026-11-22d a cut-off file with a repeated key got FAIL and the same file without the repeat got HOLD. Syntax is now checked first (AMBIGUITY_LOG.txt entry 37). New vectors t3-032 and t3-033. The wider question stays open under E-002.
+E-007 Truncated file with a repeated key. CHANGED 22 November 2026 (no expected result in the 55 published vectors changed). Source: review of 16 November 2026 by Konrad Gruszka, b7n0de (https://proofbundle.dev), reproduced by the editor on 22 November 2026. On 22 November 2026 he answered that a file cut off in the middle should be HOLD, which is what t3-032 and t3-033 now give; he takes no position on the wider question in E-002. Before build 2026-11-22d a cut-off file with a repeated key got FAIL and the same file without the repeat got HOLD. Syntax is now checked first (AMBIGUITY_LOG.txt entry 37). New vectors t3-032 and t3-033. The wider question stays open under E-002.
 E-008 Very large integer. CHANGED 22 November 2026 (no published expected result changed). Source: the same review, reproduced by the editor. The verdict could depend on the interpreter's integer-string limit. Fixed (AMBIGUITY_LOG.txt entry 38). New vector t3-034.
 E-009 Memory exhaustion on far-apart sequence numbers. CHANGED 22 November 2026 (no published expected result changed). Found by the editor's red-team run, not by an outside reader. A seq of 9007199254740991 made the verifier run out of memory. Fixed (AMBIGUITY_LOG.txt entry 39). New vector t3-035. Nothing here was reproduced by anyone outside the editor.
 E-010 Whole missing stream. OPEN. T3 walks the streams it is given. A stream that is absent from the file is not seen, because nothing in the file says it should exist. Two ways to close it: an "expected streams" list in the declaration, or a stated limit in the README. Not decided; no code changed.
@@ -426,7 +429,7 @@ FILE: LICENSE (SHA-256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417b
    limitations under the License.
 END OF FILE: LICENSE
 
-FILE: MANIFEST.json (SHA-256 fc61a6b17e9b64b09046b5e8b855bdc8368992cd79eac37e3c01b443573f6f5d)
+FILE: MANIFEST.json (SHA-256 ef4f53b2f14340dba27a10dff5929921b4bc98e21d490b289adc1ef1508abd95)
 {
   "package": "o4m-record-tests-vectors-2026-11-22d",
   "date": "2026-11-22",
@@ -478,11 +481,11 @@ FILE: MANIFEST.json (SHA-256 fc61a6b17e9b64b09046b5e8b855bdc8368992cd79eac37e3c0
     },
     {
       "path": "CHANGES_2026-11-22d.txt",
-      "bytes": 2887
+      "bytes": 3324
     },
     {
       "path": "ERRATA.txt",
-      "bytes": 4837
+      "bytes": 5136
     },
     {
       "path": "LICENSE",
@@ -498,7 +501,7 @@ FILE: MANIFEST.json (SHA-256 fc61a6b17e9b64b09046b5e8b855bdc8368992cd79eac37e3c0
     },
     {
       "path": "README.txt",
-      "bytes": 15229
+      "bytes": 15235
     },
     {
       "path": "REASON_CODES_PROPOSED.txt",
@@ -1960,7 +1963,7 @@ Print one verdict per input: PASS, FAIL or HOLD, and a short reason. Exit codes 
 What to do with an input that does not follow this sheet, how to treat a gap, an open stream, an empty file, a checkpoint that does not balance, a declared gap, a duplicate, and what makes a result FAIL rather than HOLD. Decide from the specification, and write each decision in CHOICES.txt.
 END OF FILE: PROFILE_V0.txt
 
-FILE: README.txt (SHA-256 48b7b65942012f816d7f2354571e7dd69226336cf150472ad0473fe418a14edf)
+FILE: README.txt (SHA-256 94d9db537a1d6f8d5fa83f58b45805bd79f39f63904b0f67261a9b0a6a22b49e)
 START HERE (feedback welcome, no expertise needed)
 Want to help? Go to the section "Help us test it" below (about 15 minutes). Tell us what you find: open the Issues tab, tap New issue, and choose Comment, Reader report or Repeat run. Or email comments@sts-forensics.com with the subject "O4M Record Tests". Comment draft closes 1 Dec 2026.
 The format sheet for readers is PROFILE_V0.txt (in this folder). 
@@ -1974,7 +1977,7 @@ A small package of test vectors for two of the O4M Record Tests: T3 (chain walk 
 Specification: O4M Record Tests 2026 v1.0, DOI 10.5281/zenodo.23857888 (https://doi.org/10.5281/zenodo.23857888). Markdown source SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d.
 
 Status, plainly
-Build 2026-11-22d (22 Nov 2026) fixes three defects in the verifier found by an outside reader's review of 16 Nov and by the editor's own red team (a repeated key in a cut-off file, a very long integer, far-apart sequence numbers; ERRATA.txt E-007 to E-011) and adds vectors t3-032 to t3-035. No expected result of the 55 earlier vectors changed, and no rule was changed. See CHANGES_2026-11-22d.txt.
+Build 2026-11-22d (22 Nov 2026) fixes three defects in the verifier found by Konrad Gruszka's (b7n0de) review of 16 Nov and by the editor's own red team (a repeated key in a cut-off file, a very long integer, far-apart sequence numbers; ERRATA.txt E-007 to E-011) and adds vectors t3-032 to t3-035. No expected result of the 55 earlier vectors changed, and no rule was changed. See CHANGES_2026-11-22d.txt.
 This is a self-run. The verifier, the vectors and the mutation harness were written and run by one author, and nobody else has reproduced any result. Nothing here has been verified by anyone outside the editor. The specification is in development and is not an implementation-ready test suite.
 This package holds a new reference verifier written from the requirement text. It is not RT-1, the editor's demonstration code mentioned in the specification, and RT-1 is not in this package. The cells for RT-1 in Annex B of the specification stay "not yet checked". MUTATION_RECORD.txt fills the matrix for this new verifier only.
 
@@ -5463,19 +5466,19 @@ FILE: SECOND_READER_PACKET/pass2_inputs/t3-031__T3.json (SHA-256 231debf76b060cb
 }
 END OF FILE: SECOND_READER_PACKET/pass2_inputs/t3-031__T3.json
 
-FILE: SHA256SUMS (SHA-256 3b12a0aab0c65176509bfb0b363eef93e1e6182fa595d294a4d8bd09e2310548)
+FILE: SHA256SUMS (SHA-256 04140fbb28bdf83b64d1d08029f706158103af06c5e965ac3bb1f1351483ee03)
 705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da  .gitattributes
 a716d80cf38b27011496ba95d61a29d1d7c19ebad6e895c25734a6e3e77d22f8  AMBIGUITY_LOG.txt
 ccdafdddb517e08f2561849cbdda54013ac319606dca9c052a4fc0465af9da7e  CHANGES_2026-11-07b.txt
 33356d617a9fba1609bc73bbfbf0721c2dadf8ac91a1e944c01c9ecbe1406cb2  CHANGES_2026-11-10b.txt
 598df4963e14f06413d7835b57fa66f998f330f94cb7349ac652df82b5fe0c1e  CHANGES_2026-11-10c.txt
-70a17951e5cdfe8e88fcd307badd2ab828fed285a949069499dbce1ccfc6f61c  CHANGES_2026-11-22d.txt
-4de4a8fd7fc1fbd524910dab1e42102dea190bd7ef2a93aea9c80e3b03ecc015  ERRATA.txt
+b0787707955cdbf6c26dab6cbdd2c08152a15941ac77c58a411226f7207dc072  CHANGES_2026-11-22d.txt
+ce30cf264372ba85a4a86ffe236219e126178da7ba5c385c8a9323643f4d7d42  ERRATA.txt
 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30  LICENSE
-fc61a6b17e9b64b09046b5e8b855bdc8368992cd79eac37e3c01b443573f6f5d  MANIFEST.json
+ef4f53b2f14340dba27a10dff5929921b4bc98e21d490b289adc1ef1508abd95  MANIFEST.json
 22893a02d52afe1dbd2e399680c9bc86c01edda5e7d1301aef7630510e12edea  NOTICE
 abf8b1e25d3656f527e9a74e9d18800772e9f7eb3e3bb9b93767ff9f4918861b  PROFILE_V0.txt
-48b7b65942012f816d7f2354571e7dd69226336cf150472ad0473fe418a14edf  README.txt
+94d9db537a1d6f8d5fa83f58b45805bd79f39f63904b0f67261a9b0a6a22b49e  README.txt
 5c747ccd04df823390bd4b6dd9d5ce98ac2dccfe86ca4c488b2a9a26facb54fe  REASON_CODES_PROPOSED.txt
 0c1db860a57b68e2c0aced35e8181adfff6d75f2851cfda799a7800adf957828  REGULATOR_QUESTIONS.txt
 f31c407edae930ab9c8f9382ec7c2d0b0d47d20ce2af3ea0d2ff77aa72437c30  SECOND_READER_PACKET/INSTRUCTIONS_FOR_SECOND_READER_2026-11-10.txt

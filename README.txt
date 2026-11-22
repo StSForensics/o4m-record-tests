@@ -11,7 +11,7 @@ A small package of test vectors for two of the O4M Record Tests: T3 (chain walk 
 Specification: O4M Record Tests 2026 v1.0, DOI 10.5281/zenodo.23857888 (https://doi.org/10.5281/zenodo.23857888). Markdown source SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d.
 
 Status, plainly
-Build 2026-11-22d (22 Nov 2026) fixes three defects in the verifier found by an outside reader's review of 16 Nov and by the editor's own red team (a repeated key in a cut-off file, a very long integer, far-apart sequence numbers; ERRATA.txt E-007 to E-011) and adds vectors t3-032 to t3-035. No expected result of the 55 earlier vectors changed, and no rule was changed. See CHANGES_2026-11-22d.txt.
+Build 2026-11-22d (22 Nov 2026) fixes three defects in the verifier found by Konrad Gruszka's (b7n0de) review of 16 Nov and by the editor's own red team (a repeated key in a cut-off file, a very long integer, far-apart sequence numbers; ERRATA.txt E-007 to E-011) and adds vectors t3-032 to t3-035. No expected result of the 55 earlier vectors changed, and no rule was changed. See CHANGES_2026-11-22d.txt.
 This is a self-run. The verifier, the vectors and the mutation harness were written and run by one author, and nobody else has reproduced any result. Nothing here has been verified by anyone outside the editor. The specification is in development and is not an implementation-ready test suite.
 This package holds a new reference verifier written from the requirement text. It is not RT-1, the editor's demonstration code mentioned in the specification, and RT-1 is not in this package. The cells for RT-1 in Annex B of the specification stay "not yet checked". MUTATION_RECORD.txt fills the matrix for this new verifier only.
 

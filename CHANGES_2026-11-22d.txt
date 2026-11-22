@@ -22,3 +22,6 @@ README.txt (build date, vector count, status paragraph, run record, SHA256SUMS s
 Not changed, on purpose
 The rule for rejected input (HOLD or FAIL, E-001 and E-002), the policy comparison in T14a (E-003), declared gaps and T1b (E-005) and the whole-missing-stream question (E-010). These wait for outside readers' results. blind_inputs and SECOND_READER_PACKET are unchanged; the four new vectors are not in them.
 Status unchanged: self-run, generated with AI assistance, not reproduced by anyone outside the editor.
+
+Credits (added 22 Nov 2026 evening, documents only; code and vectors unchanged from commit e27e666)
+Findings behind E-007 and E-008: Konrad Gruszka, b7n0de, https://proofbundle.dev. Four-reader run behind E-001 to E-006: Toshikatsu Oga, The HORIZONs Co., Ltd. (HORIZON SHIELD). Both are named with their written consent of 22 November 2026, in the wording they gave. Naming does not mean either has reproduced or endorsed the verifier.
