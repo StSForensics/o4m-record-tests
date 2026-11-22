@@ -1,0 +1,1 @@
+Added 22 Nov 2026. Same truncated file as t3-032 with one key written twice in the first record. Before build 2026-11-22d the duplicate key was reported first and the file got FAIL (INPUT-DUPKEY) although it was not valid JSON at all. Now syntax is checked first: an unreadable file is HOLD whatever it contains. Expected HOLD.

@@ -1,0 +1,1 @@
+Added 22 Nov 2026. Two events (seq 1, 2) then one at seq 9007199254740991, the largest integer vector profile v0 allows, with no teardown. Before build 2026-11-22d the gap scan built a list of about 9e15 numbers and ran out of memory. Now gaps are held as ranges: one range, T3-GAP, and the open stream is reported as T3-OPEN. Result FAIL in seconds. Expected FAIL.

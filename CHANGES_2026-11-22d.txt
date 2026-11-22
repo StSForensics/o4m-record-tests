@@ -1,0 +1,24 @@
+CHANGES, package o4m-record-tests-vectors-2026-11-22d (build d, 22 Nov 2026), on top of the repository state of 14 Nov 2026 (README, ERRATA, PROFILE_V0, blind_inputs, issue forms and translations as published then).
+Rule: no expected result of an earlier vector is changed. A diff of the 55 earlier expected.txt and expected_exit.txt files against the 14 Nov repository shows no difference. The specification (DOI 10.5281/zenodo.23857888) is not touched; its comment draft stays open to 1 Dec 2026.
+
+Code (verify.py)
+1. Syntax is checked for the whole file before duplicate keys are reported. A cut-off file is HOLD (INPUT-UNPARSEABLE) whether or not it repeats a key. A readable file with a repeated key is still FAIL (INPUT-DUPKEY). AMBIGUITY_LOG.txt entry 37, ERRATA.txt E-007.
+2. Integers longer than 20 characters are read as out of profile and never converted, so the verdict no longer depends on the interpreter's integer-string limit. Entry 38, E-008.
+3. Missing sequence numbers and declared gaps are held as ranges. A seq of 9007199254740991 no longer exhausts memory. Entry 39, E-009.
+4. A number written with a fraction or very long digits no longer prints a memory address in a detail line. E-011.
+
+Vectors added (generated intent-first by gen_vectors.py, then run; 0 mismatches against intent)
+t3-032 cut-off file, HOLD, INPUT-UNPARSEABLE.
+t3-033 the same cut-off file with a repeated key, HOLD, INPUT-UNPARSEABLE (was FAIL before this build).
+t3-034 a seq of 5,000 digits, HOLD, T3-MALFORMED.
+t3-035 seq 1, 2 then 9007199254740991, no teardown, FAIL, T3-GAP and T3-OPEN.
+
+Mutation record (mutation/mutate.py)
+The gap-scan mutants were rewritten against the new scan (the old text no longer exists). Mutants M-IN-09, M-IN-10, M-T3-21, M-T3-22, M-T3-23 added. The old M-T3-17 duplicate was removed. Result: 58 mutants, 56 killed, 2 survived; both survivors are equivalent mutants (explained in MUTATION_RECORD.txt). The 10c record had said 49 killed with M-T3-06, 06b and 06c "NOT APPLIED" in a re-run of 22 Nov; that gap is closed here. Python 3.13.18.
+
+Documents
+README.txt (build date, vector count, status paragraph, run record, SHA256SUMS statement), ERRATA.txt (E-007 to E-011), AMBIGUITY_LOG.txt (entries 37 to 39), MANIFEST.json, SHA256SUMS (now covers the whole package; it failed on README.txt in the 14 Nov repository) and bundle_2026-11-22d.txt (replaces bundle_2026-11-10c.txt; the earlier bundle stays in the Git history).
+
+Not changed, on purpose
+The rule for rejected input (HOLD or FAIL, E-001 and E-002), the policy comparison in T14a (E-003), declared gaps and T1b (E-005) and the whole-missing-stream question (E-010). These wait for outside readers' results. blind_inputs and SECOND_READER_PACKET are unchanged; the four new vectors are not in them.
+Status unchanged: self-run, generated with AI assistance, not reproduced by anyone outside the editor.

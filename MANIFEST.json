@@ -1,18 +1,18 @@
 {
-  "package": "o4m-record-tests-vectors-2026-11-10c",
-  "date": "2026-11-10",
-  "first_issued": "2026-11-07 (revision b: 2026-11-07b; this is revision c, build c of 10 Nov 2026; earlier same-day builds were never made public)",
+  "package": "o4m-record-tests-vectors-2026-11-22d",
+  "date": "2026-11-22",
+  "first_issued": "2026-11-07 (revision b: 2026-11-07b; revision c: 2026-11-10c; this is build d of 22 Nov 2026)",
   "specification": {
     "title": "O4M Record Tests 2026 v1.0",
     "doi": "10.5281/zenodo.23857888",
     "source_md_sha256": "8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d"
   },
   "profile": "vector profile v0 (not normative)",
-  "python_used_for_recorded_run": "3.13.18 (mutation record, 10 Nov 2026, Linux)",
-  "python_minimum_intended": "3.8; on 10 Nov 2026 every vector (55), check_exit_codes.py (7 cases) and two hostile nesting files were run with identical results on 3.11.18 (55 vectors, 0 mismatches; 7 cases, 0 failed), 3.12.3 (55 vectors, 0 mismatches; 7 cases, 0 failed) and 3.13.18 (55 vectors, 0 mismatches; 7 cases, 0 failed); 3.8 to 3.10, Windows and macOS not run",
+  "python_used_for_recorded_run": "3.13.18 (mutation record, 22 Nov 2026, Linux)",
+  "python_minimum_intended": "3.8; on 22 Nov 2026 every vector (59) and check_exit_codes.py (7 cases) were run with identical results on 3.11, 3.12 and 3.13 (Linux) with PYTHONINTMAXSTRDIGITS unset, 0 and 640. 3.8 to 3.10, Windows and macOS have not been run. Earlier record, 10 Nov 2026: 3.8; on 10 Nov 2026 every vector (55), check_exit_codes.py (7 cases) and two hostile nesting files were run with identical results on 3.11.18 (55 vectors, 0 mismatches; 7 cases, 0 failed), 3.12.3 (55 vectors, 0 mismatches; 7 cases, 0 failed) and 3.13.18 (55 vectors, 0 mismatches; 7 cases, 0 failed); 3.8 to 3.10, Windows and macOS not run",
   "third_party_packages": "none",
   "vector_count": {
-    "T3": 31,
+    "T3": 35,
     "T14a": 19,
     "alt-readings": 5
   },
@@ -33,7 +33,7 @@
     },
     {
       "path": "AMBIGUITY_LOG.txt",
-      "bytes": 15849
+      "bytes": 18541
     },
     {
       "path": "CHANGES_2026-11-07b.txt",
@@ -48,6 +48,14 @@
       "bytes": 1222
     },
     {
+      "path": "CHANGES_2026-11-22d.txt",
+      "bytes": 2887
+    },
+    {
+      "path": "ERRATA.txt",
+      "bytes": 4837
+    },
+    {
       "path": "LICENSE",
       "bytes": 11358
     },
@@ -56,8 +64,12 @@
       "bytes": 484
     },
     {
+      "path": "PROFILE_V0.txt",
+      "bytes": 3433
+    },
+    {
       "path": "README.txt",
-      "bytes": 9899
+      "bytes": 15229
     },
     {
       "path": "REASON_CODES_PROPOSED.txt",
@@ -281,15 +293,15 @@
     },
     {
       "path": "gen_vectors.py",
-      "bytes": 27746
+      "bytes": 30159
     },
     {
       "path": "mutation/MUTATION_RECORD.txt",
-      "bytes": 9068
+      "bytes": 10156
     },
     {
       "path": "mutation/mutate.py",
-      "bytes": 12918
+      "bytes": 14293
     },
     {
       "path": "vectors/T14a/t14a-001/about.txt",
@@ -1292,6 +1304,86 @@
       "bytes": 116
     },
     {
+      "path": "vectors/T3/t3-032/about.txt",
+      "bytes": 205
+    },
+    {
+      "path": "vectors/T3/t3-032/expected.txt",
+      "bytes": 1357
+    },
+    {
+      "path": "vectors/T3/t3-032/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-032/input.json",
+      "bytes": 1785
+    },
+    {
+      "path": "vectors/T3/t3-032/intent.txt",
+      "bytes": 121
+    },
+    {
+      "path": "vectors/T3/t3-033/about.txt",
+      "bytes": 328
+    },
+    {
+      "path": "vectors/T3/t3-033/expected.txt",
+      "bytes": 1357
+    },
+    {
+      "path": "vectors/T3/t3-033/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-033/input.json",
+      "bytes": 1801
+    },
+    {
+      "path": "vectors/T3/t3-033/intent.txt",
+      "bytes": 121
+    },
+    {
+      "path": "vectors/T3/t3-034/about.txt",
+      "bytes": 376
+    },
+    {
+      "path": "vectors/T3/t3-034/expected.txt",
+      "bytes": 1647
+    },
+    {
+      "path": "vectors/T3/t3-034/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-034/input.json",
+      "bytes": 6953
+    },
+    {
+      "path": "vectors/T3/t3-034/intent.txt",
+      "bytes": 116
+    },
+    {
+      "path": "vectors/T3/t3-035/about.txt",
+      "bytes": 366
+    },
+    {
+      "path": "vectors/T3/t3-035/expected.txt",
+      "bytes": 1782
+    },
+    {
+      "path": "vectors/T3/t3-035/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-035/input.json",
+      "bytes": 1132
+    },
+    {
+      "path": "vectors/T3/t3-035/intent.txt",
+      "bytes": 119
+    },
+    {
       "path": "vectors/alt-readings/alt-b-001/about.txt",
       "bytes": 148
     },
@@ -1393,8 +1485,8 @@
     },
     {
       "path": "verify.py",
-      "bytes": 21892
+      "bytes": 24042
     }
   ],
-  "revision": "c, 10 Nov 2026: nesting depth limit 16 (HOLD, INPUT-MALFORMED) decided by a byte scan before parsing; string walk iterative; vectors t3-029, t3-030, t3-031 added; mutants M-IN-06 to M-IN-08 added; check_exit_codes.py added; gen_vectors.py refuses an OUTDIR starting with \"-\"; README Python versions stated from recorded runs; \"not yet started trading\" sentence removed from README disclaimer. The 52 earlier vectors are byte-identical to 2026-11-07b. The second-reader packet is refreshed (50 blind inputs, three-stage handover, instructions version 2). Build c changes documentation only: README comment log address and patents scope. See CHANGES_2026-11-10c.txt and CHANGES_2026-11-10b.txt."
+  "revision": "d, 22 Nov 2026: syntax checked before duplicate keys; integers over 20 characters read as out of profile; missing and declared sequence numbers held as ranges; memory address removed from a detail line; vectors t3-032 to t3-035 added; mutants rewritten and extended. No expected result of the 55 earlier vectors changed."
 }

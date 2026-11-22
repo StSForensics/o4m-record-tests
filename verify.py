@@ -58,14 +58,36 @@ class Float:
     def __init__(self, text):
         self.text = text
 
+    def __repr__(self):
+        # Printed inside T3-MALFORMED details. Without this the default repr leaked a memory address,
+        # so two runs on the same bytes printed different text (found by the mutation harness, 22 Nov 2026).
+        if len(self.text) <= 24:
+            return self.text
+        return "%s... (%d characters)" % (self.text[:16], len(self.text))
+
+
+DUPES = []
+
 
 def pairs_hook(pairs):
+    # Duplicate keys are recorded, not raised, so that the whole file is syntax-checked first:
+    # an unreadable file is HOLD whatever it contains; INPUT-DUPKEY is reported only for a file
+    # that parses completely (proposed 22 Nov 2026, from outside comment of 16 Nov).
     obj = {}
     for k, v in pairs:
         if k in obj:
-            raise DupKey(k)
+            DUPES.append(k)
         obj[k] = v
     return obj
+
+
+def parse_int(text):
+    # Profile v0 integers are at most 2^53 - 1 in size, so at most 16 digits plus a sign. A longer
+    # integer is marked, not converted, so the verdict does not depend on the interpreter's
+    # integer-string limit (PYTHONINTMAXSTRDIGITS, Python 3.10.7 and later).
+    if len(text) > 20:
+        return Float(text)
+    return int(text)
 
 
 def canonical(obj):
@@ -257,7 +279,7 @@ def run_t3(top, decl, v):
     declared = {}
     if decl:
         for g in decl["declared_gaps"]:
-            declared.setdefault(g["stream_id"], set()).update(range(g["from_seq"], g["to_seq"] + 1))
+            declared.setdefault(g["stream_id"], []).append((g["from_seq"], g["to_seq"]))
             v.declared.append("stream %s seq %d to %d (%s): %s"
                               % (g["stream_id"], g["from_seq"], g["to_seq"], g["action_type"], g["reason"]))
             v.add("DECLARED-GAP", "stream %s seq %d to %d declared as not captured; reported as DECLARED GAP, never PASS for that scope"
@@ -265,7 +287,45 @@ def run_t3(top, decl, v):
     for sid in sorted(streams):
         if sid in bad_streams:
             continue
-        t3_stream(sid, streams[sid], declared.get(sid, set()), v)
+        t3_stream(sid, streams[sid], declared.get(sid, []), v)
+
+
+def merge_intervals(ivs):
+    out = []
+    for a, b in sorted(ivs):
+        if out and a <= out[-1][1] + 1:
+            out[-1] = (out[-1][0], max(out[-1][1], b))
+        else:
+            out.append((a, b))
+    return out
+
+
+def subtract_intervals(ivs, cuts):
+    # ivs and cuts are lists of inclusive (a, b); cuts must be merged. No sequence is expanded.
+    out = []
+    for a, b in ivs:
+        cur = a
+        for c, d in cuts:
+            if d < cur or c > b:
+                continue
+            if c > cur:
+                out.append((cur, c - 1))
+            cur = max(cur, d + 1)
+            if cur > b:
+                break
+        if cur <= b:
+            out.append((cur, b))
+    return out
+
+
+GAP_LIST_CAP = 1000
+
+
+def describe_missing(ivs):
+    total = sum(b - a + 1 for a, b in ivs)
+    if total <= GAP_LIST_CAP:
+        return "seq " + ", ".join(str(n) for a, b in ivs for n in range(a, b + 1))
+    return "%d seq numbers in %d ranges, first range %d to %d" % (total, len(ivs), ivs[0][0], ivs[0][1])
 
 
 def t3_stream(sid, rs, declared_seqs, v):
@@ -286,11 +346,16 @@ def t3_stream(sid, rs, declared_seqs, v):
             if r["prev_hash"] != ZERO_HASH:
                 v.add("T3-START", "stream %s seq 1: prev_hash is not the zero value" % sid)
     # (c) gaps
-    missing = [s for s in range(1, highest + 1) if s not in by_seq]
-    und = [s for s in missing if s not in declared_seqs]
+    missing = []
+    prev = 0
+    for s_ in seqs:
+        if s_ > prev + 1:
+            missing.append((prev + 1, s_ - 1))
+        prev = max(prev, s_)
+    und = subtract_intervals(missing, merge_intervals(declared_seqs))
     if und:
-        v.add("T3-GAP", "stream %s: missing seq %s" % (sid, ", ".join(str(s) for s in und)))
-        v.undeclared.append("stream %s: missing seq %s" % (sid, ", ".join(str(s) for s in und)))
+        v.add("T3-GAP", "stream %s: missing %s" % (sid, describe_missing(und)))
+        v.undeclared.append("stream %s: missing %s" % (sid, describe_missing(und)))
     # (d) forks
     for s in seqs:
         if len(by_seq[s]) > 1:
@@ -468,9 +533,10 @@ def main(argv):
     else:
         try:
             top = json.loads(raw.decode("utf-8"), object_pairs_hook=pairs_hook,
-                             parse_float=Float, parse_constant=Float)
-        except DupKey as e:
-            v.add("INPUT-DUPKEY", "duplicate key %r; vector profile v0 rejects duplicate keys" % str(e))
+                             parse_float=Float, parse_int=parse_int, parse_constant=Float)
+            if DUPES:
+                v.add("INPUT-DUPKEY", "duplicate key %r; vector profile v0 rejects duplicate keys" % str(DUPES[0]))
+                top = None
         except (ValueError, UnicodeDecodeError):
             v.add("INPUT-UNPARSEABLE", "input is not valid UTF-8 JSON")
         except RecursionError:

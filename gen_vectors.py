@@ -270,6 +270,38 @@ add("T3/t3-031", "T3", {"declaration": decl(), "records": s + [deep(13)]}, "HOLD
     "16 levels, the limit. The depth scan lets it through; the odd element is then a malformed record (T3-MALFORMED), HOLD. "
     "Pins the limit from the other side: a limit of 15 would reject this file. Expected HOLD.")
 
+# Added 22 Nov 2026 (package 2026-11-22d) after an outside reader (Konrad Gruszka's review, 16 Nov 2026) and a red team
+# of the 10c package found inputs whose verdict depended on the interpreter or on check order. Intent was written first.
+_base = json.dumps({"declaration": decl(), "records": stream("s1")}, indent=2, ensure_ascii=True) + "\n"
+_cut = _base[:_base.index('"s1 teardown"') - 40]
+
+add("T3/t3-032", "T3", _cut, "HOLD", ["INPUT-UNPARSEABLE"],
+    "Added 22 Nov 2026. The t3-001 file cut off in the middle of the last record, as a failed copy or upload leaves it. "
+    "Not valid JSON, so HOLD with INPUT-UNPARSEABLE. Models a truncated export. Expected HOLD.")
+
+_dup = _cut.replace('"seq": 1,', '"seq": 1,\n      "seq": 1,', 1)
+assert _dup != _cut
+add("T3/t3-033", "T3", _dup, "HOLD", ["INPUT-UNPARSEABLE"],
+    "Added 22 Nov 2026. Same truncated file as t3-032 with one key written twice in the first record. Before build 2026-11-22d "
+    "the duplicate key was reported first and the file got FAIL (INPUT-DUPKEY) although it was not valid JSON at all. "
+    "Now syntax is checked first: an unreadable file is HOLD whatever it contains. Expected HOLD.")
+
+_s = stream("s1")
+_txt = json.dumps({"declaration": decl(), "records": _s}, indent=2, ensure_ascii=True) + "\n"
+_big = _txt.replace('"seq": 3,', '"seq": ' + "9" * 5000 + ",", 1)
+assert _big != _txt
+add("T3/t3-034", "T3", _big, "HOLD", ["T3-MALFORMED"],
+    "Added 22 Nov 2026. One seq written as an integer of 5,000 digits. Python 3.11 and later refuse to convert such a string "
+    "unless PYTHONINTMAXSTRDIGITS is changed, so before build 2026-11-22d the verdict could depend on an environment variable. "
+    "Now an integer longer than 20 characters is read as out of profile (outside plus or minus 2^53-1): T3-MALFORMED, HOLD. Expected HOLD.")
+
+_s = stream("s1", n=2)[:2]
+_far = rec("s1", 9007199254740991, _s[-1]["hash"], "s1 event far away")
+add("T3/t3-035", "T3", {"declaration": decl(), "records": _s + [_far]}, "FAIL", ["T3-GAP", "T3-OPEN"],
+    "Added 22 Nov 2026. Two events (seq 1, 2) then one at seq 9007199254740991, the largest integer vector profile v0 allows, "
+    "with no teardown. Before build 2026-11-22d the gap scan built a list of about 9e15 numbers and ran out of memory. Now gaps "
+    "are held as ranges: one range, T3-GAP, and the open stream is reported as T3-OPEN. Result FAIL in seconds. Expected FAIL.")
+
 # T14a vectors
 
 add("T14a/t14a-001", "T14a", {"declaration": decl(), "checkpoints": [cp("cp-1", 100, 100, 0)]}, "PASS", [],

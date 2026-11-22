@@ -4,13 +4,14 @@ The format sheet for readers is PROFILE_V0.txt (in this folder).
 The 50 test inputs are in blind_inputs. 
 Open items are in ERRATA.txt.
 
-O4M RECORD TESTS 2026 v1.0: TEST VECTORS FOR T3 AND T14a (DRAFT PACKAGE, 10 Nov 2026, revision c of the package first issued 7 Nov 2026)
+O4M RECORD TESTS 2026 v1.0: TEST VECTORS FOR T3 AND T14a (DRAFT PACKAGE, 22 Nov 2026, build d of the package first issued 7 Nov 2026)
 
 What this is
-A small package of test vectors for two of the O4M Record Tests: T3 (chain walk per stream, requirement C3) and T14a (capture counters balance, requirement C14). It holds a reference verifier written in Python with the standard library only, a deterministic generator that rebuilds every vector byte for byte, 55 vectors with their expected verdicts and exit codes, a mutation-kill record, a short script that checks the exit-3 paths, an ambiguity log and a list of proposed reason codes. It also holds PROFILE_V0.txt (how the inputs are written, with no expected results), blind_inputs (the 50 inputs with no expected results), ERRATA.txt (open items and dated changes) and forms for comments, reader reports and repeat runs.
+A small package of test vectors for two of the O4M Record Tests: T3 (chain walk per stream, requirement C3) and T14a (capture counters balance, requirement C14). It holds a reference verifier written in Python with the standard library only, a deterministic generator that rebuilds every vector byte for byte, 59 vectors with their expected verdicts and exit codes, a mutation-kill record, a short script that checks the exit-3 paths, an ambiguity log and a list of proposed reason codes. It also holds PROFILE_V0.txt (how the inputs are written, with no expected results), blind_inputs (the 50 inputs with no expected results), ERRATA.txt (open items and dated changes) and forms for comments, reader reports and repeat runs.
 Specification: O4M Record Tests 2026 v1.0, DOI 10.5281/zenodo.23857888 (https://doi.org/10.5281/zenodo.23857888). Markdown source SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d.
 
 Status, plainly
+Build 2026-11-22d (22 Nov 2026) fixes three defects in the verifier found by an outside reader's review of 16 Nov and by the editor's own red team (a repeated key in a cut-off file, a very long integer, far-apart sequence numbers; ERRATA.txt E-007 to E-011) and adds vectors t3-032 to t3-035. No expected result of the 55 earlier vectors changed, and no rule was changed. See CHANGES_2026-11-22d.txt.
 This is a self-run. The verifier, the vectors and the mutation harness were written and run by one author, and nobody else has reproduced any result. Nothing here has been verified by anyone outside the editor. The specification is in development and is not an implementation-ready test suite.
 This package holds a new reference verifier written from the requirement text. It is not RT-1, the editor's demonstration code mentioned in the specification, and RT-1 is not in this package. The cells for RT-1 in Annex B of the specification stay "not yet checked". MUTATION_RECORD.txt fills the matrix for this new verifier only.
 
@@ -23,7 +24,7 @@ t14a-011: if the operator consistently under-reports what it received, the count
 t3-006 (an open stream's tail cannot be checked by T3 alone) is a third limit of the same kind.
 
 How to run
-Python 3, no packages to install. On a Mac type python3 instead of python; on Windows, python or py. On 10 Nov 2026 every vector, the exit-code check and two hostile nesting files were run with Python 3.11.18, 3.12.3 and 3.13.18 on Linux, with identical results (the result lines are in MANIFEST.json). The code is written for Python 3.8 or later, but 3.8 to 3.10 have not been run, and Windows and macOS have not been run. From this folder:
+Python 3, no packages to install. On a Mac type python3 instead of python; on Windows, python or py. On 22 Nov 2026 every vector (59) and the exit-code check (7 cases) were run with Python 3.11, 3.12 and 3.13 on Linux, each with the environment variable PYTHONINTMAXSTRDIGITS unset, set to 0 and set to 640, with identical results. The earlier run record of 10 Nov 2026, including two hostile nesting files, is kept in MANIFEST.json. The code is written for Python 3.8 or later, but 3.8 to 3.10 have not been run, and Windows and macOS have not been run. From this folder:
   python verify.py T3 vectors/T3/t3-001/input.json
   python verify.py T14a vectors/T14a/t14a-003/input.json
   python verify.py T14a vectors/alt-readings/alt-b-002/input.json --reading B
@@ -34,6 +35,7 @@ To rebuild and re-test everything:
   python gen_vectors.py . --expected      (rebuilds inputs and expected outputs; stops on any mismatch with intent)
   python mutation/mutate.py               (runs every mutant against every vector, rewrites MUTATION_RECORD.txt)
   python check_exit_codes.py              (checks the exit-3 paths, which give no verdict and so cannot be vectors)
+The SHA256SUMS of the 14 Nov repository failed on README.txt, because README.txt was edited after SHA256SUMS was written. Since build 2026-11-22d SHA256SUMS is regenerated after the last edit and also covers ERRATA.txt, PROFILE_V0.txt and CHANGES_2026-11-22d.txt.
 mutate.py writes the date, time and Python version of your run at the top of MUTATION_RECORD.txt, so after you run it that one file no longer matches SHA256SUMS. Every other file should still match. Compare the mutant lines, not the header.
 Extract the zip rather than copying vectors by hand. The evidence hash in every verdict is the SHA-256 of the input.json bytes, so a changed line ending changes every expected verdict. The file .gitattributes stops Git from rewriting line endings. The zip file's own hash is not reproducible (zip stores timestamps); SHA256SUMS is the reference.
 

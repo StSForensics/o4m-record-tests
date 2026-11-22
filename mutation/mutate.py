@@ -33,12 +33,14 @@ MUTANTS = [
      'if r["prev_hash"] != ZERO_HASH:', "if False:"),
     ("M-T3-05", "accept first seq 0",
      "if lowest != 1:", "if lowest not in (0, 1):"),
-    ("M-T3-06", "off-by-one in the gap test: highest seq left out of the scan (equivalent mutant, see note)",
-     "range(1, highest + 1)", "range(1, highest)"),
-    ("M-T3-06b", "off-by-one in the gap test: seq 1 left out of the scan",
-     "range(1, highest + 1)", "range(2, highest + 1)"),
-    ("M-T3-06c", "off-by-one in the gap test: scan runs one past the highest seq",
-     "range(1, highest + 1)", "range(1, highest + 2)"),
+    ("M-T3-06", "gap scan starts after seq 1 (a missing seq 1 is never a gap)",
+     "    prev = 0\n    for s_ in seqs:", "    prev = 1\n    for s_ in seqs:"),
+    ("M-T3-06b", "gap scan misses a one-number gap",
+     "if s_ > prev + 1:", "if s_ > prev + 2:"),
+    ("M-T3-06c", "gap range runs one past the missing numbers",
+     "missing.append((prev + 1, s_ - 1))", "missing.append((prev + 1, s_))"),
+    ("M-T3-06d", "gap scan keeps the last seq seen, not the highest (equivalent mutant: seqs are sorted, see note)",
+     "prev = max(prev, s_)", "prev = s_"),
     ("M-T3-20", "link compared only with seq minus one (a missing predecessor is never a link failure)",
      "pred = seqs[idx - 1]", "pred = s - 1\n        if pred not in by_seq:\n            continue"),
     ("M-T3-07", "skip the link check",
@@ -61,8 +63,6 @@ MUTANTS = [
      'v.add("T3-EMPTY"', 'None and v.add("T3-EMPTY"'),
     ("M-T3-16", "accept uppercase hex",
      'HEX = set("0123456789abcdef")', 'HEX = set("0123456789abcdefABCDEF")'),
-    ("M-T3-17", "declared-gap range ignored (declared seqs still counted as undeclared)",
-     "und = [s for s in missing if s not in declared_seqs]", "und = missing"),
     ("M-T3-18", "declared gap reported without the DECLARED-GAP hold (declared scope can PASS)",
      'v.add("DECLARED-GAP", "stream', 'None and v.add("DECLARED-GAP", "stream'),
     ("M-T3-19", "missing seqs not listed as UNDECLARED GAP",
@@ -133,6 +133,16 @@ MUTANTS = [
      "MAX_DEPTH = 16", "MAX_DEPTH = 17"),
     ("M-IN-08", "nesting limit off by one, too low (15)",
      "MAX_DEPTH = 16", "MAX_DEPTH = 15"),
+    ("M-IN-09", "long integers converted instead of marked (verdict depends on the interpreter limit)",
+     "    if len(text) > 20:\n        return Float(text)", "    if False:\n        return Float(text)"),
+    ("M-IN-10", "duplicate keys never reported",
+     "            if DUPES:\n", "            if False:\n"),
+    ("M-T3-21", "gap lists always summarised (cap of zero)",
+     "GAP_LIST_CAP = 1000", "GAP_LIST_CAP = 0"),
+    ("M-T3-22", "declared gaps never subtracted (every declared gap reported undeclared)",
+     "und = subtract_intervals(missing, merge_intervals(declared_seqs))", "und = missing"),
+    ("M-T3-23", "gap ranges not merged with declared ranges that touch them (cut off by one)",
+     "if out and a <= out[-1][1] + 1:", "if out and a <= out[-1][1]:"),
 ]
 
 
@@ -219,9 +229,12 @@ def main():
         "t3-028 (valid first record with a non-zero prev_hash) and t14a-019 (imbalance of exactly 1) were added, "
         "every expected.txt was regenerated from the unchanged verifier, and both mutants are now killed. Mutants "
         "M-T3-06b, M-T3-06c and M-T3-20 were added at the same time. No expected.txt was edited to kill a mutant.",
-        "M-T3-06 survives and is an equivalent mutant: the highest seq in a stream is present by construction (it is "
-        "taken from the records), so leaving it out of the missing-seq scan cannot change any output. No vector can "
-        "kill it. The sharper off-by-one mutants M-T3-06b and M-T3-06c are killed.",
+        "Build 2026-11-22d (22 Nov 2026): the gap scan was rewritten to hold missing numbers as ranges (a seq of "
+        "9007199254740991 used to exhaust memory). The old M-T3-06 targeted the removed loop. Mutants M-T3-06, "
+        "M-T3-06b and M-T3-06c were rewritten against the new scan. M-T3-06d (keep the last seq seen, not the highest) "
+        "and M-T3-23 (declared ranges that touch are not merged) are equivalent mutants: seqs are sorted, so keeping the last seq seen equals keeping the highest, and the subtraction gives the same ranges whether touching declared ranges are merged or not. No vector can kill them; both are the only survivors. M-IN-09, M-IN-10, M-T3-21, M-T3-22 and M-T3-23 "
+        "were added with vectors t3-032 to t3-035. Earlier records said M-T3-06b, M-T3-06c and M-T3-20 were killed; in the "
+        "10c harness M-T3-06, 06b and 06c reported NOT APPLIED in a run of 22 Nov, so that statement was wrong for them.",
         "Limits of this record: mutants are hand-written text substitutions chosen by the same author who wrote the "
         "verifier, so they reflect that author's idea of likely mistakes. A kill shows that a vector disagrees with the "
         "mutant; it does not show that the expected outputs are right. Agreement with RT-1 or with a second reader has "

@@ -1,0 +1,1 @@
+Added 22 Nov 2026. One seq written as an integer of 5,000 digits. Python 3.11 and later refuse to convert such a string unless PYTHONINTMAXSTRDIGITS is changed, so before build 2026-11-22d the verdict could depend on an environment variable. Now an integer longer than 20 characters is read as out of profile (outside plus or minus 2^53-1): T3-MALFORMED, HOLD. Expected HOLD.

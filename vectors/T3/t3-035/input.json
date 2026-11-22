@@ -1,0 +1,41 @@
+{
+  "declaration": {
+    "consequential_action_types": [
+      "payment"
+    ],
+    "tolerances": {
+      "max_gap": 0,
+      "max_clock_skew_s": 5,
+      "max_unsealed_window_s": 60
+    },
+    "fail_mode": "fail-closed",
+    "monitors": [],
+    "declared_gaps": []
+  },
+  "records": [
+    {
+      "stream_id": "s1",
+      "seq": 1,
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "type": "event",
+      "data": "s1 event 1",
+      "hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 2,
+      "prev_hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f",
+      "type": "event",
+      "data": "s1 event 2",
+      "hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 9007199254740991,
+      "prev_hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd",
+      "type": "event",
+      "data": "s1 event far away",
+      "hash": "04ff3e8af976ba87af9a31b8c7511e1b10070494d9253afb14f800fcd51a0e2e"
+    }
+  ]
+}

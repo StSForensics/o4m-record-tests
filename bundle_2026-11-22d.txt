@@ -1,11 +1,11 @@
-BUNDLE: o4m-record-tests-vectors-2026-11-10c, every text file in the package, one header line per file.
+BUNDLE: o4m-record-tests-vectors-2026-11-22d, every text file in the package, one header line per file.
 SHA256SUMS in this package is the reference; this bundle is for copy and paste.
 
 FILE: .gitattributes (SHA-256 705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da)
 * -text
 END OF FILE: .gitattributes
 
-FILE: AMBIGUITY_LOG.txt (SHA-256 aff30c275ccc0f8b668f1de2cc389718be8c709c54c995dd85dd4a882622b697)
+FILE: AMBIGUITY_LOG.txt (SHA-256 a716d80cf38b27011496ba95d61a29d1d7c19ebad6e895c25734a6e3e77d22f8)
 AMBIGUITY LOG, O4M Record Tests 2026 v1.0, tests T3 and T14a, vector profile v0
 Package first issued 7 Nov 2026; revision c issued 10 Nov 2026. Source text: DOI 10.5281/zenodo.23857888, Markdown source SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d.
 Each entry: where the document is silent or unclear, the question, the readings considered, the reading used, and which vectors change if the reading changes. Every reading used here is a vector profile v0 choice. None is normative.
@@ -117,6 +117,15 @@ Question: what happens to a file that starts with a UTF-8 byte order mark, as so
 
 36. Maximum nesting depth (C2; found by a red-team run of hostile inputs, 7 Nov 2026).
 Question: how deeply may a JSON input nest? Before revision c the answer depended on the Python build. 100,000 nested arrays gave HOLD (INPUT-UNPARSEABLE, exit 2), but 5,000 nested objects parsed and then crashed the string walk with no verdict (exit 3), and where the cut-off fell depended on the interpreter's recursion limit. An operator could therefore choose a no-verdict outcome over a HOLD by shaping the file, and two honest verifiers on different Pythons could disagree on the same bytes. Readings considered: leave to the interpreter; a fixed limit. Used: a fixed limit of 16 levels (real inputs reach 4), counted by an iterative byte scan of [ and { outside strings, before parsing. Deeper input is HOLD with INPUT-MALFORMED, "nesting deeper than 16". The string walk is iterative as well. Effect: vectors t3-029 (17 levels, HOLD), t3-031 (exactly 16 levels, passes the scan) and mutants M-IN-06 to M-IN-08. The number 16 is a vector profile v0 choice; a different limit changes only t3-029 and t3-031.
+
+37. Order of checks: syntax before duplicate keys (C2; outside comment of 16 Nov 2026, red-team run of 22 Nov 2026).
+Question: a file that is both cut off and holds a repeated key, which verdict? Before build 2026-11-22d the duplicate key was reported while parsing, so a truncated file with a repeated key near the top got FAIL (INPUT-DUPKEY) and the same file without the repeat got HOLD (INPUT-UNPARSEABLE). Whether a truncated export is read as an attack or as damage then depended on a key that played no part in the cut. Readings considered: (a) keep the old order; (b) check syntax of the whole file first, then duplicates. Used: (b). An unreadable file is HOLD whatever it contains; a file that parses completely and repeats a key is still FAIL (INPUT-DUPKEY), as in t3-021. Effect: vectors t3-032 and t3-033. No earlier expected result changed. Whether a repeated key in a readable file should be FAIL or HOLD is the open item E-002 in ERRATA.txt and is not decided here.
+
+38. Integers longer than the profile allows (C2; red-team run of 22 Nov 2026).
+Question: what does the verifier do with an integer of thousands of digits? Python 3.11 and later refuse to convert a decimal string longer than 4,300 digits unless the environment variable PYTHONINTMAXSTRDIGITS is changed, and "python -I" ignores that variable. Before this build the verdict for such a file depended on the interpreter version and on that setting. Used: vector profile v0 integers lie within plus or minus (2^53 - 1), at most 17 characters, so any integer of more than 20 characters is read as out of profile and never converted. It is then treated like any other out-of-profile number (T3-MALFORMED for a seq field). Effect: vector t3-034; the same bytes now give the same verdict on Python 3.11, 3.12 and 3.13 with the variable unset, set to 0 and set to 640. The 20-character threshold is a vector profile v0 choice.
+
+39. Large and far-apart sequence numbers (C3; red-team run of 22 Nov 2026).
+Question: what does T3 do with a seq of 9007199254740991 after a seq of 2? Before this build the gap scan listed every missing number and a declared gap was expanded the same way, so a file of a few hundred bytes could exhaust memory (no verdict, or a killed process). Used: missing numbers and declared ranges are held as ranges and never expanded. A detail line lists the numbers when 1,000 or fewer are missing ("missing seq 3, 4"); above that it prints the count, the number of ranges and the first range. Effect: vector t3-035. No earlier expected result changed, because every earlier vector misses fewer than 1,000 numbers. The cap of 1,000 is a presentation choice. A runtime-defect fix, not a rule change.
 END OF FILE: AMBIGUITY_LOG.txt
 
 FILE: CHANGES_2026-11-07b.txt (SHA-256 ccdafdddb517e08f2561849cbdda54013ac319606dca9c052a4fc0465af9da7e)
@@ -160,6 +169,57 @@ Nothing but documentation changed. verify.py, gen_vectors.py, check_exit_codes.p
 4. MANIFEST.json (package name, revision note), SHA256SUMS and the bundle (bundle_2026-11-10c.txt) regenerated. CHANGES_2026-11-07b.txt and CHANGES_2026-11-10b.txt are kept for history.
 Status unchanged: self-run, generated with AI assistance, not reproduced by anyone outside the editor.
 END OF FILE: CHANGES_2026-11-10c.txt
+
+FILE: CHANGES_2026-11-22d.txt (SHA-256 70a17951e5cdfe8e88fcd307badd2ab828fed285a949069499dbce1ccfc6f61c)
+CHANGES, package o4m-record-tests-vectors-2026-11-22d (build d, 22 Nov 2026), on top of the repository state of 14 Nov 2026 (README, ERRATA, PROFILE_V0, blind_inputs, issue forms and translations as published then).
+Rule: no expected result of an earlier vector is changed. A diff of the 55 earlier expected.txt and expected_exit.txt files against the 14 Nov repository shows no difference. The specification (DOI 10.5281/zenodo.23857888) is not touched; its comment draft stays open to 1 Dec 2026.
+
+Code (verify.py)
+1. Syntax is checked for the whole file before duplicate keys are reported. A cut-off file is HOLD (INPUT-UNPARSEABLE) whether or not it repeats a key. A readable file with a repeated key is still FAIL (INPUT-DUPKEY). AMBIGUITY_LOG.txt entry 37, ERRATA.txt E-007.
+2. Integers longer than 20 characters are read as out of profile and never converted, so the verdict no longer depends on the interpreter's integer-string limit. Entry 38, E-008.
+3. Missing sequence numbers and declared gaps are held as ranges. A seq of 9007199254740991 no longer exhausts memory. Entry 39, E-009.
+4. A number written with a fraction or very long digits no longer prints a memory address in a detail line. E-011.
+
+Vectors added (generated intent-first by gen_vectors.py, then run; 0 mismatches against intent)
+t3-032 cut-off file, HOLD, INPUT-UNPARSEABLE.
+t3-033 the same cut-off file with a repeated key, HOLD, INPUT-UNPARSEABLE (was FAIL before this build).
+t3-034 a seq of 5,000 digits, HOLD, T3-MALFORMED.
+t3-035 seq 1, 2 then 9007199254740991, no teardown, FAIL, T3-GAP and T3-OPEN.
+
+Mutation record (mutation/mutate.py)
+The gap-scan mutants were rewritten against the new scan (the old text no longer exists). Mutants M-IN-09, M-IN-10, M-T3-21, M-T3-22, M-T3-23 added. The old M-T3-17 duplicate was removed. Result: 58 mutants, 56 killed, 2 survived; both survivors are equivalent mutants (explained in MUTATION_RECORD.txt). The 10c record had said 49 killed with M-T3-06, 06b and 06c "NOT APPLIED" in a re-run of 22 Nov; that gap is closed here. Python 3.13.18.
+
+Documents
+README.txt (build date, vector count, status paragraph, run record, SHA256SUMS statement), ERRATA.txt (E-007 to E-011), AMBIGUITY_LOG.txt (entries 37 to 39), MANIFEST.json, SHA256SUMS (now covers the whole package; it failed on README.txt in the 14 Nov repository) and bundle_2026-11-22d.txt (replaces bundle_2026-11-10c.txt; the earlier bundle stays in the Git history).
+
+Not changed, on purpose
+The rule for rejected input (HOLD or FAIL, E-001 and E-002), the policy comparison in T14a (E-003), declared gaps and T1b (E-005) and the whole-missing-stream question (E-010). These wait for outside readers' results. blind_inputs and SECOND_READER_PACKET are unchanged; the four new vectors are not in them.
+Status unchanged: self-run, generated with AI assistance, not reproduced by anyone outside the editor.
+END OF FILE: CHANGES_2026-11-22d.txt
+
+FILE: ERRATA.txt (SHA-256 4de4a8fd7fc1fbd524910dab1e42102dea190bd7ef2a93aea9c80e3b03ecc015)
+ERRATA AND OPEN ITEMS, O4M Record Tests 2026 v1.0 tests T3 and T14a, vector profile v0
+Opened 14 November 2026. Rule: no expected result is changed silently. Each change is dated here with its reason. Status words: UNDER REVIEW (keys unchanged), CHANGED (date and reason given), NO CHANGE (reason given).
+
+Source of the first entries: comment C-001, 14 November 2026, four model-written readers run by an outside party. Their logs have not yet been seen, so their results are not yet reproduced here.
+
+E-001 t14a-009, t14a-010, t14a-012, t14a-015, t3-022, t3-023. UNDER REVIEW. Key is HOLD. The outside readers chose FAIL for t14a-009, t14a-010, t14a-012 and t3-023, and no reader matched the key on t14a-015 or t3-022. The author's verifier reproduces the key. The key follows rules written in AMBIGUITY_LOG.txt entries 3, 6, 14 and 23 (a malformed input is HOLD). Those rules are not in the specification text and the blind readers are not given the log. Question for decision: add a malformed-input rule to the next version of the specification, or change the keys.
+E-002 t3-018, t3-021. UNDER REVIEW. Key is FAIL (non-NFC string, duplicate key; AMBIGUITY_LOG.txt entries 4 and 5). Two outside readers chose HOLD. Open question: when is a rejected input FAIL (an attack) and when HOLD (unreadable)? The line is a judgement and is not written in the specification.
+E-003 t14a-016. UNDER REVIEW. Key is FAIL (T14A-POLICY: checkpoint policy differs from the declared fail mode; AMBIGUITY_LOG.txt entry 19). Four outside readers chose PASS. The T14a text in the specification says only "counters balance", so a literal reader sees balanced counters. Question for decision: add the policy comparison to T14a, or move it to another test.
+E-004 t3-015. UNDER REVIEW. Key is PASS (the verifier walks each stream by seq; file order is not meaningful; AMBIGUITY_LOG.txt entry 11). One outside reader walked file order and chose FAIL. The specification does not say which.
+E-005 T1b and declared gaps (t3-019, t3-020). UNDER REVIEW. The verifier prints "T1b: not run" and the declared-gap shape (AMBIGUITY_LOG.txt entries 26 and 27) means "declared gaps cover every action type" would be DECL-LOOSE if T1b were run. The outside party raised the same point. Needs a clearer definition of how a declared gap covers an action type.
+E-006 Second reader packet. UNDER REVIEW. Outside readers could not use the inputs without choosing field names, and chose between 16 and 23 of the 29 names in use. PROFILE_V0.txt (format only, no expected results) now exists so a reader can be given the format without the verdict rules. Whether to hand it to every reader, or only to some, is recorded with each report as "standard" or "strict".
+
+E-007 Truncated file with a repeated key. CHANGED 22 November 2026 (no expected result in the 55 published vectors changed). Source: an outside reader's review of 16 November 2026, reproduced by the editor on 22 November 2026. Before build 2026-11-22d a cut-off file with a repeated key got FAIL and the same file without the repeat got HOLD. Syntax is now checked first (AMBIGUITY_LOG.txt entry 37). New vectors t3-032 and t3-033. The wider question stays open under E-002.
+E-008 Very large integer. CHANGED 22 November 2026 (no published expected result changed). Source: the same review, reproduced by the editor. The verdict could depend on the interpreter's integer-string limit. Fixed (AMBIGUITY_LOG.txt entry 38). New vector t3-034.
+E-009 Memory exhaustion on far-apart sequence numbers. CHANGED 22 November 2026 (no published expected result changed). Found by the editor's red-team run, not by an outside reader. A seq of 9007199254740991 made the verifier run out of memory. Fixed (AMBIGUITY_LOG.txt entry 39). New vector t3-035. Nothing here was reproduced by anyone outside the editor.
+E-010 Whole missing stream. OPEN. T3 walks the streams it is given. A stream that is absent from the file is not seen, because nothing in the file says it should exist. Two ways to close it: an "expected streams" list in the declaration, or a stated limit in the README. Not decided; no code changed.
+E-011 Memory address in a detail line. CHANGED 22 November 2026 (no published expected result changed). Found by the mutation harness while preparing this build: a number written with a fraction or very long digits was printed with a memory address, so two runs gave different text. Fixed in the verifier; the detail line now shows the number, shortened if long.
+
+Rule changes are not made in this build. Whether a rejected input is FAIL or HOLD (E-001, E-002) waits for outside readers' results. Code fixes that keep every published expected result are made now.
+
+Changes made: build 2026-11-22d, E-007 to E-009 and E-011 above (code and four new vectors). No expected result of the 55 published vectors was changed.
+END OF FILE: ERRATA.txt
 
 FILE: LICENSE (SHA-256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30)
 
@@ -366,22 +426,22 @@ FILE: LICENSE (SHA-256 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417b
    limitations under the License.
 END OF FILE: LICENSE
 
-FILE: MANIFEST.json (SHA-256 600fd4c120b598ec8ea1fd3c84dbb5c43a423b2f29d465f1a1002efb52311ae5)
+FILE: MANIFEST.json (SHA-256 fc61a6b17e9b64b09046b5e8b855bdc8368992cd79eac37e3c01b443573f6f5d)
 {
-  "package": "o4m-record-tests-vectors-2026-11-10c",
-  "date": "2026-11-10",
-  "first_issued": "2026-11-07 (revision b: 2026-11-07b; this is revision c, build c of 10 Nov 2026; earlier same-day builds were never made public)",
+  "package": "o4m-record-tests-vectors-2026-11-22d",
+  "date": "2026-11-22",
+  "first_issued": "2026-11-07 (revision b: 2026-11-07b; revision c: 2026-11-10c; this is build d of 22 Nov 2026)",
   "specification": {
     "title": "O4M Record Tests 2026 v1.0",
     "doi": "10.5281/zenodo.23857888",
     "source_md_sha256": "8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d"
   },
   "profile": "vector profile v0 (not normative)",
-  "python_used_for_recorded_run": "3.13.18 (mutation record, 10 Nov 2026, Linux)",
-  "python_minimum_intended": "3.8; on 10 Nov 2026 every vector (55), check_exit_codes.py (7 cases) and two hostile nesting files were run with identical results on 3.11.18 (55 vectors, 0 mismatches; 7 cases, 0 failed), 3.12.3 (55 vectors, 0 mismatches; 7 cases, 0 failed) and 3.13.18 (55 vectors, 0 mismatches; 7 cases, 0 failed); 3.8 to 3.10, Windows and macOS not run",
+  "python_used_for_recorded_run": "3.13.18 (mutation record, 22 Nov 2026, Linux)",
+  "python_minimum_intended": "3.8; on 22 Nov 2026 every vector (59) and check_exit_codes.py (7 cases) were run with identical results on 3.11, 3.12 and 3.13 (Linux) with PYTHONINTMAXSTRDIGITS unset, 0 and 640. 3.8 to 3.10, Windows and macOS have not been run. Earlier record, 10 Nov 2026: 3.8; on 10 Nov 2026 every vector (55), check_exit_codes.py (7 cases) and two hostile nesting files were run with identical results on 3.11.18 (55 vectors, 0 mismatches; 7 cases, 0 failed), 3.12.3 (55 vectors, 0 mismatches; 7 cases, 0 failed) and 3.13.18 (55 vectors, 0 mismatches; 7 cases, 0 failed); 3.8 to 3.10, Windows and macOS not run",
   "third_party_packages": "none",
   "vector_count": {
-    "T3": 31,
+    "T3": 35,
     "T14a": 19,
     "alt-readings": 5
   },
@@ -402,7 +462,7 @@ FILE: MANIFEST.json (SHA-256 600fd4c120b598ec8ea1fd3c84dbb5c43a423b2f29d465f1a10
     },
     {
       "path": "AMBIGUITY_LOG.txt",
-      "bytes": 15849
+      "bytes": 18541
     },
     {
       "path": "CHANGES_2026-11-07b.txt",
@@ -417,6 +477,14 @@ FILE: MANIFEST.json (SHA-256 600fd4c120b598ec8ea1fd3c84dbb5c43a423b2f29d465f1a10
       "bytes": 1222
     },
     {
+      "path": "CHANGES_2026-11-22d.txt",
+      "bytes": 2887
+    },
+    {
+      "path": "ERRATA.txt",
+      "bytes": 4837
+    },
+    {
       "path": "LICENSE",
       "bytes": 11358
     },
@@ -425,8 +493,12 @@ FILE: MANIFEST.json (SHA-256 600fd4c120b598ec8ea1fd3c84dbb5c43a423b2f29d465f1a10
       "bytes": 484
     },
     {
+      "path": "PROFILE_V0.txt",
+      "bytes": 3433
+    },
+    {
       "path": "README.txt",
-      "bytes": 9899
+      "bytes": 15229
     },
     {
       "path": "REASON_CODES_PROPOSED.txt",
@@ -650,15 +722,15 @@ FILE: MANIFEST.json (SHA-256 600fd4c120b598ec8ea1fd3c84dbb5c43a423b2f29d465f1a10
     },
     {
       "path": "gen_vectors.py",
-      "bytes": 27746
+      "bytes": 30159
     },
     {
       "path": "mutation/MUTATION_RECORD.txt",
-      "bytes": 9068
+      "bytes": 10156
     },
     {
       "path": "mutation/mutate.py",
-      "bytes": 12918
+      "bytes": 14293
     },
     {
       "path": "vectors/T14a/t14a-001/about.txt",
@@ -1661,6 +1733,86 @@ FILE: MANIFEST.json (SHA-256 600fd4c120b598ec8ea1fd3c84dbb5c43a423b2f29d465f1a10
       "bytes": 116
     },
     {
+      "path": "vectors/T3/t3-032/about.txt",
+      "bytes": 205
+    },
+    {
+      "path": "vectors/T3/t3-032/expected.txt",
+      "bytes": 1357
+    },
+    {
+      "path": "vectors/T3/t3-032/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-032/input.json",
+      "bytes": 1785
+    },
+    {
+      "path": "vectors/T3/t3-032/intent.txt",
+      "bytes": 121
+    },
+    {
+      "path": "vectors/T3/t3-033/about.txt",
+      "bytes": 328
+    },
+    {
+      "path": "vectors/T3/t3-033/expected.txt",
+      "bytes": 1357
+    },
+    {
+      "path": "vectors/T3/t3-033/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-033/input.json",
+      "bytes": 1801
+    },
+    {
+      "path": "vectors/T3/t3-033/intent.txt",
+      "bytes": 121
+    },
+    {
+      "path": "vectors/T3/t3-034/about.txt",
+      "bytes": 376
+    },
+    {
+      "path": "vectors/T3/t3-034/expected.txt",
+      "bytes": 1647
+    },
+    {
+      "path": "vectors/T3/t3-034/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-034/input.json",
+      "bytes": 6953
+    },
+    {
+      "path": "vectors/T3/t3-034/intent.txt",
+      "bytes": 116
+    },
+    {
+      "path": "vectors/T3/t3-035/about.txt",
+      "bytes": 366
+    },
+    {
+      "path": "vectors/T3/t3-035/expected.txt",
+      "bytes": 1782
+    },
+    {
+      "path": "vectors/T3/t3-035/expected_exit.txt",
+      "bytes": 2
+    },
+    {
+      "path": "vectors/T3/t3-035/input.json",
+      "bytes": 1132
+    },
+    {
+      "path": "vectors/T3/t3-035/intent.txt",
+      "bytes": 119
+    },
+    {
       "path": "vectors/alt-readings/alt-b-001/about.txt",
       "bytes": 148
     },
@@ -1762,10 +1914,10 @@ FILE: MANIFEST.json (SHA-256 600fd4c120b598ec8ea1fd3c84dbb5c43a423b2f29d465f1a10
     },
     {
       "path": "verify.py",
-      "bytes": 21892
+      "bytes": 24042
     }
   ],
-  "revision": "c, 10 Nov 2026: nesting depth limit 16 (HOLD, INPUT-MALFORMED) decided by a byte scan before parsing; string walk iterative; vectors t3-029, t3-030, t3-031 added; mutants M-IN-06 to M-IN-08 added; check_exit_codes.py added; gen_vectors.py refuses an OUTDIR starting with \"-\"; README Python versions stated from recorded runs; \"not yet started trading\" sentence removed from README disclaimer. The 52 earlier vectors are byte-identical to 2026-11-07b. The second-reader packet is refreshed (50 blind inputs, three-stage handover, instructions version 2). Build c changes documentation only: README comment log address and patents scope. See CHANGES_2026-11-10c.txt and CHANGES_2026-11-10b.txt."
+  "revision": "d, 22 Nov 2026: syntax checked before duplicate keys; integers over 20 characters read as out of profile; missing and declared sequence numbers held as ranges; memory address removed from a detail line; vectors t3-032 to t3-035 added; mutants rewritten and extended. No expected result of the 55 earlier vectors changed."
 }
 END OF FILE: MANIFEST.json
 
@@ -1778,14 +1930,51 @@ Requirement and test text from O4M Record Tests 2026 v1.0 (DOI 10.5281/zenodo.23
 Provided AS IS, WITHOUT WARRANTY OF ANY KIND. Not a rating, certificate or approval, and not legal advice. See README.txt, "Disclaimer and terms of use".
 END OF FILE: NOTICE
 
-FILE: README.txt (SHA-256 ed2c259521196fffc5cf5dab2e3da60e5f89897938fa52d7b2f33745df287277)
-O4M RECORD TESTS 2026 v1.0: TEST VECTORS FOR T3 AND T14a (DRAFT PACKAGE, 10 Nov 2026, revision c of the package first issued 7 Nov 2026)
+FILE: PROFILE_V0.txt (SHA-256 abf8b1e25d3656f527e9a74e9d18800772e9f7eb3e3bb9b93767ff9f4918861b)
+PROFILE_V0: HOW THE TEST INPUTS ARE WRITTEN (O4M Record Tests 2026 v1.0, tests T3 and T14a, vector profile v0)
+Draft, 14 November 2026. Format only. This sheet tells you how an input file is written. It does not tell you what verdict an input deserves; that is for you to decide from the specification, and to record in CHOICES.txt. It holds no expected results. Every item is a "vector profile v0" choice, not a standard.
+
+1. Files
+One input is one JSON file, UTF-8, with no byte order mark. Nesting is at most 16 levels. A T3 file has the top-level keys declaration and records. A T14a file has the top-level keys declaration and checkpoints. The file name ends with __T3.json or __T14a.json.
+
+2. Allowed value types
+Keys are ASCII names. Values are strings, integers, booleans, lists and objects. There are no nulls and no floats. An integer is a whole number between minus (2 to the power 53, minus 1) and plus (2 to the power 53, minus 1). Counters and seq are not negative. Strings are Unicode NFC. A boolean is not an integer.
+
+3. Field table (29 names)
+declaration (object): consequential_action_types (list of strings), tolerances (object: max_gap integer, max_clock_skew_s integer, max_unsealed_window_s integer), fail_mode (string, "fail-closed" or "fail-open"), monitors (list of strings), declared_gaps (list of objects).
+declared_gaps entry (object): stream_id (string), from_seq (integer), to_seq (integer), action_type (string), reason (string).
+records (list, T3 only), each record (object): stream_id (string), seq (integer), prev_hash (string), type (string, "event" or "teardown"), data (string), hash (string), and for a teardown also last_seq (integer).
+checkpoints (list, T14a only), each checkpoint (object): checkpoint_id (string), received (integer), accepted (integer), dropped (integer), policy (string, "fail-closed" or "fail-open"), and optionally provenance (string, "SOURCE-LOCAL", "INDEPENDENTLY-RECONCILED" or "UNVERIFIED"; if absent, SOURCE-LOCAL).
+Counters mean: received is what the capture point received; accepted is what it passed on; dropped is what it did not pass on.
+
+4. The chain (T3)
+Each stream is a separate chain, named by stream_id. seq starts at 1 and goes up by 1.
+The first record of a stream has prev_hash equal to 64 zero characters. Every later record has prev_hash equal to the hash of the previous record in the same stream.
+hash is the SHA-256 of the record's canonical bytes, with the record's own "hash" field left out, written as 64 lowercase hexadecimal characters. Canonical bytes: the record as JSON with keys sorted, no spaces (separators "," and ":"), characters not escaped, encoded as UTF-8. For this restricted subset that equals RFC 8785 (JCS).
+Teardown: a stream may end with one record of type "teardown". Its seq is the seq of the last event plus 1, its last_seq is the seq of the last event, and it links to the last event like any record.
+
+5. Output
+Print one verdict per input: PASS, FAIL or HOLD, and a short reason. Exit codes if your program uses them: 0 PASS, 1 FAIL, 2 HOLD, 3 no verdict (could not read, or your own error).
+
+6. What this sheet leaves to you
+What to do with an input that does not follow this sheet, how to treat a gap, an open stream, an empty file, a checkpoint that does not balance, a declared gap, a duplicate, and what makes a result FAIL rather than HOLD. Decide from the specification, and write each decision in CHOICES.txt.
+END OF FILE: PROFILE_V0.txt
+
+FILE: README.txt (SHA-256 48b7b65942012f816d7f2354571e7dd69226336cf150472ad0473fe418a14edf)
+START HERE (feedback welcome, no expertise needed)
+Want to help? Go to the section "Help us test it" below (about 15 minutes). Tell us what you find: open the Issues tab, tap New issue, and choose Comment, Reader report or Repeat run. Or email comments@sts-forensics.com with the subject "O4M Record Tests". Comment draft closes 1 Dec 2026.
+The format sheet for readers is PROFILE_V0.txt (in this folder). 
+The 50 test inputs are in blind_inputs. 
+Open items are in ERRATA.txt.
+
+O4M RECORD TESTS 2026 v1.0: TEST VECTORS FOR T3 AND T14a (DRAFT PACKAGE, 22 Nov 2026, build d of the package first issued 7 Nov 2026)
 
 What this is
-A small package of test vectors for two of the O4M Record Tests: T3 (chain walk per stream, requirement C3) and T14a (capture counters balance, requirement C14). It holds a reference verifier written in Python with the standard library only, a deterministic generator that rebuilds every vector byte for byte, 55 vectors with their expected verdicts and exit codes, a mutation-kill record, a short script that checks the exit-3 paths, an ambiguity log and a list of proposed reason codes.
+A small package of test vectors for two of the O4M Record Tests: T3 (chain walk per stream, requirement C3) and T14a (capture counters balance, requirement C14). It holds a reference verifier written in Python with the standard library only, a deterministic generator that rebuilds every vector byte for byte, 59 vectors with their expected verdicts and exit codes, a mutation-kill record, a short script that checks the exit-3 paths, an ambiguity log and a list of proposed reason codes. It also holds PROFILE_V0.txt (how the inputs are written, with no expected results), blind_inputs (the 50 inputs with no expected results), ERRATA.txt (open items and dated changes) and forms for comments, reader reports and repeat runs.
 Specification: O4M Record Tests 2026 v1.0, DOI 10.5281/zenodo.23857888 (https://doi.org/10.5281/zenodo.23857888). Markdown source SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d.
 
 Status, plainly
+Build 2026-11-22d (22 Nov 2026) fixes three defects in the verifier found by an outside reader's review of 16 Nov and by the editor's own red team (a repeated key in a cut-off file, a very long integer, far-apart sequence numbers; ERRATA.txt E-007 to E-011) and adds vectors t3-032 to t3-035. No expected result of the 55 earlier vectors changed, and no rule was changed. See CHANGES_2026-11-22d.txt.
 This is a self-run. The verifier, the vectors and the mutation harness were written and run by one author, and nobody else has reproduced any result. Nothing here has been verified by anyone outside the editor. The specification is in development and is not an implementation-ready test suite.
 This package holds a new reference verifier written from the requirement text. It is not RT-1, the editor's demonstration code mentioned in the specification, and RT-1 is not in this package. The cells for RT-1 in Annex B of the specification stay "not yet checked". MUTATION_RECORD.txt fills the matrix for this new verifier only.
 
@@ -1798,7 +1987,7 @@ t14a-011: if the operator consistently under-reports what it received, the count
 t3-006 (an open stream's tail cannot be checked by T3 alone) is a third limit of the same kind.
 
 How to run
-Python 3, no packages to install. On a Mac type python3 instead of python; on Windows, python or py. On 10 Nov 2026 every vector, the exit-code check and two hostile nesting files were run with Python 3.11.18, 3.12.3 and 3.13.18 on Linux, with identical results (the result lines are in MANIFEST.json). The code is written for Python 3.8 or later, but 3.8 to 3.10 have not been run, and Windows and macOS have not been run. From this folder:
+Python 3, no packages to install. On a Mac type python3 instead of python; on Windows, python or py. On 22 Nov 2026 every vector (59) and the exit-code check (7 cases) were run with Python 3.11, 3.12 and 3.13 on Linux, each with the environment variable PYTHONINTMAXSTRDIGITS unset, set to 0 and set to 640, with identical results. The earlier run record of 10 Nov 2026, including two hostile nesting files, is kept in MANIFEST.json. The code is written for Python 3.8 or later, but 3.8 to 3.10 have not been run, and Windows and macOS have not been run. From this folder:
   python verify.py T3 vectors/T3/t3-001/input.json
   python verify.py T14a vectors/T14a/t14a-003/input.json
   python verify.py T14a vectors/alt-readings/alt-b-002/input.json --reading B
@@ -1809,6 +1998,7 @@ To rebuild and re-test everything:
   python gen_vectors.py . --expected      (rebuilds inputs and expected outputs; stops on any mismatch with intent)
   python mutation/mutate.py               (runs every mutant against every vector, rewrites MUTATION_RECORD.txt)
   python check_exit_codes.py              (checks the exit-3 paths, which give no verdict and so cannot be vectors)
+The SHA256SUMS of the 14 Nov repository failed on README.txt, because README.txt was edited after SHA256SUMS was written. Since build 2026-11-22d SHA256SUMS is regenerated after the last edit and also covers ERRATA.txt, PROFILE_V0.txt and CHANGES_2026-11-22d.txt.
 mutate.py writes the date, time and Python version of your run at the top of MUTATION_RECORD.txt, so after you run it that one file no longer matches SHA256SUMS. Every other file should still match. Compare the mutant lines, not the header.
 Extract the zip rather than copying vectors by hand. The evidence hash in every verdict is the SHA-256 of the input.json bytes, so a changed line ending changes every expected verdict. The file .gitattributes stops Git from rewriting line endings. The zip file's own hash is not reproducible (zip stores timestamps); SHA256SUMS is the reference.
 
@@ -1820,6 +2010,33 @@ REGULATOR_QUESTIONS.txt indexes the vectors by three questions: is the record co
 
 Second reader
 SECOND_READER_PACKET holds what an independent second implementer should get: instructions, the published specification, and the vector inputs to hand over only after they have written their own verifier. It contains no reference code and no expected outputs. A second reader from the same AI vendor as the author is weak evidence; a different vendor or a human is better. Agreement counts show agreement only.
+
+Help us test it (no expertise needed, about 15 minutes)
+We want to know two things. Do our results repeat on your machine? And can someone who reads only the specification reach the same verdicts? Pick one way.
+
+Way 1, use any chatbot.
+1. Get the specification: DOI 10.5281/zenodo.23857888, file "O4M Record Tests 2026 v1_0 2026-11-01.md" (SHA-256 8758174e927e971391443ce9142f9c78bafad21ad52f63613d2443a422869d3d).
+2. Get PROFILE_V0.txt and the folder blind_inputs from this repository. blind_inputs holds the 50 test inputs and no expected results.
+3. Paste the prompt below into the chatbot and attach the specification and PROFILE_V0.txt.
+4. Save the program it writes as reader.py and run it: python reader.py blind_inputs > results.csv
+5. Send us four things: reader.py, CHOICES.txt, results.csv, and the name and exact version of the chatbot. Use the "Reader report" form (open an issue), or email comments@sts-forensics.com with the subject "O4M Record Tests".
+Way 2, you are a person. Write the program yourself from the same two files and send the same four things (say "human" for the chatbot).
+Way 3, just run ours. Run python verify.py on every vector as shown under "How to run" and tell us any vector whose output differs from its expected.txt. Use the "Repeat run" form.
+Harder and stronger: give the chatbot the specification only, without PROFILE_V0.txt, and write "strict" in your report. Expect more disagreement about field names.
+Two rules. Do not open expected.txt, about.txt, verify.py or AMBIGUITY_LOG.txt until you have finished. If you did, say so in your report. And do not search the web for these tests while you work.
+
+The prompt (copy everything from START to END)
+START
+I am testing a draft technical specification. I need you to act as an independent second reader.
+I have attached two files. SPEC is the specification (only requirements C3 and C14, and the tests T3 and T14a, matter). PROFILE is a one-page sheet that says how the test inputs are written (field names, types, hash method, numbering). It does not say what verdicts the inputs deserve.
+1. Write one Python 3 program, standard library only, called reader.py. It reads every file in a folder given on the command line. Each file name ends with __T3.json or __T14a.json, which tells you which test to apply. For each file it decides PASS, FAIL or HOLD using only SPEC and PROFILE, and prints one line: vector_id,verdict,reason (vector_id is the part of the file name before the two underscores).
+2. Do not ask me questions. Where the text does not tell you what to do, take the most natural reading and write each such choice in a file CHOICES.txt, one line per choice, in the form: section | what was unclear | what I chose.
+3. You have not been shown any expected results, and I will not show you any. Do not try to find them.
+4. Give me reader.py and CHOICES.txt. If you can run code, also run it on the folder I give you and give me results.csv. If you cannot, tell me the one command to run on my computer.
+END
+
+What we do with your report
+We reply in the issue. We say whether we will change the specification text, a vector's expected result, or nothing, and why. Every change is dated in ERRATA.txt. No expected result is changed silently. We do not publish your name or organisation without your yes. A count of agreements shows agreement only, so we read your CHOICES.txt more closely than your score.
 
 Disclaimer and terms of use
 1. This package is free. It is provided AS IS, WITHOUT WARRANTY OF ANY KIND, under the Apache License 2.0 (sections 7 and 8 of that licence apply). Like any software it can contain errors; check anything important another way too.
@@ -1845,8 +2062,9 @@ The editor used AI assistants (Claude, by Anthropic) to help draft and edit requ
 The reference verifier, vectors and mutation harness in this package were generated by an AI assistant from the requirement text above and are not yet reviewed or reproduced by anyone else.
 
 Comments
-Send comments to comments@sts-forensics.com with the subject "O4M Record Tests", or open an issue in this repository. Comments and the editor's replies are kept in a public comment log. Comments sent by email are copied there only with the sender's permission.
-Public comment log: https://github.com/StSForensics/o4m-record-tests/issues
+Use the forms at https://github.com/StSForensics/o4m-record-tests/issues/new/choose (Comment, Reader report, Repeat run), or email comments@sts-forensics.com with the subject "O4M Record Tests". One finding per issue, please, so each can be answered and closed on its own. Comments and the editor's replies are kept in the public comment log, which is this repository's Issues page. Comments sent by email are copied there only with the sender's permission.
+Contributions to the code and vectors are accepted under Apache-2.0 with a Developer Certificate of Origin sign-off (a line "Signed-off-by: Your Name <your email>" in the commit). Contributions to the specification text are under CC BY 4.0.
+Open items and changes are listed in ERRATA.txt.
 
 Copyright 2026 Gareth Wong.
 END OF FILE: README.txt
@@ -5245,16 +5463,19 @@ FILE: SECOND_READER_PACKET/pass2_inputs/t3-031__T3.json (SHA-256 231debf76b060cb
 }
 END OF FILE: SECOND_READER_PACKET/pass2_inputs/t3-031__T3.json
 
-FILE: SHA256SUMS (SHA-256 cb0b6f79be2ad737845e668dc20a9a7b095010ccbcbc26310737388475a27803)
+FILE: SHA256SUMS (SHA-256 3b12a0aab0c65176509bfb0b363eef93e1e6182fa595d294a4d8bd09e2310548)
 705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da  .gitattributes
-aff30c275ccc0f8b668f1de2cc389718be8c709c54c995dd85dd4a882622b697  AMBIGUITY_LOG.txt
+a716d80cf38b27011496ba95d61a29d1d7c19ebad6e895c25734a6e3e77d22f8  AMBIGUITY_LOG.txt
 ccdafdddb517e08f2561849cbdda54013ac319606dca9c052a4fc0465af9da7e  CHANGES_2026-11-07b.txt
 33356d617a9fba1609bc73bbfbf0721c2dadf8ac91a1e944c01c9ecbe1406cb2  CHANGES_2026-11-10b.txt
 598df4963e14f06413d7835b57fa66f998f330f94cb7349ac652df82b5fe0c1e  CHANGES_2026-11-10c.txt
+70a17951e5cdfe8e88fcd307badd2ab828fed285a949069499dbce1ccfc6f61c  CHANGES_2026-11-22d.txt
+4de4a8fd7fc1fbd524910dab1e42102dea190bd7ef2a93aea9c80e3b03ecc015  ERRATA.txt
 cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30  LICENSE
-600fd4c120b598ec8ea1fd3c84dbb5c43a423b2f29d465f1a1002efb52311ae5  MANIFEST.json
+fc61a6b17e9b64b09046b5e8b855bdc8368992cd79eac37e3c01b443573f6f5d  MANIFEST.json
 22893a02d52afe1dbd2e399680c9bc86c01edda5e7d1301aef7630510e12edea  NOTICE
-ed2c259521196fffc5cf5dab2e3da60e5f89897938fa52d7b2f33745df287277  README.txt
+abf8b1e25d3656f527e9a74e9d18800772e9f7eb3e3bb9b93767ff9f4918861b  PROFILE_V0.txt
+48b7b65942012f816d7f2354571e7dd69226336cf150472ad0473fe418a14edf  README.txt
 5c747ccd04df823390bd4b6dd9d5ce98ac2dccfe86ca4c488b2a9a26facb54fe  REASON_CODES_PROPOSED.txt
 0c1db860a57b68e2c0aced35e8181adfff6d75f2851cfda799a7800adf957828  REGULATOR_QUESTIONS.txt
 f31c407edae930ab9c8f9382ec7c2d0b0d47d20ce2af3ea0d2ff77aa72437c30  SECOND_READER_PACKET/INSTRUCTIONS_FOR_SECOND_READER_2026-11-10.txt
@@ -5310,9 +5531,9 @@ bf1b938601ea930e4882f355911cc79641304986b1c4237ee905f03e12cd0ce5  SECOND_READER_
 afdaab76f70284c0778abbab39c4d407058b08af5e71801f69501d97dcfaf7f8  SECOND_READER_PACKET/pass2_inputs/t3-030__T3.json
 231debf76b060cb4f0117d03c49b2918fa3a671a0539f49678370f568d7c0030  SECOND_READER_PACKET/pass2_inputs/t3-031__T3.json
 fd3ba838126f9d0f393fdd71b80b436eeb3d3f26af8b920c42be1456a80b327b  check_exit_codes.py
-6b2f60e0c40bdc7e7fcc4a11f5db0590ef02363b8be3649d4793858ecb96e96e  gen_vectors.py
-d96d619d077eca1af18618758ce0be0ef7d4662d79a4c7534b47105af6cf09e6  mutation/MUTATION_RECORD.txt
-859b9e86e56398e82aa590de9a102380de4911f29bdc67af4582c0fbaa84e69a  mutation/mutate.py
+8f3cb073bdfc6e02c934de1507820f06a7f2efd4324418dbab3708c9b6356619  gen_vectors.py
+069ac741eda69153b06d52e56634d4fcc5d57e47f1f9af57416d9b8add7cb14c  mutation/MUTATION_RECORD.txt
+42da252a88b8ea000682315b4120b0fd705bc1740eb32d613cbba4642c081d4e  mutation/mutate.py
 f62eee87a0be80bf24a6a2325b7048d5c12caf738f10138929d921815e5276c3  vectors/T14a/t14a-001/about.txt
 fc9ddc25af48ff5a734719b7e412d64c063164a2088d5785b28d3c6a611ae0c0  vectors/T14a/t14a-001/expected.txt
 9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  vectors/T14a/t14a-001/expected_exit.txt
@@ -5563,6 +5784,26 @@ ebebd67242962d04f6eca64ab4d7996fc30d8be02bf7bd36c09d3e077d5f3bcb  vectors/T3/t3-
 53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  vectors/T3/t3-031/expected_exit.txt
 231debf76b060cb4f0117d03c49b2918fa3a671a0539f49678370f568d7c0030  vectors/T3/t3-031/input.json
 c696b52d726e13e50beb8ff2c4f12cca37c5e8530ebfc93b8ca9c58990391ee8  vectors/T3/t3-031/intent.txt
+8c9d6937a178c22024555ac3c8bea410504e18ffeb957e0c9ee3eed588b81bea  vectors/T3/t3-032/about.txt
+12b6451fae2de1f4cf5409953d11fb2a016b7df548a5bfb6a3c9ce7674178058  vectors/T3/t3-032/expected.txt
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  vectors/T3/t3-032/expected_exit.txt
+923126163b07e1a940e47f009e575258e97ab162f99b71be4f3f3a000666b88e  vectors/T3/t3-032/input.json
+59e70c77bd881ca1b67b66994d73d9af19401dcdc20af8698b9fd6288b75c94b  vectors/T3/t3-032/intent.txt
+1f92dfa3eb8431753a667794123270f7d6f6d311a2b1c2ed08477288e2515822  vectors/T3/t3-033/about.txt
+0c6a0056f2177a66948cd2215db7b5e58642dbc01ec51e80626f2fc36441aaec  vectors/T3/t3-033/expected.txt
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  vectors/T3/t3-033/expected_exit.txt
+0b641ab9f478bd2fa96d515a8c3ff061b711ef7f6fb5b078359b98ac09edb5df  vectors/T3/t3-033/input.json
+fbe2c0d40092dca5c3821aef37df4e2ab5d35596560d4d5c45c3c3aacbffa611  vectors/T3/t3-033/intent.txt
+8c22fbee7c773f024ce76c424512df719b59b1ae4192c48dfc924622268338ad  vectors/T3/t3-034/about.txt
+4e7a0311d0784d50fa7120c152363b6e6f6369544bd3ed2e1fc21e09fd0fee92  vectors/T3/t3-034/expected.txt
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  vectors/T3/t3-034/expected_exit.txt
+638222209e567f41dabd6fa4699c8c9a0e3d701a30b8dd8a8c99a55e762ce053  vectors/T3/t3-034/input.json
+7503ab80cfc1ec47c8db5d44886e44c3f8dc698127a40122c854c0b9091508fd  vectors/T3/t3-034/intent.txt
+3103827f308aebe20cf532cb9a3d44aaa56876f952897dadc8b8c2e95bca174b  vectors/T3/t3-035/about.txt
+e82279784b03de97ce71f503cd4f339cf7b39bc9637200d2e90c54f122b89231  vectors/T3/t3-035/expected.txt
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  vectors/T3/t3-035/expected_exit.txt
+e2156dba7104486926b3962825a302fe653ff3f2d224ea438dec2997063e1afd  vectors/T3/t3-035/input.json
+57996a0bf4e673a3c5dfa1746ba73b01bcf5414b12a6a74e87506c1144d9e38d  vectors/T3/t3-035/intent.txt
 7b0e082657ca40756fc520044710199373bc24e3d5e336aab8909bde0164bcd6  vectors/alt-readings/alt-b-001/about.txt
 1bdf8856e225792dc2b270ba7aaf2860f13bba4d70ad5de9d1b421034285d9f2  vectors/alt-readings/alt-b-001/expected.txt
 9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  vectors/alt-readings/alt-b-001/expected_exit.txt
@@ -5588,7 +5829,7 @@ ec493dda73e3db47d732d9a878fbd620ec0deaeb67260305baaeab7119747fe0  vectors/alt-re
 53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  vectors/alt-readings/alt-d-001/expected_exit.txt
 653ca2035527dcbf860426fb2b0d922a627c3f642fa99728bed5a86c84cbe240  vectors/alt-readings/alt-d-001/input.json
 006a5093280ccdd4f7699fcdc99fb2bddce3cf7fe12f7a0ec010592f4f275e0b  vectors/alt-readings/alt-d-001/intent.txt
-ed7ac40559d0524a524f44116cabd226c485fb9fc61ac275d686f72ce05aa228  verify.py
+4b1246fcb2996a07618351971c18ba984d74c9e7ff9b7c4685519685df2e811f  verify.py
 END OF FILE: SHA256SUMS
 
 FILE: check_exit_codes.py (SHA-256 fd3ba838126f9d0f393fdd71b80b436eeb3d3f26af8b920c42be1456a80b327b)
@@ -5644,7 +5885,7 @@ if __name__ == "__main__":
     sys.exit(main())
 END OF FILE: check_exit_codes.py
 
-FILE: gen_vectors.py (SHA-256 6b2f60e0c40bdc7e7fcc4a11f5db0590ef02363b8be3649d4793858ecb96e96e)
+FILE: gen_vectors.py (SHA-256 8f3cb073bdfc6e02c934de1507820f06a7f2efd4324418dbab3708c9b6356619)
 #!/usr/bin/env python3
 # Copyright 2026 Gareth Wong
 # SPDX-License-Identifier: Apache-2.0
@@ -5917,6 +6158,38 @@ add("T3/t3-031", "T3", {"declaration": decl(), "records": s + [deep(13)]}, "HOLD
     "16 levels, the limit. The depth scan lets it through; the odd element is then a malformed record (T3-MALFORMED), HOLD. "
     "Pins the limit from the other side: a limit of 15 would reject this file. Expected HOLD.")
 
+# Added 22 Nov 2026 (package 2026-11-22d) after an outside reader (Konrad Gruszka's review, 16 Nov 2026) and a red team
+# of the 10c package found inputs whose verdict depended on the interpreter or on check order. Intent was written first.
+_base = json.dumps({"declaration": decl(), "records": stream("s1")}, indent=2, ensure_ascii=True) + "\n"
+_cut = _base[:_base.index('"s1 teardown"') - 40]
+
+add("T3/t3-032", "T3", _cut, "HOLD", ["INPUT-UNPARSEABLE"],
+    "Added 22 Nov 2026. The t3-001 file cut off in the middle of the last record, as a failed copy or upload leaves it. "
+    "Not valid JSON, so HOLD with INPUT-UNPARSEABLE. Models a truncated export. Expected HOLD.")
+
+_dup = _cut.replace('"seq": 1,', '"seq": 1,\n      "seq": 1,', 1)
+assert _dup != _cut
+add("T3/t3-033", "T3", _dup, "HOLD", ["INPUT-UNPARSEABLE"],
+    "Added 22 Nov 2026. Same truncated file as t3-032 with one key written twice in the first record. Before build 2026-11-22d "
+    "the duplicate key was reported first and the file got FAIL (INPUT-DUPKEY) although it was not valid JSON at all. "
+    "Now syntax is checked first: an unreadable file is HOLD whatever it contains. Expected HOLD.")
+
+_s = stream("s1")
+_txt = json.dumps({"declaration": decl(), "records": _s}, indent=2, ensure_ascii=True) + "\n"
+_big = _txt.replace('"seq": 3,', '"seq": ' + "9" * 5000 + ",", 1)
+assert _big != _txt
+add("T3/t3-034", "T3", _big, "HOLD", ["T3-MALFORMED"],
+    "Added 22 Nov 2026. One seq written as an integer of 5,000 digits. Python 3.11 and later refuse to convert such a string "
+    "unless PYTHONINTMAXSTRDIGITS is changed, so before build 2026-11-22d the verdict could depend on an environment variable. "
+    "Now an integer longer than 20 characters is read as out of profile (outside plus or minus 2^53-1): T3-MALFORMED, HOLD. Expected HOLD.")
+
+_s = stream("s1", n=2)[:2]
+_far = rec("s1", 9007199254740991, _s[-1]["hash"], "s1 event far away")
+add("T3/t3-035", "T3", {"declaration": decl(), "records": _s + [_far]}, "FAIL", ["T3-GAP", "T3-OPEN"],
+    "Added 22 Nov 2026. Two events (seq 1, 2) then one at seq 9007199254740991, the largest integer vector profile v0 allows, "
+    "with no teardown. Before build 2026-11-22d the gap scan built a list of about 9e15 numbers and ran out of memory. Now gaps "
+    "are held as ranges: one range, T3-GAP, and the open stream is reported as T3-OPEN. Result FAIL in seconds. Expected FAIL.")
+
 # T14a vectors
 
 add("T14a/t14a-001", "T14a", {"declaration": decl(), "checkpoints": [cp("cp-1", 100, 100, 0)]}, "PASS", [],
@@ -6094,53 +6367,53 @@ if __name__ == "__main__":
     sys.exit(main(sys.argv))
 END OF FILE: gen_vectors.py
 
-FILE: mutation/MUTATION_RECORD.txt (SHA-256 d96d619d077eca1af18618758ce0be0ef7d4662d79a4c7534b47105af6cf09e6)
+FILE: mutation/MUTATION_RECORD.txt (SHA-256 069ac741eda69153b06d52e56634d4fcc5d57e47f1f9af57416d9b8add7cb14c)
 MUTATION RECORD, O4M Record Tests 2026 v1.0, T3 and T14a, vector profile v0
 Self-run by the author of the verifier. Not reproduced by anyone else. Finer mutants beyond this list have not been run.
 
-Run started: 2026-11-10 02:06:53 UTC
-Python: 3.13.18 (Linux-6.18.44-fc-v338-x86_64-with-glibc2.39)
-SHA-256 verify.py: ed7ac40559d0524a524f44116cabd226c485fb9fc61ac275d686f72ce05aa228
-SHA-256 gen_vectors.py: 6b2f60e0c40bdc7e7fcc4a11f5db0590ef02363b8be3649d4793858ecb96e96e
-SHA-256 mutation/mutate.py: 859b9e86e56398e82aa590de9a102380de4911f29bdc67af4582c0fbaa84e69a
+Run started: 2026-11-22 00:48:23 UTC
+Python: 3.13.18 (Linux-6.18.44-fc-v726-x86_64-with-glibc2.39)
+SHA-256 verify.py: 4b1246fcb2996a07618351971c18ba984d74c9e7ff9b7c4685519685df2e811f
+SHA-256 gen_vectors.py: 8f3cb073bdfc6e02c934de1507820f06a7f2efd4324418dbab3708c9b6356619
+SHA-256 mutation/mutate.py: 42da252a88b8ea000682315b4120b0fd705bc1740eb32d613cbba4642c081d4e
 Commands (from the package root):
   python gen_vectors.py . --expected
   python mutation/mutate.py
-Vectors run per mutant: 55 (T3, T14a and alternative readings; a vector kills a mutant if stdout or exit code differs from expected)
+Vectors run per mutant: 59 (T3, T14a and alternative readings; a vector kills a mutant if stdout or exit code differs from expected)
 Unmutated verifier against every vector: all match
 
 One line per mutant: id | description | result
-M-T3-01 | T3 always PASS (all T3 checks skipped) | killed by t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-013, t3-014, t3-016, t3-017, t3-019, t3-020, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-031
-M-T3-02 | T3 always FAIL | killed by t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-031
+M-T3-01 | T3 always PASS (all T3 checks skipped) | killed by t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-013, t3-014, t3-016, t3-017, t3-019, t3-020, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-031, t3-034, t3-035
+M-T3-02 | T3 always FAIL | killed by t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-031, t3-034, t3-035
 M-T3-03 | skip the hash recomputation | killed by t3-007, t3-010, t3-016, t3-026
 M-T3-04 | skip the genesis (zero prev_hash) check | killed by t3-028
 M-T3-05 | accept first seq 0 | killed by t3-014
-M-T3-06 | off-by-one in the gap test: highest seq left out of the scan (equivalent mutant, see note) | SURVIVED
-M-T3-06b | off-by-one in the gap test: seq 1 left out of the scan | killed by t3-004
-M-T3-06c | off-by-one in the gap test: scan runs one past the highest seq | killed by t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-024, t3-025, t3-026, t3-027, t3-028, t3-031
+M-T3-06 | gap scan starts after seq 1 (a missing seq 1 is never a gap) | killed by t3-004
+M-T3-06b | gap scan misses a one-number gap | killed by t3-003, t3-004, t3-005, t3-020
+M-T3-06c | gap range runs one past the missing numbers | killed by t3-003, t3-004, t3-005, t3-019, t3-020, t3-035
+M-T3-06d | gap scan keeps the last seq seen, not the highest (equivalent mutant: seqs are sorted, see note) | SURVIVED
 M-T3-20 | link compared only with seq minus one (a missing predecessor is never a link failure) | killed by t3-003, t3-005, t3-020
 M-T3-07 | skip the link check | killed by t3-003, t3-005, t3-007, t3-011, t3-020, t3-026, t3-027
 M-T3-08 | skip the fork check | killed by t3-008, t3-009
 M-T3-09 | ignore teardown last_seq | killed by t3-005, t3-017
-M-T3-10 | treat an open stream as PASS | killed by t3-006
-M-T3-11 | report only the first reason code | killed by t3-003, t3-004, t3-005, t3-007, t3-009, t3-020, t3-026
+M-T3-10 | treat an open stream as PASS | killed by t3-006, t3-035
+M-T3-11 | report only the first reason code | killed by t3-003, t3-004, t3-005, t3-007, t3-009, t3-020, t3-026, t3-035
 M-T3-12 | walk in file order instead of seq order | killed by t3-007, t3-015
 M-T3-13 | accept more than one teardown | killed by t3-009, t3-025
 M-T3-14 | accept records after the teardown | killed by t3-024
 M-T3-15 | treat an empty input as PASS | killed by t3-013
 M-T3-16 | accept uppercase hex | killed by t3-022
-M-T3-17 | declared-gap range ignored (declared seqs still counted as undeclared) | killed by t3-019
 M-T3-18 | declared gap reported without the DECLARED-GAP hold (declared scope can PASS) | killed by t3-019, t3-020
-M-T3-19 | missing seqs not listed as UNDECLARED GAP | killed by t3-003, t3-004, t3-005, t3-020
+M-T3-19 | missing seqs not listed as UNDECLARED GAP | killed by t3-003, t3-004, t3-005, t3-020, t3-035
 M-IN-01 | booleans accepted as integers | killed by t14a-012
 M-IN-02 | duplicate keys accepted (last one wins) | killed by t3-021
 M-IN-03 | NFC check removed | killed by t3-018
-M-IN-04 | evidence hash over the input with newlines removed instead of the file bytes | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
+M-IN-04 | evidence hash over the input with newlines removed instead of the file bytes | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, t3-032, t3-033, t3-034, t3-035, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
 M-IN-05 | integer bound raised to 2^64 | killed by t14a-014
-M-OUT-01 | profile line dropped | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
-M-OUT-02 | V2.4 unsigned-result sentence dropped | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
-M-OUT-03 | exit code always 0 | killed by t14a-003, t14a-004, t14a-006, t14a-008, t14a-009, t14a-010, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-019, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-013, t3-014, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, alt-b-002, alt-c-002, alt-d-001
-M-OUT-04 | FAIL and HOLD precedence swapped | killed by t3-020
+M-OUT-01 | profile line dropped | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, t3-032, t3-033, t3-034, t3-035, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
+M-OUT-02 | V2.4 unsigned-result sentence dropped | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, t3-001, t3-002, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-012, t3-013, t3-014, t3-015, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, t3-032, t3-033, t3-034, t3-035, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
+M-OUT-03 | exit code always 0 | killed by t14a-003, t14a-004, t14a-006, t14a-008, t14a-009, t14a-010, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-019, t3-003, t3-004, t3-005, t3-006, t3-007, t3-008, t3-009, t3-010, t3-011, t3-013, t3-014, t3-016, t3-017, t3-018, t3-019, t3-020, t3-021, t3-022, t3-023, t3-024, t3-025, t3-026, t3-027, t3-028, t3-029, t3-030, t3-031, t3-032, t3-033, t3-034, t3-035, alt-b-002, alt-c-002, alt-d-001
+M-OUT-04 | FAIL and HOLD precedence swapped | killed by t3-020, t3-035
 M-T14-01 | T14a always PASS (all T14a checks skipped) | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
 M-T14-02 | T14a always FAIL | killed by t14a-001, t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-008, t14a-009, t14a-010, t14a-011, t14a-012, t14a-013, t14a-014, t14a-015, t14a-016, t14a-017, t14a-018, t14a-019, alt-b-001, alt-b-002, alt-c-001, alt-c-002, alt-d-001
 M-T14-03 | ignore dropped | killed by t14a-002, t14a-003, t14a-004, t14a-005, t14a-006, t14a-007, t14a-016, alt-b-001, alt-b-002, alt-d-001
@@ -6163,16 +6436,21 @@ M-ALT-D | Reading D hold disabled | killed by alt-d-001
 M-IN-06 | nesting depth check removed | killed by t3-029
 M-IN-07 | nesting limit off by one, too high (17) | killed by t3-029
 M-IN-08 | nesting limit off by one, too low (15) | killed by t3-029, t3-031
+M-IN-09 | long integers converted instead of marked (verdict depends on the interpreter limit) | killed by t3-034
+M-IN-10 | duplicate keys never reported | killed by t3-021
+M-T3-21 | gap lists always summarised (cap of zero) | killed by t3-003, t3-004, t3-005, t3-020
+M-T3-22 | declared gaps never subtracted (every declared gap reported undeclared) | killed by t3-019
+M-T3-23 | gap ranges not merged with declared ranges that touch them (cut off by one) | SURVIVED
 
-Mutants: 53. Killed: 52. Survived: 1.
+Mutants: 58. Killed: 56. Survived: 2.
 
 On survivors and history
 First run on 7 Nov 2026: 47 mutants, 44 killed, 3 survived (M-T3-04 skip the genesis check, M-T3-06, M-T14-06 tolerate an imbalance of 1). Two survivors showed missing vectors, not equivalent code. Vectors t3-028 (valid first record with a non-zero prev_hash) and t14a-019 (imbalance of exactly 1) were added, every expected.txt was regenerated from the unchanged verifier, and both mutants are now killed. Mutants M-T3-06b, M-T3-06c and M-T3-20 were added at the same time. No expected.txt was edited to kill a mutant.
-M-T3-06 survives and is an equivalent mutant: the highest seq in a stream is present by construction (it is taken from the records), so leaving it out of the missing-seq scan cannot change any output. No vector can kill it. The sharper off-by-one mutants M-T3-06b and M-T3-06c are killed.
+Build 2026-11-22d (22 Nov 2026): the gap scan was rewritten to hold missing numbers as ranges (a seq of 9007199254740991 used to exhaust memory). The old M-T3-06 targeted the removed loop. Mutants M-T3-06, M-T3-06b and M-T3-06c were rewritten against the new scan. M-T3-06d (keep the last seq seen, not the highest) and M-T3-23 (declared ranges that touch are not merged) are equivalent mutants: seqs are sorted, so keeping the last seq seen equals keeping the highest, and the subtraction gives the same ranges whether touching declared ranges are merged or not. No vector can kill them; both are the only survivors. M-IN-09, M-IN-10, M-T3-21, M-T3-22 and M-T3-23 were added with vectors t3-032 to t3-035. Earlier records said M-T3-06b, M-T3-06c and M-T3-20 were killed; in the 10c harness M-T3-06, 06b and 06c reported NOT APPLIED in a run of 22 Nov, so that statement was wrong for them.
 Limits of this record: mutants are hand-written text substitutions chosen by the same author who wrote the verifier, so they reflect that author's idea of likely mistakes. A kill shows that a vector disagrees with the mutant; it does not show that the expected outputs are right. Agreement with RT-1 or with a second reader has not been checked.
 END OF FILE: mutation/MUTATION_RECORD.txt
 
-FILE: mutation/mutate.py (SHA-256 859b9e86e56398e82aa590de9a102380de4911f29bdc67af4582c0fbaa84e69a)
+FILE: mutation/mutate.py (SHA-256 42da252a88b8ea000682315b4120b0fd705bc1740eb32d613cbba4642c081d4e)
 #!/usr/bin/env python3
 # Copyright 2026 Gareth Wong
 # SPDX-License-Identifier: Apache-2.0
@@ -6208,12 +6486,14 @@ MUTANTS = [
      'if r["prev_hash"] != ZERO_HASH:', "if False:"),
     ("M-T3-05", "accept first seq 0",
      "if lowest != 1:", "if lowest not in (0, 1):"),
-    ("M-T3-06", "off-by-one in the gap test: highest seq left out of the scan (equivalent mutant, see note)",
-     "range(1, highest + 1)", "range(1, highest)"),
-    ("M-T3-06b", "off-by-one in the gap test: seq 1 left out of the scan",
-     "range(1, highest + 1)", "range(2, highest + 1)"),
-    ("M-T3-06c", "off-by-one in the gap test: scan runs one past the highest seq",
-     "range(1, highest + 1)", "range(1, highest + 2)"),
+    ("M-T3-06", "gap scan starts after seq 1 (a missing seq 1 is never a gap)",
+     "    prev = 0\n    for s_ in seqs:", "    prev = 1\n    for s_ in seqs:"),
+    ("M-T3-06b", "gap scan misses a one-number gap",
+     "if s_ > prev + 1:", "if s_ > prev + 2:"),
+    ("M-T3-06c", "gap range runs one past the missing numbers",
+     "missing.append((prev + 1, s_ - 1))", "missing.append((prev + 1, s_))"),
+    ("M-T3-06d", "gap scan keeps the last seq seen, not the highest (equivalent mutant: seqs are sorted, see note)",
+     "prev = max(prev, s_)", "prev = s_"),
     ("M-T3-20", "link compared only with seq minus one (a missing predecessor is never a link failure)",
      "pred = seqs[idx - 1]", "pred = s - 1\n        if pred not in by_seq:\n            continue"),
     ("M-T3-07", "skip the link check",
@@ -6236,8 +6516,6 @@ MUTANTS = [
      'v.add("T3-EMPTY"', 'None and v.add("T3-EMPTY"'),
     ("M-T3-16", "accept uppercase hex",
      'HEX = set("0123456789abcdef")', 'HEX = set("0123456789abcdefABCDEF")'),
-    ("M-T3-17", "declared-gap range ignored (declared seqs still counted as undeclared)",
-     "und = [s for s in missing if s not in declared_seqs]", "und = missing"),
     ("M-T3-18", "declared gap reported without the DECLARED-GAP hold (declared scope can PASS)",
      'v.add("DECLARED-GAP", "stream', 'None and v.add("DECLARED-GAP", "stream'),
     ("M-T3-19", "missing seqs not listed as UNDECLARED GAP",
@@ -6308,6 +6586,16 @@ MUTANTS = [
      "MAX_DEPTH = 16", "MAX_DEPTH = 17"),
     ("M-IN-08", "nesting limit off by one, too low (15)",
      "MAX_DEPTH = 16", "MAX_DEPTH = 15"),
+    ("M-IN-09", "long integers converted instead of marked (verdict depends on the interpreter limit)",
+     "    if len(text) > 20:\n        return Float(text)", "    if False:\n        return Float(text)"),
+    ("M-IN-10", "duplicate keys never reported",
+     "            if DUPES:\n", "            if False:\n"),
+    ("M-T3-21", "gap lists always summarised (cap of zero)",
+     "GAP_LIST_CAP = 1000", "GAP_LIST_CAP = 0"),
+    ("M-T3-22", "declared gaps never subtracted (every declared gap reported undeclared)",
+     "und = subtract_intervals(missing, merge_intervals(declared_seqs))", "und = missing"),
+    ("M-T3-23", "gap ranges not merged with declared ranges that touch them (cut off by one)",
+     "if out and a <= out[-1][1] + 1:", "if out and a <= out[-1][1]:"),
 ]
 
 
@@ -6394,9 +6682,12 @@ def main():
         "t3-028 (valid first record with a non-zero prev_hash) and t14a-019 (imbalance of exactly 1) were added, "
         "every expected.txt was regenerated from the unchanged verifier, and both mutants are now killed. Mutants "
         "M-T3-06b, M-T3-06c and M-T3-20 were added at the same time. No expected.txt was edited to kill a mutant.",
-        "M-T3-06 survives and is an equivalent mutant: the highest seq in a stream is present by construction (it is "
-        "taken from the records), so leaving it out of the missing-seq scan cannot change any output. No vector can "
-        "kill it. The sharper off-by-one mutants M-T3-06b and M-T3-06c are killed.",
+        "Build 2026-11-22d (22 Nov 2026): the gap scan was rewritten to hold missing numbers as ranges (a seq of "
+        "9007199254740991 used to exhaust memory). The old M-T3-06 targeted the removed loop. Mutants M-T3-06, "
+        "M-T3-06b and M-T3-06c were rewritten against the new scan. M-T3-06d (keep the last seq seen, not the highest) "
+        "and M-T3-23 (declared ranges that touch are not merged) are equivalent mutants: seqs are sorted, so keeping the last seq seen equals keeping the highest, and the subtraction gives the same ranges whether touching declared ranges are merged or not. No vector can kill them; both are the only survivors. M-IN-09, M-IN-10, M-T3-21, M-T3-22 and M-T3-23 "
+        "were added with vectors t3-032 to t3-035. Earlier records said M-T3-06b, M-T3-06c and M-T3-20 were killed; in the "
+        "10c harness M-T3-06, 06b and 06c reported NOT APPLIED in a run of 22 Nov, so that statement was wrong for them.",
         "Limits of this record: mutants are hand-written text substitutions chosen by the same author who wrote the "
         "verifier, so they reflect that author's idea of likely mistakes. A kill shows that a vector disagrees with the "
         "mutant; it does not show that the expected outputs are right. Agreement with RT-1 or with a second reader has "
@@ -11243,6 +11534,394 @@ intended result: HOLD
 intended reason codes: T3-MALFORMED
 END OF FILE: vectors/T3/t3-031/intent.txt
 
+FILE: vectors/T3/t3-032/about.txt (SHA-256 8c9d6937a178c22024555ac3c8bea410504e18ffeb957e0c9ee3eed588b81bea)
+Added 22 Nov 2026. The t3-001 file cut off in the middle of the last record, as a failed copy or upload leaves it. Not valid JSON, so HOLD with INPUT-UNPARSEABLE. Models a truncated export. Expected HOLD.
+END OF FILE: vectors/T3/t3-032/about.txt
+
+FILE: vectors/T3/t3-032/expected.txt (SHA-256 12b6451fae2de1f4cf5409953d11fb2a016b7df548a5bfb6a3c9ce7674178058)
+Declaration: not read (input rejected); T1b: not run
+Clock grade: no ordering claims made by this test
+Sampling: none, every record checked
+Test: T3 | Suite: O4M Record Tests 2026 v1.0 (vector profile v0) | Evidence SHA-256: 923126163b07e1a940e47f009e575258e97ab162f99b71be4f3f3a000666b88e
+Profile: F (vector profile v0 assumes sequence numbers assigned at the source)
+Result: HOLD
+Reason codes (proposed, not normative): INPUT-UNPARSEABLE
+  INPUT-UNPARSEABLE: input is not valid UTF-8 JSON
+Declared gaps: none
+Undeclared gaps: none
+Coverage windows (C22 item 6): not run
+T14e-SHADOW: not run
+Verifier disclosure: no fee, volunteer run, no financial relationship with the operator
+Unsigned result. This is the output of the O4M Record Tests, published as plain text with the SHA-256 of the evidence it was run on. It is not a certificate, seal or approval. No certificates are issued.
+T6c: OPEN (demo time sources sign the operator clock)
+Scope 1: records of AI system operation at inference and action time only; not training, model internals or behavioural tests.
+Scope 2: policy adequacy is out of scope.
+Scope 3: no claim to any assurance level of any other scheme; any mapping is informative only.
+Scope 4: evidence after the fact; these tests prevent nothing.
+Scope 5: integrity is not truth; an intact record of false content is still false content.
+END OF FILE: vectors/T3/t3-032/expected.txt
+
+FILE: vectors/T3/t3-032/expected_exit.txt (SHA-256 53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3)
+2
+END OF FILE: vectors/T3/t3-032/expected_exit.txt
+
+FILE: vectors/T3/t3-032/input.json (SHA-256 923126163b07e1a940e47f009e575258e97ab162f99b71be4f3f3a000666b88e)
+{
+  "declaration": {
+    "consequential_action_types": [
+      "payment"
+    ],
+    "tolerances": {
+      "max_gap": 0,
+      "max_clock_skew_s": 5,
+      "max_unsealed_window_s": 60
+    },
+    "fail_mode": "fail-closed",
+    "monitors": [],
+    "declared_gaps": []
+  },
+  "records": [
+    {
+      "stream_id": "s1",
+      "seq": 1,
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "type": "event",
+      "data": "s1 event 1",
+      "hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 2,
+      "prev_hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f",
+      "type": "event",
+      "data": "s1 event 2",
+      "hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 3,
+      "prev_hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd",
+      "type": "event",
+      "data": "s1 event 3",
+      "hash": "e0344161fab948f6fdb6735ca6985d4870c1c7d33722910e4397b05abefdaaed"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 4,
+      "prev_hash": "e0344161fab948f6fdb6735ca6985d4870c1c7d33722910e4397b05abefdaaed",
+      "type": "event",
+      "data": "s1 event 4",
+      "hash": "e726e2f420b6d7d5a7f11a8c2868e96632144a290d83ddf6da6022e6ecc88db1"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 5,
+      "prev_hash": "e726e2f420b6d7d5a7f11a8c2868e96632144a290d83ddf6da6022e6ecc88db1",
+      "type": "event",
+      "data": "s1 event 5",
+      "hash": "2d6cf5245621d7664f7bd910957f75500ad69959ff24effc04c5836d337d7363"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 6,
+      "prev_hash": "2d6cf5245621d7664f7bd910957f75500ad69959ff24effc04c5836d337d7363",
+END OF FILE: vectors/T3/t3-032/input.json
+
+FILE: vectors/T3/t3-032/intent.txt (SHA-256 59e70c77bd881ca1b67b66994d73d9af19401dcdc20af8698b9fd6288b75c94b)
+command: python verify.py T3 vectors/T3/t3-032/input.json
+intended result: HOLD
+intended reason codes: INPUT-UNPARSEABLE
+END OF FILE: vectors/T3/t3-032/intent.txt
+
+FILE: vectors/T3/t3-033/about.txt (SHA-256 1f92dfa3eb8431753a667794123270f7d6f6d311a2b1c2ed08477288e2515822)
+Added 22 Nov 2026. Same truncated file as t3-032 with one key written twice in the first record. Before build 2026-11-22d the duplicate key was reported first and the file got FAIL (INPUT-DUPKEY) although it was not valid JSON at all. Now syntax is checked first: an unreadable file is HOLD whatever it contains. Expected HOLD.
+END OF FILE: vectors/T3/t3-033/about.txt
+
+FILE: vectors/T3/t3-033/expected.txt (SHA-256 0c6a0056f2177a66948cd2215db7b5e58642dbc01ec51e80626f2fc36441aaec)
+Declaration: not read (input rejected); T1b: not run
+Clock grade: no ordering claims made by this test
+Sampling: none, every record checked
+Test: T3 | Suite: O4M Record Tests 2026 v1.0 (vector profile v0) | Evidence SHA-256: 0b641ab9f478bd2fa96d515a8c3ff061b711ef7f6fb5b078359b98ac09edb5df
+Profile: F (vector profile v0 assumes sequence numbers assigned at the source)
+Result: HOLD
+Reason codes (proposed, not normative): INPUT-UNPARSEABLE
+  INPUT-UNPARSEABLE: input is not valid UTF-8 JSON
+Declared gaps: none
+Undeclared gaps: none
+Coverage windows (C22 item 6): not run
+T14e-SHADOW: not run
+Verifier disclosure: no fee, volunteer run, no financial relationship with the operator
+Unsigned result. This is the output of the O4M Record Tests, published as plain text with the SHA-256 of the evidence it was run on. It is not a certificate, seal or approval. No certificates are issued.
+T6c: OPEN (demo time sources sign the operator clock)
+Scope 1: records of AI system operation at inference and action time only; not training, model internals or behavioural tests.
+Scope 2: policy adequacy is out of scope.
+Scope 3: no claim to any assurance level of any other scheme; any mapping is informative only.
+Scope 4: evidence after the fact; these tests prevent nothing.
+Scope 5: integrity is not truth; an intact record of false content is still false content.
+END OF FILE: vectors/T3/t3-033/expected.txt
+
+FILE: vectors/T3/t3-033/expected_exit.txt (SHA-256 53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3)
+2
+END OF FILE: vectors/T3/t3-033/expected_exit.txt
+
+FILE: vectors/T3/t3-033/input.json (SHA-256 0b641ab9f478bd2fa96d515a8c3ff061b711ef7f6fb5b078359b98ac09edb5df)
+{
+  "declaration": {
+    "consequential_action_types": [
+      "payment"
+    ],
+    "tolerances": {
+      "max_gap": 0,
+      "max_clock_skew_s": 5,
+      "max_unsealed_window_s": 60
+    },
+    "fail_mode": "fail-closed",
+    "monitors": [],
+    "declared_gaps": []
+  },
+  "records": [
+    {
+      "stream_id": "s1",
+      "seq": 1,
+      "seq": 1,
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "type": "event",
+      "data": "s1 event 1",
+      "hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 2,
+      "prev_hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f",
+      "type": "event",
+      "data": "s1 event 2",
+      "hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 3,
+      "prev_hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd",
+      "type": "event",
+      "data": "s1 event 3",
+      "hash": "e0344161fab948f6fdb6735ca6985d4870c1c7d33722910e4397b05abefdaaed"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 4,
+      "prev_hash": "e0344161fab948f6fdb6735ca6985d4870c1c7d33722910e4397b05abefdaaed",
+      "type": "event",
+      "data": "s1 event 4",
+      "hash": "e726e2f420b6d7d5a7f11a8c2868e96632144a290d83ddf6da6022e6ecc88db1"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 5,
+      "prev_hash": "e726e2f420b6d7d5a7f11a8c2868e96632144a290d83ddf6da6022e6ecc88db1",
+      "type": "event",
+      "data": "s1 event 5",
+      "hash": "2d6cf5245621d7664f7bd910957f75500ad69959ff24effc04c5836d337d7363"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 6,
+      "prev_hash": "2d6cf5245621d7664f7bd910957f75500ad69959ff24effc04c5836d337d7363",
+END OF FILE: vectors/T3/t3-033/input.json
+
+FILE: vectors/T3/t3-033/intent.txt (SHA-256 fbe2c0d40092dca5c3821aef37df4e2ab5d35596560d4d5c45c3c3aacbffa611)
+command: python verify.py T3 vectors/T3/t3-033/input.json
+intended result: HOLD
+intended reason codes: INPUT-UNPARSEABLE
+END OF FILE: vectors/T3/t3-033/intent.txt
+
+FILE: vectors/T3/t3-034/about.txt (SHA-256 8c22fbee7c773f024ce76c424512df719b59b1ae4192c48dfc924622268338ad)
+Added 22 Nov 2026. One seq written as an integer of 5,000 digits. Python 3.11 and later refuse to convert such a string unless PYTHONINTMAXSTRDIGITS is changed, so before build 2026-11-22d the verdict could depend on an environment variable. Now an integer longer than 20 characters is read as out of profile (outside plus or minus 2^53-1): T3-MALFORMED, HOLD. Expected HOLD.
+END OF FILE: vectors/T3/t3-034/about.txt
+
+FILE: vectors/T3/t3-034/expected.txt (SHA-256 4e7a0311d0784d50fa7120c152363b6e6f6369544bd3ed2e1fc21e09fd0fee92)
+Declaration: consequential action types declared: 1; tolerances: max gap 0, max clock skew 5 s, max unsealed window 60 s; fail mode: fail-closed; monitors: none declared; declared gaps: none, covering 0 of 1 consequential action types; T1b: not run
+Clock grade: no ordering claims made by this test
+Sampling: none, every record checked
+Test: T3 | Suite: O4M Record Tests 2026 v1.0 (vector profile v0) | Evidence SHA-256: 638222209e567f41dabd6fa4699c8c9a0e3d701a30b8dd8a8c99a55e762ce053
+Profile: F (vector profile v0 assumes sequence numbers assigned at the source)
+Result: HOLD
+Reason codes (proposed, not normative): T3-MALFORMED
+  T3-MALFORMED: stream s1, record number 3 in file order (seq field 9999999999999999... (5000 characters)): fields or types outside vector profile v0
+Declared gaps: none
+Undeclared gaps: none
+Coverage windows (C22 item 6): not run
+T14e-SHADOW: not run
+Verifier disclosure: no fee, volunteer run, no financial relationship with the operator
+Unsigned result. This is the output of the O4M Record Tests, published as plain text with the SHA-256 of the evidence it was run on. It is not a certificate, seal or approval. No certificates are issued.
+T6c: OPEN (demo time sources sign the operator clock)
+Scope 1: records of AI system operation at inference and action time only; not training, model internals or behavioural tests.
+Scope 2: policy adequacy is out of scope.
+Scope 3: no claim to any assurance level of any other scheme; any mapping is informative only.
+Scope 4: evidence after the fact; these tests prevent nothing.
+Scope 5: integrity is not truth; an intact record of false content is still false content.
+END OF FILE: vectors/T3/t3-034/expected.txt
+
+FILE: vectors/T3/t3-034/expected_exit.txt (SHA-256 53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3)
+2
+END OF FILE: vectors/T3/t3-034/expected_exit.txt
+
+FILE: vectors/T3/t3-034/input.json (SHA-256 638222209e567f41dabd6fa4699c8c9a0e3d701a30b8dd8a8c99a55e762ce053)
+{
+  "declaration": {
+    "consequential_action_types": [
+      "payment"
+    ],
+    "tolerances": {
+      "max_gap": 0,
+      "max_clock_skew_s": 5,
+      "max_unsealed_window_s": 60
+    },
+    "fail_mode": "fail-closed",
+    "monitors": [],
+    "declared_gaps": []
+  },
+  "records": [
+    {
+      "stream_id": "s1",
+      "seq": 1,
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "type": "event",
+      "data": "s1 event 1",
+      "hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 2,
+      "prev_hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f",
+      "type": "event",
+      "data": "s1 event 2",
+      "hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999,
+      "prev_hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd",
+      "type": "event",
+      "data": "s1 event 3",
+      "hash": "e0344161fab948f6fdb6735ca6985d4870c1c7d33722910e4397b05abefdaaed"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 4,
+      "prev_hash": "e0344161fab948f6fdb6735ca6985d4870c1c7d33722910e4397b05abefdaaed",
+      "type": "event",
+      "data": "s1 event 4",
+      "hash": "e726e2f420b6d7d5a7f11a8c2868e96632144a290d83ddf6da6022e6ecc88db1"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 5,
+      "prev_hash": "e726e2f420b6d7d5a7f11a8c2868e96632144a290d83ddf6da6022e6ecc88db1",
+      "type": "event",
+      "data": "s1 event 5",
+      "hash": "2d6cf5245621d7664f7bd910957f75500ad69959ff24effc04c5836d337d7363"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 6,
+      "prev_hash": "2d6cf5245621d7664f7bd910957f75500ad69959ff24effc04c5836d337d7363",
+      "type": "teardown",
+      "data": "s1 teardown",
+      "last_seq": 5,
+      "hash": "e663dc2edba040dd623725ff14dc7038870b31f3df377abac723f8603bbc03ee"
+    }
+  ]
+}
+END OF FILE: vectors/T3/t3-034/input.json
+
+FILE: vectors/T3/t3-034/intent.txt (SHA-256 7503ab80cfc1ec47c8db5d44886e44c3f8dc698127a40122c854c0b9091508fd)
+command: python verify.py T3 vectors/T3/t3-034/input.json
+intended result: HOLD
+intended reason codes: T3-MALFORMED
+END OF FILE: vectors/T3/t3-034/intent.txt
+
+FILE: vectors/T3/t3-035/about.txt (SHA-256 3103827f308aebe20cf532cb9a3d44aaa56876f952897dadc8b8c2e95bca174b)
+Added 22 Nov 2026. Two events (seq 1, 2) then one at seq 9007199254740991, the largest integer vector profile v0 allows, with no teardown. Before build 2026-11-22d the gap scan built a list of about 9e15 numbers and ran out of memory. Now gaps are held as ranges: one range, T3-GAP, and the open stream is reported as T3-OPEN. Result FAIL in seconds. Expected FAIL.
+END OF FILE: vectors/T3/t3-035/about.txt
+
+FILE: vectors/T3/t3-035/expected.txt (SHA-256 e82279784b03de97ce71f503cd4f339cf7b39bc9637200d2e90c54f122b89231)
+Declaration: consequential action types declared: 1; tolerances: max gap 0, max clock skew 5 s, max unsealed window 60 s; fail mode: fail-closed; monitors: none declared; declared gaps: none, covering 0 of 1 consequential action types; T1b: not run
+Clock grade: no ordering claims made by this test
+Sampling: none, every record checked
+Test: T3 | Suite: O4M Record Tests 2026 v1.0 (vector profile v0) | Evidence SHA-256: e2156dba7104486926b3962825a302fe653ff3f2d224ea438dec2997063e1afd
+Profile: F (vector profile v0 assumes sequence numbers assigned at the source)
+Result: FAIL
+Reason codes (proposed, not normative): T3-GAP, T3-OPEN
+  T3-GAP: stream s1: missing 9007199254740988 seq numbers in 1 ranges, first range 3 to 9007199254740990
+  T3-OPEN: stream s1: no teardown; tail completeness not established
+Declared gaps: none
+Undeclared gaps:
+  UNDECLARED GAP: stream s1: missing 9007199254740988 seq numbers in 1 ranges, first range 3 to 9007199254740990
+Coverage windows (C22 item 6): not run
+T14e-SHADOW: not run
+Verifier disclosure: no fee, volunteer run, no financial relationship with the operator
+Unsigned result. This is the output of the O4M Record Tests, published as plain text with the SHA-256 of the evidence it was run on. It is not a certificate, seal or approval. No certificates are issued.
+T6c: OPEN (demo time sources sign the operator clock)
+Scope 1: records of AI system operation at inference and action time only; not training, model internals or behavioural tests.
+Scope 2: policy adequacy is out of scope.
+Scope 3: no claim to any assurance level of any other scheme; any mapping is informative only.
+Scope 4: evidence after the fact; these tests prevent nothing.
+Scope 5: integrity is not truth; an intact record of false content is still false content.
+END OF FILE: vectors/T3/t3-035/expected.txt
+
+FILE: vectors/T3/t3-035/expected_exit.txt (SHA-256 4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865)
+1
+END OF FILE: vectors/T3/t3-035/expected_exit.txt
+
+FILE: vectors/T3/t3-035/input.json (SHA-256 e2156dba7104486926b3962825a302fe653ff3f2d224ea438dec2997063e1afd)
+{
+  "declaration": {
+    "consequential_action_types": [
+      "payment"
+    ],
+    "tolerances": {
+      "max_gap": 0,
+      "max_clock_skew_s": 5,
+      "max_unsealed_window_s": 60
+    },
+    "fail_mode": "fail-closed",
+    "monitors": [],
+    "declared_gaps": []
+  },
+  "records": [
+    {
+      "stream_id": "s1",
+      "seq": 1,
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "type": "event",
+      "data": "s1 event 1",
+      "hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 2,
+      "prev_hash": "c70eb8e6c16b43741eaaf6b1c5c348393f9d902b38a72fd61e9209d2b50fcf2f",
+      "type": "event",
+      "data": "s1 event 2",
+      "hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd"
+    },
+    {
+      "stream_id": "s1",
+      "seq": 9007199254740991,
+      "prev_hash": "d9060b3423defff4daa8cd1d799cabd9af515ae5c5ebd5ce6750d65c989a91bd",
+      "type": "event",
+      "data": "s1 event far away",
+      "hash": "04ff3e8af976ba87af9a31b8c7511e1b10070494d9253afb14f800fcd51a0e2e"
+    }
+  ]
+}
+END OF FILE: vectors/T3/t3-035/input.json
+
+FILE: vectors/T3/t3-035/intent.txt (SHA-256 57996a0bf4e673a3c5dfa1746ba73b01bcf5414b12a6a74e87506c1144d9e38d)
+command: python verify.py T3 vectors/T3/t3-035/input.json
+intended result: FAIL
+intended reason codes: T3-GAP, T3-OPEN
+END OF FILE: vectors/T3/t3-035/intent.txt
+
 FILE: vectors/alt-readings/alt-b-001/about.txt (SHA-256 7b0e082657ca40756fc520044710199373bc24e3d5e336aab8909bde0164bcd6)
 Reading B (counters never decrease between checkpoints). Three cumulative checkpoints, each counter rising or level. Expected PASS under Reading B.
 END OF FILE: vectors/alt-readings/alt-b-001/about.txt
@@ -11720,7 +12399,7 @@ intended result: HOLD
 intended reason codes: DECLARED-GAP
 END OF FILE: vectors/alt-readings/alt-d-001/intent.txt
 
-FILE: verify.py (SHA-256 ed7ac40559d0524a524f44116cabd226c485fb9fc61ac275d686f72ce05aa228)
+FILE: verify.py (SHA-256 4b1246fcb2996a07618351971c18ba984d74c9e7ff9b7c4685519685df2e811f)
 #!/usr/bin/env python3
 # Copyright 2026 Gareth Wong
 # SPDX-License-Identifier: Apache-2.0
@@ -11781,14 +12460,36 @@ class Float:
     def __init__(self, text):
         self.text = text
 
+    def __repr__(self):
+        # Printed inside T3-MALFORMED details. Without this the default repr leaked a memory address,
+        # so two runs on the same bytes printed different text (found by the mutation harness, 22 Nov 2026).
+        if len(self.text) <= 24:
+            return self.text
+        return "%s... (%d characters)" % (self.text[:16], len(self.text))
+
+
+DUPES = []
+
 
 def pairs_hook(pairs):
+    # Duplicate keys are recorded, not raised, so that the whole file is syntax-checked first:
+    # an unreadable file is HOLD whatever it contains; INPUT-DUPKEY is reported only for a file
+    # that parses completely (proposed 22 Nov 2026, from outside comment of 16 Nov).
     obj = {}
     for k, v in pairs:
         if k in obj:
-            raise DupKey(k)
+            DUPES.append(k)
         obj[k] = v
     return obj
+
+
+def parse_int(text):
+    # Profile v0 integers are at most 2^53 - 1 in size, so at most 16 digits plus a sign. A longer
+    # integer is marked, not converted, so the verdict does not depend on the interpreter's
+    # integer-string limit (PYTHONINTMAXSTRDIGITS, Python 3.10.7 and later).
+    if len(text) > 20:
+        return Float(text)
+    return int(text)
 
 
 def canonical(obj):
@@ -11980,7 +12681,7 @@ def run_t3(top, decl, v):
     declared = {}
     if decl:
         for g in decl["declared_gaps"]:
-            declared.setdefault(g["stream_id"], set()).update(range(g["from_seq"], g["to_seq"] + 1))
+            declared.setdefault(g["stream_id"], []).append((g["from_seq"], g["to_seq"]))
             v.declared.append("stream %s seq %d to %d (%s): %s"
                               % (g["stream_id"], g["from_seq"], g["to_seq"], g["action_type"], g["reason"]))
             v.add("DECLARED-GAP", "stream %s seq %d to %d declared as not captured; reported as DECLARED GAP, never PASS for that scope"
@@ -11988,7 +12689,45 @@ def run_t3(top, decl, v):
     for sid in sorted(streams):
         if sid in bad_streams:
             continue
-        t3_stream(sid, streams[sid], declared.get(sid, set()), v)
+        t3_stream(sid, streams[sid], declared.get(sid, []), v)
+
+
+def merge_intervals(ivs):
+    out = []
+    for a, b in sorted(ivs):
+        if out and a <= out[-1][1] + 1:
+            out[-1] = (out[-1][0], max(out[-1][1], b))
+        else:
+            out.append((a, b))
+    return out
+
+
+def subtract_intervals(ivs, cuts):
+    # ivs and cuts are lists of inclusive (a, b); cuts must be merged. No sequence is expanded.
+    out = []
+    for a, b in ivs:
+        cur = a
+        for c, d in cuts:
+            if d < cur or c > b:
+                continue
+            if c > cur:
+                out.append((cur, c - 1))
+            cur = max(cur, d + 1)
+            if cur > b:
+                break
+        if cur <= b:
+            out.append((cur, b))
+    return out
+
+
+GAP_LIST_CAP = 1000
+
+
+def describe_missing(ivs):
+    total = sum(b - a + 1 for a, b in ivs)
+    if total <= GAP_LIST_CAP:
+        return "seq " + ", ".join(str(n) for a, b in ivs for n in range(a, b + 1))
+    return "%d seq numbers in %d ranges, first range %d to %d" % (total, len(ivs), ivs[0][0], ivs[0][1])
 
 
 def t3_stream(sid, rs, declared_seqs, v):
@@ -12009,11 +12748,16 @@ def t3_stream(sid, rs, declared_seqs, v):
             if r["prev_hash"] != ZERO_HASH:
                 v.add("T3-START", "stream %s seq 1: prev_hash is not the zero value" % sid)
     # (c) gaps
-    missing = [s for s in range(1, highest + 1) if s not in by_seq]
-    und = [s for s in missing if s not in declared_seqs]
+    missing = []
+    prev = 0
+    for s_ in seqs:
+        if s_ > prev + 1:
+            missing.append((prev + 1, s_ - 1))
+        prev = max(prev, s_)
+    und = subtract_intervals(missing, merge_intervals(declared_seqs))
     if und:
-        v.add("T3-GAP", "stream %s: missing seq %s" % (sid, ", ".join(str(s) for s in und)))
-        v.undeclared.append("stream %s: missing seq %s" % (sid, ", ".join(str(s) for s in und)))
+        v.add("T3-GAP", "stream %s: missing %s" % (sid, describe_missing(und)))
+        v.undeclared.append("stream %s: missing %s" % (sid, describe_missing(und)))
     # (d) forks
     for s in seqs:
         if len(by_seq[s]) > 1:
@@ -12191,9 +12935,10 @@ def main(argv):
     else:
         try:
             top = json.loads(raw.decode("utf-8"), object_pairs_hook=pairs_hook,
-                             parse_float=Float, parse_constant=Float)
-        except DupKey as e:
-            v.add("INPUT-DUPKEY", "duplicate key %r; vector profile v0 rejects duplicate keys" % str(e))
+                             parse_float=Float, parse_int=parse_int, parse_constant=Float)
+            if DUPES:
+                v.add("INPUT-DUPKEY", "duplicate key %r; vector profile v0 rejects duplicate keys" % str(DUPES[0]))
+                top = None
         except (ValueError, UnicodeDecodeError):
             v.add("INPUT-UNPARSEABLE", "input is not valid UTF-8 JSON")
         except RecursionError:
