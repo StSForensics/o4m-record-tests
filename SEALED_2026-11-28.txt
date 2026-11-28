@@ -1,0 +1,37 @@
+SEALED, O4M Record Tests second reader run, 28 November 2026 (Europe/London, UTC+00:00)
+Only hashes are published here. The files themselves (amended rule text, reader prompt, ten inputs r2-01 to r2-10, and the expected results) are kept private until the readers' results are in, planned after 4 December 2026. Anyone can then check each file against these lines with: sha256sum -c
+Verifier used for the expected results: verify.py, build 2026-11-22d, commit be8393c, unchanged.
+
+6dc38b3b8af996781c1223962457cda2cd2f5c0b6567e510e12026d26542596d  2026-11-28_O4M-Record-Tests_amended-rule-text_second-run_DRAFT_v1.txt
+8b2e9c7477ffe6347d66f4fd33516e88ac303c9d1615cbe71e77db7bff6da84d  2026-11-28_second-run_READER_PROMPT_v1.txt
+06644ebcee3becaf3e0927299506d5477f601efd0b9b9e35ee6ba259a9e342ef  inputs/r2-01__T14a.json
+9260037d92c55ba3bd0700219aa77299bd35d6316916ee97a0f2e94bf7c84bb1  inputs/r2-02__T14a.json
+1378bae35daf9505093d2ef63a2ec18b1d94c6550cc22f8b7c5a8f8d1d2c97ab  inputs/r2-03__T14a.json
+031174fa3ac63dd214c2443f7782bc3744899ca0e554e59b8c1c43b934a8b896  inputs/r2-04__T14a.json
+8c9553bffc5de455696c59e08b78c0d022f6a5400935b166e76f344cc40bbb2d  inputs/r2-05__T14a.json
+c75d6b403eee07c465a91ff8883e48dc4dc8973317796089340408d76d15c5f6  inputs/r2-06__T14a.json
+38dcfe89c8d54f057ffa3c256eafa008b70b4348f90d8bdc2953d38d84612c4b  inputs/r2-07__T3.json
+389da07a56a8c116df52b665fa0391d3965e31e66105c102fed07835363d7249  inputs/r2-08__T3.json
+977e8c8099f3f9cb9d3cbe1c776c97968cfcd932127470a11cc447fca29e6c54  inputs/r2-09__T3.json
+1ce9dfbde09f50de4f66736b935489e96882acfe4e00db06346cbd085d4e1032  inputs/r2-10__T3.json
+2dd4e0914ca5f6dca0ff70b9710dc13f653d694d6c9914982e8d16d09ad39dc5  2026-11-28_second-run_KEY_r2-01_to_r2-10_PRIVATE_v1.txt
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  expected/r2-01__T14a.exit.txt
+d7c1ef382452ea8d162953ce78a6abc146d1ef04c3b53d30fbf936df5abcb74a  expected/r2-01__T14a.expected.txt
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  expected/r2-02__T14a.exit.txt
+9da379f28987a6b621539e525cb7ef6902c2b83572ed8f3e2e89949a52e4b826  expected/r2-02__T14a.expected.txt
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  expected/r2-03__T14a.exit.txt
+e735aa73779e38346aba5315c350528ba909d237f18f3d68d44fdc36fc5c6744  expected/r2-03__T14a.expected.txt
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  expected/r2-04__T14a.exit.txt
+ac4a4fcdd10d40293725f341eb02c01f7cb0e151c83b501b62139e63c48b5192  expected/r2-04__T14a.expected.txt
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  expected/r2-05__T14a.exit.txt
+38a63ded271c15032408b0cfb1d2520b3b18e796ee143f8a292746bb201681f4  expected/r2-05__T14a.expected.txt
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  expected/r2-06__T14a.exit.txt
+9ff3f46b06b001f7aa916983da0a0fba0507392f70f28946786ebda84ba8ece6  expected/r2-06__T14a.expected.txt
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  expected/r2-07__T3.exit.txt
+026c2716470559f95894d83cc4b04c78fad930caa8107688c2f7ae8fa3a7d7ba  expected/r2-07__T3.expected.txt
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  expected/r2-08__T3.exit.txt
+1d960142b9bc72ee1f3fc6e28e1248916f43cfc48c60e918d2db2ffb8adf8a7a  expected/r2-08__T3.expected.txt
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  expected/r2-09__T3.exit.txt
+4659ebed9d2ceca0e8cabeb6ac0f8a63515f62d8576304da3308f179ac63c962  expected/r2-09__T3.expected.txt
+4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865  expected/r2-10__T3.exit.txt
+50f6687681500e47c888863b3c1b41f795d2cee748ca8415b195cd8b92378747  expected/r2-10__T3.expected.txt
